@@ -1225,6 +1225,14 @@ if (interaction.isButton()) {
         const label = interaction.options.getString("label", true).trim();
         const type = interaction.options.getString("type", true);
         const required = interaction.options.getBoolean("required", true);
+		
+		if (label.length > 45) {
+		  await interaction.reply({
+			content: "Can't exceed 45 characters", // à ajouter dans tes fichiers de langue
+			flags: MessageFlags.Ephemeral,
+		  });
+		  return;
+		}
 
         const existingQuestions = getGuildVerificationQuestionsStmt.all(
           interaction.guild.id
@@ -1315,9 +1323,17 @@ if (interaction.isButton()) {
         }
 
         const index = interaction.options.getInteger("index", true);
-        const newLabel = interaction.options.getString("label");
+        const newLabel = interaction.options.getString("label", true).trim();
         const newType = interaction.options.getString("type");
         const newRequired = interaction.options.getBoolean("required");
+		
+		if (newLabel.length > 45) {
+		  await interaction.reply({
+			content: "Can't exceed 45 characters", // à ajouter dans tes fichiers de langue
+			flags: MessageFlags.Ephemeral,
+		  });
+		  return;
+		}
 
         const question = getGuildVerificationQuestionByIndexStmt.get(
           interaction.guild.id,

@@ -164,6 +164,11 @@ Funkcja ta wysyła alerty do administracji, gdy użytkownik wysyła dużą liczb
   spamInfoNombre : "Liczba wiadomości, po której przekroczeniu uruchamiane jest powiadomienie",
   spamInfoDuree : "Czas trwania okna wykrywania w sekundach",
   DelaiDescriptionCommande : "Czas w godzinach na przesłanie odpowiedzi weryfikacyjnych",
+  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Aktualna konfiguracja weryfikacji**
+
+1) Rola używana do weryfikacji członków : ${verifiedRoleDisplay}
+2) Rola używana do powiadamiania zespołu moderacji : ${verifiedRoleDisplay}
+3) Maksymalny czas na rozpoczęcie weryfikacji : ${verifiedRoleDisplay} godzina(y)`,
 };
 
 const pl_out = {

@@ -72,6 +72,7 @@ dotenv.config();
 const TOKEN = process.env.DISCORD_TOKEN!;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID!;
 const GUILD_ID = process.env.DISCORD_GUILD_ID!;
+const isProduction = process.env.BOT_EN_PRODUCTION === "1";
 
 // =========================
 // CLIENT
@@ -377,39 +378,39 @@ const commands = [
 		  [Locale.German]: cmd_de.newQuestionTypeDescription,
 		  [Locale.Polish]: cmd_pl.newQuestionTypeDescription,
 		})
-        .setRequired(false)
+    .setRequired(false)
 		.addChoices(
-		  {
-			name: cmd_en.choiceShortText,
-			value: "text_short",
-			name_localizations: {
-			  [Locale.French]: cmd_fr.choiceShortText,
-			  [Locale.SpanishES]: cmd_es.choiceShortText,
-			  [Locale.German]: cmd_de.choiceShortText,
-			  [Locale.Polish]: cmd_pl.choiceShortText,
-			},
-		  },
-		  {
-			name: cmd_en.choiceParagraph,
-			value: "text_paragraph",
-			name_localizations: {
-			  [Locale.French]: cmd_fr.choiceParagraph,
-			  [Locale.SpanishES]: cmd_es.choiceParagraph,
-			  [Locale.German]: cmd_de.choiceParagraph,
-			  [Locale.Polish]: cmd_pl.choiceParagraph,
-			},
-		  },
-		  {
-			name: cmd_en.choiceImageUpload,
-			value: "file_image",
-			name_localizations: {
-			  [Locale.French]: cmd_fr.choiceImageUpload,
-			  [Locale.SpanishES]: cmd_es.choiceImageUpload,
-			  [Locale.German]: cmd_de.choiceImageUpload,
-			  [Locale.Polish]: cmd_pl.choiceImageUpload,
-			},
-		  }
-		)
+          {
+          name: cmd_en.choiceShortText,
+          value: "text_short",
+          name_localizations: {
+            [Locale.French]: cmd_fr.choiceShortText,
+            [Locale.SpanishES]: cmd_es.choiceShortText,
+            [Locale.German]: cmd_de.choiceShortText,
+            [Locale.Polish]: cmd_pl.choiceShortText,
+          },
+          },
+          {
+          name: cmd_en.choiceParagraph,
+          value: "text_paragraph",
+          name_localizations: {
+            [Locale.French]: cmd_fr.choiceParagraph,
+            [Locale.SpanishES]: cmd_es.choiceParagraph,
+            [Locale.German]: cmd_de.choiceParagraph,
+            [Locale.Polish]: cmd_pl.choiceParagraph,
+          },
+          },
+          {
+          name: cmd_en.choiceImageUpload,
+          value: "file_image",
+          name_localizations: {
+            [Locale.French]: cmd_fr.choiceImageUpload,
+            [Locale.SpanishES]: cmd_es.choiceImageUpload,
+            [Locale.German]: cmd_de.choiceImageUpload,
+            [Locale.Polish]: cmd_pl.choiceImageUpload,
+          },
+          }
+        )
     )
     .addBooleanOption((option) =>
       option
@@ -555,6 +556,17 @@ const commands = [
       .setRequired(false)
       .setMinValue(5)
   ),
+  // 1) Dans le tableau commands, ajoute cette commande
+new SlashCommandBuilder()
+  .setName("view-setup-verification")
+  .setDescription("Display the current verification setup for this server")
+  .setDescriptionLocalizations({
+    [Locale.French]: "Affiche la configuration actuelle de vérification de ce serveur",
+    [Locale.SpanishES]: "Muestra la configuración actual de verificación de este servidor",
+    [Locale.German]: "Zeigt die aktuelle Verifizierungskonfiguration dieses Servers an",
+    [Locale.Polish]: "Wyświetla obecną konfigurację weryfikacji tego serwera",
+  })
+  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -817,12 +829,23 @@ client.once(Events.ClientReady, async (readyClient) => {
   try {
     // Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),   : pour tester sur un seul serveur 
     // Routes.applicationCommands(CLIENT_ID),    : pour déployer sur d'autres serveurs
+    // isProduction : 1 en production, 0 pour en test
 
     const rest = new REST({ version: "10" }).setToken(TOKEN);
+    /*
     await rest.put(
       Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
       { body: commands }
     );
+    */
+
+  await rest.put(
+    isProduction
+      ? Routes.applicationCommands(CLIENT_ID)
+      : Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
+    { body: commands }
+  );
+
     console.log("✅ Commandes slash enregistrées");
   } catch (error) {
     console.error("❌ Erreur enregistrement commandes :", error);
@@ -1555,6 +1578,50 @@ if (interaction.isButton()) {
 
 	  return;
 	}
+
+  if (interaction.commandName === "view-setup-verification") {
+    if (!isUsedOnAServer(interaction)) {
+      await interaction.reply({
+        content: msgIn.commandMustBeUsedInServer,
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    const settings = getGuildVerificationSettingsStmt.get(
+      interaction.guild.id
+    ) as GuildVerificationSettingsRow | undefined;
+
+    if (!settings) {
+      await interaction.reply({
+        content: msgIn.verificationNotConfigured,
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    const verifiedRole = interaction.guild.roles.cache.get(settings.verified_role_id);
+    const staffRole = interaction.guild.roles.cache.get(settings.staff_role_id);
+
+    const verifiedRoleDisplay = verifiedRole
+      ? `<@&${settings.verified_role_id}>`
+      : `Rôle introuvable (${settings.verified_role_id})`;
+
+    const staffRoleDisplay = staffRole
+      ? `<@&${settings.staff_role_id}>`
+      : `Rôle introuvable (${settings.staff_role_id})`;
+
+    await interaction.reply({
+      content:
+        `**Configuration actuelle de la vérification**\n\n` +
+        `1) Rôle utilisé pour vérifier les membres : ${verifiedRoleDisplay}\n` +
+        `2) Rôle utilisé pour signaler l'équipe de modération : ${staffRoleDisplay}\n` +
+        `3) Délai maximal pour lancer la vérification : ${settings.verification_timeout_hours} heure(s)`,
+      flags: MessageFlags.Ephemeral,
+    });
+
+    return;
+  }
 
       return;
     }

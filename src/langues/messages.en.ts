@@ -156,6 +156,11 @@ This feature sends alerts to staff when a user sends an unusually high number of
   spamInfoNombre : "Number of messages required to trigger an alert",
   spamInfoDuree : "Duration in seconds of the detection window",
   DelaiDescriptionCommande : "Time limit in hours to submit verification responses",
+  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Current verification configuration**
+
+1) Role used to verify members : ${verifiedRoleDisplay}
+2) Role used to notify the moderation team : ${verifiedRoleDisplay}
+3) Maximum time allowed to start verification : ${verifiedRoleDisplay} hour(s)`,
 };
 
 const en_out = {

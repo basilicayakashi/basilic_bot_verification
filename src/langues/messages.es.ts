@@ -156,6 +156,11 @@ Esta función envía alertas al staff cuando un usuario envía muchos mensajes e
   spamInfoNombre : "Número de mensajes a partir del cual se activa una alerta",
   spamInfoDuree : "Duración en segundos de la ventana de detección",
   DelaiDescriptionCommande : "Tiempo en horas para enviar las respuestas de verificación",
+  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Configuración actual de la verificación**
+
+1) Rol utilizado para verificar a los miembros : ${verifiedRoleDisplay}
+2) Rol utilizado para notificar al equipo de moderación : ${verifiedRoleDisplay}
+3) Tiempo máximo permitido para iniciar la verificación : ${verifiedRoleDisplay} hora(s)`,
 };
 
 const es_out = {

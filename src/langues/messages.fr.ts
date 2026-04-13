@@ -157,6 +157,11 @@ Cette fonctionnalité permet d’envoyer des alertes au staff lorsqu’un membre
   spamInfoNombre : "Nombre de messages à partir duquel une alerte est déclenchée",
   spamInfoDuree : "Durée en secondes de la fenêtre de détection",
   DelaiDescriptionCommande : "Délai en heures pour soumettre les réponses de vérification",
+  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Configuration actuelle de la vérification**
+
+1) Rôle utilisé pour vérifier les membres : ${verifiedRoleDisplay}
+2) Rôle utilisé pour signaler l'équipe de modération : ${verifiedRoleDisplay}
+3) Délai maximal pour lancer la vérification : ${verifiedRoleDisplay} heure(s)`,
 };
 
 const fr_out = {

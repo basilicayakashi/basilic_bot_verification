@@ -157,6 +157,11 @@ Diese Funktion benachrichtigt das Team, wenn ein Nutzer viele Nachrichten in kur
   spamInfoNombre : "Anzahl der Nachrichten, ab der eine Warnung ausgelöst wird",
   spamInfoDuree : "Dauer des Erkennungszeitfensters in Sekunden",
   DelaiDescriptionCommande : "Zeitlimit in Stunden zum Einreichen der Verifizierungsantworten",
+  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Aktuelle Verifizierungskonfiguration**
+
+1) Rolle zur Verifizierung von Mitgliedern : ${verifiedRoleDisplay}
+2) Rolle zur Benachrichtigung des Moderationsteams : ${verifiedRoleDisplay}
+3) Maximale Zeit, um die Verifizierung zu starten : ${verifiedRoleDisplay} Stunde(n)`,
 };
 
 const de_out = {

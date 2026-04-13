@@ -159,8 +159,8 @@ Esta función envía alertas al staff cuando un usuario envía muchos mensajes e
   ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Configuración actual de la verificación**
 
 1) Rol utilizado para verificar a los miembros : ${verifiedRoleDisplay}
-2) Rol utilizado para notificar al equipo de moderación : ${verifiedRoleDisplay}
-3) Tiempo máximo permitido para iniciar la verificación : ${verifiedRoleDisplay} hora(s)`,
+2) Rol utilizado para notificar al equipo de moderación : ${staffRoleDisplay}
+3) Tiempo máximo permitido para iniciar la verificación : ${verification_timeout_hours} hora(s)`,
 };
 
 const es_out = {

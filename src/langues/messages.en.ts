@@ -159,8 +159,8 @@ This feature sends alerts to staff when a user sends an unusually high number of
   ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Current verification configuration**
 
 1) Role used to verify members : ${verifiedRoleDisplay}
-2) Role used to notify the moderation team : ${verifiedRoleDisplay}
-3) Maximum time allowed to start verification : ${verifiedRoleDisplay} hour(s)`,
+2) Role used to notify the moderation team : ${staffRoleDisplay}
+3) Maximum time allowed to start verification : ${verification_timeout_hours} hour(s)`,
 };
 
 const en_out = {

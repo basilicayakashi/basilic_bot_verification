@@ -160,8 +160,8 @@ Cette fonctionnalité permet d’envoyer des alertes au staff lorsqu’un membre
   ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Configuration actuelle de la vérification**
 
 1) Rôle utilisé pour vérifier les membres : ${verifiedRoleDisplay}
-2) Rôle utilisé pour signaler l'équipe de modération : ${verifiedRoleDisplay}
-3) Délai maximal pour lancer la vérification : ${verifiedRoleDisplay} heure(s)`,
+2) Rôle utilisé pour signaler l'équipe de modération : ${staffRoleDisplay}
+3) Délai maximal pour lancer la vérification : ${verification_timeout_hours} heure(s)`,
 };
 
 const fr_out = {

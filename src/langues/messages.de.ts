@@ -160,8 +160,8 @@ Diese Funktion benachrichtigt das Team, wenn ein Nutzer viele Nachrichten in kur
   ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Aktuelle Verifizierungskonfiguration**
 
 1) Rolle zur Verifizierung von Mitgliedern : ${verifiedRoleDisplay}
-2) Rolle zur Benachrichtigung des Moderationsteams : ${verifiedRoleDisplay}
-3) Maximale Zeit, um die Verifizierung zu starten : ${verifiedRoleDisplay} Stunde(n)`,
+2) Rolle zur Benachrichtigung des Moderationsteams : ${staffRoleDisplay}
+3) Maximale Zeit, um die Verifizierung zu starten : ${verification_timeout_hours} Stunde(n)`,
 };
 
 const de_out = {

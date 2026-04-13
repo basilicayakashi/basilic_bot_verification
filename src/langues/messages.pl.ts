@@ -167,8 +167,8 @@ Funkcja ta wysyła alerty do administracji, gdy użytkownik wysyła dużą liczb
   ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Aktualna konfiguracja weryfikacji**
 
 1) Rola używana do weryfikacji członków : ${verifiedRoleDisplay}
-2) Rola używana do powiadamiania zespołu moderacji : ${verifiedRoleDisplay}
-3) Maksymalny czas na rozpoczęcie weryfikacji : ${verifiedRoleDisplay} godzina(y)`,
+2) Rola używana do powiadamiania zespołu moderacji : ${staffRoleDisplay}
+3) Maksymalny czas na rozpoczęcie weryfikacji : ${verification_timeout_hours} godzina(y)`,
 };
 
 const pl_out = {

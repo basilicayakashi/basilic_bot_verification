@@ -1612,11 +1612,7 @@ if (interaction.isButton()) {
       : `Rôle introuvable (${settings.staff_role_id})`;
 
     await interaction.reply({
-      content:
-        `**Configuration actuelle de la vérification**\n\n` +
-        `1) Rôle utilisé pour vérifier les membres : ${verifiedRoleDisplay}\n` +
-        `2) Rôle utilisé pour signaler l'équipe de modération : ${staffRoleDisplay}\n` +
-        `3) Délai maximal pour lancer la vérification : ${settings.verification_timeout_hours} heure(s)`,
+      content: msgIn.ViewVeriicationsetup(verifiedRoleDisplay, staffRoleDisplay, settings.verification_timeout_hours),
       flags: MessageFlags.Ephemeral,
     });
 

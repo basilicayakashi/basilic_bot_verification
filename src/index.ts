@@ -46,8 +46,10 @@ import {
   deletePendingVerificationSubmissionStmt,
   getExpiredPendingVerificationSubmissionsStmt,
   getGuildWelcomeMessageStmt,
+  getGuildWelcomeMessagesAllStmt,
   upsertGuildWelcomeMessageStmt,
   deleteGuildWelcomeMessageStmt,
+
 } from "./database/sql.js";
 
 import type {
@@ -613,35 +615,74 @@ new SlashCommandBuilder()
       .setRequired(true)
       .setMaxLength(2000)
   ),
-  new SlashCommandBuilder()
-  .setName("delete-welcome-message")
-  .setDescription("Delete a welcome DM message for this server")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Supprime un message privé de bienvenue pour ce serveur",
-    [Locale.SpanishES]: "Elimina un mensaje privado de bienvenida para este servidor",
-    [Locale.German]: "Löscht eine private Willkommensnachricht für diesen Server",
-    [Locale.Polish]: "Usuwa prywatną wiadomość powitalną dla tego serwera",
-  })
-  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-  .addStringOption((option) =>
-    option
-      .setName("language")
-      .setDescription("Language of the welcome message to delete")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Langue du message de bienvenue à supprimer",
-        [Locale.SpanishES]: "Idioma del mensaje de bienvenida que se eliminará",
-        [Locale.German]: "Sprache der zu löschenden Willkommensnachricht",
-        [Locale.Polish]: "Język wiadomości powitalnej do usunięcia",
-      })
-      .setRequired(true)
-      .addChoices(
-        { name: "Français", value: "fr" },
-        { name: "English", value: "en" },
-        { name: "Español", value: "es" },
-        { name: "Deutsch", value: "de" },
-        { name: "Polski", value: "pl" }
-      )
-  ),
+	new SlashCommandBuilder()
+	  .setName("delete-welcome-message")
+	  .setDescription("Delete a welcome DM message for this server")
+	  .setDescriptionLocalizations({
+		[Locale.French]: "Supprime un message privé de bienvenue pour ce serveur",
+		[Locale.SpanishES]: "Elimina un mensaje privado de bienvenida para este servidor",
+		[Locale.German]: "Löscht eine private Willkommensnachricht für diesen Server",
+		[Locale.Polish]: "Usuwa prywatną wiadomość powitalną dla tego serwera",
+	  })
+	  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+	  .addStringOption((option) =>
+		option
+		  .setName("language")
+		  .setDescription("Language of the welcome message to delete")
+		  .setDescriptionLocalizations({
+			[Locale.French]: "Langue du message de bienvenue à supprimer",
+			[Locale.SpanishES]: "Idioma del mensaje de bienvenida que se eliminará",
+			[Locale.German]: "Sprache der zu löschenden Willkommensnachricht",
+			[Locale.Polish]: "Język wiadomości powitalnej do usunięcia",
+		  })
+		  .setRequired(true)
+		  .addChoices(
+			{ name: "Français", value: "fr" },
+			{ name: "English", value: "en" },
+			{ name: "Español", value: "es" },
+			{ name: "Deutsch", value: "de" },
+			{ name: "Polski", value: "pl" }
+		  )
+	  ),
+	new SlashCommandBuilder()
+	  .setName("view-welcome-messages")
+	  .setDescription("Show configured welcome DM messages for this server")
+	  .setDescriptionLocalizations({
+		[Locale.French]: "Affiche les messages privés de bienvenue configurés pour ce serveur",
+		[Locale.SpanishES]: "Muestra los mensajes privados de bienvenida configurados para este servidor",
+		[Locale.German]: "Zeigt die konfigurierten privaten Willkommensnachrichten für diesen Server an",
+		[Locale.Polish]: "Wyświetla skonfigurowane prywatne wiadomości powitalne dla tego serwera",
+	  })
+	  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+	new SlashCommandBuilder()
+	  .setName("test-welcome-message")
+	  .setDescription("Preview the welcome DM for a specific language")
+	  .setDescriptionLocalizations({
+		[Locale.French]: "Prévisualise le message privé de bienvenue pour une langue donnée",
+		[Locale.SpanishES]: "Previsualiza el mensaje privado de bienvenida para un idioma concreto",
+		[Locale.German]: "Zeigt die private Willkommensnachricht für eine bestimmte Sprache als Vorschau an",
+		[Locale.Polish]: "Wyświetla podgląd prywatnej wiadomości powitalnej dla wybranego języka",
+	  })
+	  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+	  .addStringOption((option) =>
+		option
+		  .setName("language")
+		  .setDescription("Language to preview")
+		  .setDescriptionLocalizations({
+			[Locale.French]: "Langue à prévisualiser",
+			[Locale.SpanishES]: "Idioma para previsualizar",
+			[Locale.German]: "Sprache für die Vorschau",
+			[Locale.Polish]: "Język do podglądu",
+		  })
+		  .setRequired(true)
+		  .addChoices(
+			{ name: "Français", value: "fr" },
+			{ name: "English", value: "en" },
+			{ name: "Español", value: "es" },
+			{ name: "Deutsch", value: "de" },
+			{ name: "Polski", value: "pl" }
+		  )
+	  ),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -691,6 +732,16 @@ function splitMessage(text: string, maxLength = 2000): string[] {
   }
 
   return chunks;
+}
+
+function normalizeSupportedLocale(locale: string | null | undefined): "fr" | "en" | "es" | "de" | "pl" {
+  const value = (locale ?? "en").toLowerCase();
+
+  if (value.startsWith("fr")) return "fr";
+  if (value.startsWith("es")) return "es";
+  if (value.startsWith("de")) return "de";
+  if (value.startsWith("pl")) return "pl";
+  return "en";
 }
 
 async function canUseSetupVerification(interaction: any): Promise<boolean> {
@@ -1177,8 +1228,6 @@ if (interaction.isButton()) {
       }
 
       if (interaction.commandName === "check-member") {
-        if (!(await requireGuild(interaction, msgIn.commandMustBeUsedInServer))) return;
-
         const context = await requireStaffOnConfiguredGuild(interaction, msgIn);
         if (!context) return;
 
@@ -1247,8 +1296,6 @@ if (interaction.isButton()) {
       }
 
       if (interaction.commandName === "blacklist-member") {
-        if (!(await requireGuild(interaction, msgIn.commandMustBeUsedInServer))) return;
-
         const context = await requireStaffOnConfiguredGuild(interaction, msgIn);
         if (!context) return;
 
@@ -1299,7 +1346,6 @@ if (interaction.isButton()) {
       }
 
       if (interaction.commandName === "add-verification-question") {
-        if (!(await requireGuild(interaction, msgIn.commandMustBeUsedInServer))) return;
         if (!(await requireAuthorizedGuildOwner(interaction, msgIn.notAllowedManageQuestions))) return;
 
         const guildSettings = await getGuildVerificationSettingsOrReply(interaction, msgIn);
@@ -1475,28 +1521,26 @@ if (interaction.isButton()) {
       }
 		  
 	if (interaction.commandName === "unblacklist-member") {
-    if (!(await requireGuild(interaction, msgIn.commandMustBeUsedInServer))) return;
+		const context = await requireStaffOnConfiguredGuild(interaction, msgIn);
+		if (!context) return;
 
-    const context = await requireStaffOnConfiguredGuild(interaction, msgIn);
-    if (!context) return;
+		const targetUserId = interaction.options.getString("user_id", true);
 
-    const targetUserId = interaction.options.getString("user_id", true);
+		const blacklistedRecord = getBlacklistedUserStmt.get(
+		  interaction.guild!.id,
+		  targetUserId
+		) as BlacklistedUserRow | undefined;
 
-    const blacklistedRecord = getBlacklistedUserStmt.get(
-      interaction.guild!.id,
-      targetUserId
-    ) as BlacklistedUserRow | undefined;
+		if (!blacklistedRecord) {
+		  await replyEphemeral(interaction, msgIn.userNotBlacklisted(targetUserId));
+		  return;
+		}
 
-    if (!blacklistedRecord) {
-      await replyEphemeral(interaction, msgIn.userNotBlacklisted(targetUserId));
-      return;
-    }
+		deleteBlacklistedUserStmt.run(interaction.guild!.id, targetUserId);
 
-    deleteBlacklistedUserStmt.run(interaction.guild!.id, targetUserId);
-
-    await replyEphemeral(interaction, msgIn.userRemovedFromBlacklist(targetUserId));
-    return;
-  }
+		await replyEphemeral(interaction, msgIn.userRemovedFromBlacklist(targetUserId));
+		return;
+	  }
 	
 	if (interaction.commandName === "setup-spam-detection") {
 	  const member = await interaction.guild!.members.fetch(interaction.user.id);
@@ -1587,6 +1631,163 @@ if (interaction.isButton()) {
 
     return;
   }
+  
+	if (interaction.commandName === "set-welcome-message") {
+	  const member = await interaction.guild.members.fetch(interaction.user.id);
+
+	  if (!isAdministrator(member, interaction)) {
+		await interaction.reply({
+		  content: msgIn.onlyStaffCanUseCommand,
+		  flags: MessageFlags.Ephemeral,
+		});
+		return;
+	  }
+
+	  const locale = interaction.options.getString("language", true);
+	  const dmMessage = interaction.options.getString("message", true).trim();
+
+	  upsertGuildWelcomeMessageStmt.run(
+		interaction.guild.id,
+		locale,
+		dmMessage,
+		new Date().toISOString()
+	  );
+
+	  await interaction.reply({
+		content: `✅ Welcome message saved for \`${locale}\`.`,
+		flags: MessageFlags.Ephemeral,
+	  });
+
+	  return;
+	}
+	
+	if (interaction.commandName === "delete-welcome-message") {
+	  const member = await interaction.guild.members.fetch(interaction.user.id);
+
+	  if (!isAdministrator(member, interaction)) {
+		await interaction.reply({
+		  content: msgIn.onlyStaffCanUseCommand,
+		  flags: MessageFlags.Ephemeral,
+		});
+		return;
+	  }
+
+	  const locale = interaction.options.getString("language", true);
+
+	  const existingMessage = getGuildWelcomeMessageStmt.get(
+		interaction.guild.id,
+		locale
+	  ) as GuildWelcomeMessageRow | undefined;
+
+	  if (!existingMessage) {
+		await interaction.reply({
+		  content: `No welcome message exists for \`${locale}\` on this server.`,
+		  flags: MessageFlags.Ephemeral,
+		});
+		return;
+	  }
+
+	  deleteGuildWelcomeMessageStmt.run(interaction.guild.id, locale);
+
+	  await interaction.reply({
+		content: `✅ Welcome message deleted for \`${locale}\`.`,
+		flags: MessageFlags.Ephemeral,
+	  });
+
+	  return;
+	}
+	
+	if (interaction.commandName === "view-welcome-messages") {
+	  const member = await interaction.guild.members.fetch(interaction.user.id);
+
+	  if (!isAdministrator(member, interaction)) {
+		await interaction.reply({
+		  content: msgIn.onlyStaffCanUseCommand,
+		  flags: MessageFlags.Ephemeral,
+		});
+		return;
+	  }
+
+	  const welcomeMessages = getGuildWelcomeMessagesAllStmt.all(
+		interaction.guild.id
+	  ) as GuildWelcomeMessageRow[];
+
+	  if (welcomeMessages.length === 0) {
+		await interaction.reply({
+		  content: "No welcome messages are configured for this server.",
+		  flags: MessageFlags.Ephemeral,
+		});
+		return;
+	  }
+
+	  const content =
+		"**Configured welcome messages:**\n\n" +
+		welcomeMessages
+		  .map((row) => `- \`${row.locale}\` → ${row.dm_message}`)
+		  .join("\n");
+
+	  const chunks = splitMessage(content);
+
+	  await interaction.reply({
+		content: chunks[0],
+		flags: MessageFlags.Ephemeral,
+	  });
+
+	  for (let i = 1; i < chunks.length; i++) {
+		await interaction.followUp({
+		  content: chunks[i],
+		  flags: MessageFlags.Ephemeral,
+		});
+	  }
+
+	  return;
+	}
+	
+	if (interaction.commandName === "test-welcome-message") {
+	  const member = await interaction.guild.members.fetch(interaction.user.id);
+
+	  if (!isAdministrator(member, interaction)) {
+		await interaction.reply({
+		  content: msgIn.onlyStaffCanUseCommand,
+		  flags: MessageFlags.Ephemeral,
+		});
+		return;
+	  }
+
+	  const locale = interaction.options.getString("language", true);
+
+	  const localizedWelcome = getGuildWelcomeMessageStmt.get(
+		interaction.guild.id,
+		locale
+	  ) as GuildWelcomeMessageRow | undefined;
+
+	  const fallbackWelcome =
+		locale === "en"
+		  ? undefined
+		  : (getGuildWelcomeMessageStmt.get(
+			  interaction.guild.id,
+			  "en"
+			) as GuildWelcomeMessageRow | undefined);
+
+	  const welcomeMessage = localizedWelcome ?? fallbackWelcome;
+
+	  if (!welcomeMessage) {
+		await interaction.reply({
+		  content: `No welcome message exists for \`${locale}\`, and no English fallback is configured either.`,
+		  flags: MessageFlags.Ephemeral,
+		});
+		return;
+	  }
+
+	  await interaction.reply({
+		content:
+		  `**Preview for \`${locale}\`:**\n\n` +
+		  welcomeMessage.dm_message,
+		flags: MessageFlags.Ephemeral,
+	  });
+
+	  return;
+	}
 
       return;
     }
@@ -1792,6 +1993,34 @@ client.on(Events.GuildMemberAdd, async (member) => {
       }
 
       return; // ⚠️ STOP ici
+    }
+	
+	// =========================
+    // 2️⃣ WELCOME DM
+    // =========================
+    const targetLocale = normalizeSupportedLocale(member.guild.preferredLocale);
+
+    const localizedWelcome = getGuildWelcomeMessageStmt.get(
+      member.guild.id,
+      targetLocale
+    ) as GuildWelcomeMessageRow | undefined;
+
+    const fallbackWelcome =
+      targetLocale === "en"
+        ? undefined
+        : (getGuildWelcomeMessageStmt.get(
+            member.guild.id,
+            "en"
+          ) as GuildWelcomeMessageRow | undefined);
+
+    const welcomeMessage = localizedWelcome ?? fallbackWelcome;
+
+    if (welcomeMessage) {
+      try {
+        await member.send(welcomeMessage.dm_message);
+      } catch {
+        // DMs fermés
+      }
     }
 
     // =========================

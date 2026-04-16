@@ -169,6 +169,7 @@ Funkcja ta wysyła alerty do administracji, gdy użytkownik wysyła dużą liczb
 1) Rola używana do weryfikacji członków : ${verifiedRoleDisplay}
 2) Rola używana do powiadamiania zespołu moderacji : ${staffRoleDisplay}
 3) Maksymalny czas na rozpoczęcie weryfikacji : ${verification_timeout_hours} godzina(y)`,
+NotAuthorizedServer: "Serwer nie został autoryzowany, nie można używać żadnej komendy",
 };
 
 const pl_out = {

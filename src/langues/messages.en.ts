@@ -161,6 +161,7 @@ This feature sends alerts to staff when a user sends an unusually high number of
 1) Role used to verify members : ${verifiedRoleDisplay}
 2) Role used to notify the moderation team : ${staffRoleDisplay}
 3) Maximum time allowed to start verification : ${verification_timeout_hours} hour(s)`,
+  NotAuthorizedServer: "The server has not been authorized, it is impossible to use any command",
 };
 
 const en_out = {

@@ -117,7 +117,7 @@ Cette fonctionnalité permet d’envoyer des alertes au staff lorsqu’un membre
     userNotKickable: (name: string, id: string) => `❌ ${name} (${id}) — utilisateur impossible à expulser`,
     userKicked: (name: string, id: string) => `✅ ${name} (${id}) — expulsé`,
     unexpectedError: (guildId: string) => `❌ ${guildId} — erreur inattendue`,
-	
+    	
 	BlacklistedUserFound: (
 	  userId: string,
 	  username: string,
@@ -162,6 +162,7 @@ Cette fonctionnalité permet d’envoyer des alertes au staff lorsqu’un membre
 1) Rôle utilisé pour vérifier les membres : ${verifiedRoleDisplay}
 2) Rôle utilisé pour signaler l'équipe de modération : ${staffRoleDisplay}
 3) Délai maximal pour lancer la vérification : ${verification_timeout_hours} heure(s)`,
+NotAuthorizedServer: "Le serveur n'a pas été autorisé, impossible d'utiliser la moindre commande",
 };
 
 const fr_out = {

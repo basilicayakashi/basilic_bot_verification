@@ -45,6 +45,9 @@ import {
   insertPendingVerificationSubmissionStmt,
   deletePendingVerificationSubmissionStmt,
   getExpiredPendingVerificationSubmissionsStmt,
+  getGuildWelcomeMessageStmt,
+  upsertGuildWelcomeMessageStmt,
+  deleteGuildWelcomeMessageStmt,
 } from "./database/sql.js";
 
 import type {
@@ -55,6 +58,7 @@ import type {
   GuildVerificationQuestionRow,
   GuildVerificationSettingsRow,
   GuildSpamSettingsRow,
+  GuildWelcomeMessageRow,
 } from "./database/sql.js";
 
 import { handleVerificationButtons, handleVerificationModals} from "./moderation/verification-flow.js";
@@ -567,6 +571,77 @@ new SlashCommandBuilder()
     [Locale.Polish]: "Wyświetla obecną konfigurację weryfikacji tego serwera",
   })
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  new SlashCommandBuilder()
+  .setName("set-welcome-message")
+  .setDescription("Create or update a welcome DM message for this server")
+  .setDescriptionLocalizations({
+    [Locale.French]: "Crée ou met à jour un message de bienvenue privé pour ce serveur",
+    [Locale.SpanishES]: "Crea o actualiza un mensaje privado de bienvenida para este servidor",
+    [Locale.German]: "Erstellt oder aktualisiert eine private Willkommensnachricht für diesen Server",
+    [Locale.Polish]: "Tworzy lub aktualizuje prywatną wiadomość powitalną dla tego serwera",
+  })
+  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+  .addStringOption((option) =>
+    option
+      .setName("language")
+      .setDescription("Language of the welcome message")
+      .setDescriptionLocalizations({
+        [Locale.French]: "Langue du message de bienvenue",
+        [Locale.SpanishES]: "Idioma del mensaje de bienvenida",
+        [Locale.German]: "Sprache der Willkommensnachricht",
+        [Locale.Polish]: "Język wiadomości powitalnej",
+      })
+      .setRequired(true)
+      .addChoices(
+        { name: "Français", value: "fr" },
+        { name: "English", value: "en" },
+        { name: "Español", value: "es" },
+        { name: "Deutsch", value: "de" },
+        { name: "Polski", value: "pl" }
+      )
+  )
+  .addStringOption((option) =>
+    option
+      .setName("message")
+      .setDescription("Private welcome message to send")
+      .setDescriptionLocalizations({
+        [Locale.French]: "Message privé de bienvenue à envoyer",
+        [Locale.SpanishES]: "Mensaje privado de bienvenida para enviar",
+        [Locale.German]: "Private Willkommensnachricht, die gesendet wird",
+        [Locale.Polish]: "Prywatna wiadomość powitalna do wysłania",
+      })
+      .setRequired(true)
+      .setMaxLength(2000)
+  ),
+  new SlashCommandBuilder()
+  .setName("delete-welcome-message")
+  .setDescription("Delete a welcome DM message for this server")
+  .setDescriptionLocalizations({
+    [Locale.French]: "Supprime un message privé de bienvenue pour ce serveur",
+    [Locale.SpanishES]: "Elimina un mensaje privado de bienvenida para este servidor",
+    [Locale.German]: "Löscht eine private Willkommensnachricht für diesen Server",
+    [Locale.Polish]: "Usuwa prywatną wiadomość powitalną dla tego serwera",
+  })
+  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+  .addStringOption((option) =>
+    option
+      .setName("language")
+      .setDescription("Language of the welcome message to delete")
+      .setDescriptionLocalizations({
+        [Locale.French]: "Langue du message de bienvenue à supprimer",
+        [Locale.SpanishES]: "Idioma del mensaje de bienvenida que se eliminará",
+        [Locale.German]: "Sprache der zu löschenden Willkommensnachricht",
+        [Locale.Polish]: "Język wiadomości powitalnej do usunięcia",
+      })
+      .setRequired(true)
+      .addChoices(
+        { name: "Français", value: "fr" },
+        { name: "English", value: "en" },
+        { name: "Español", value: "es" },
+        { name: "Deutsch", value: "de" },
+        { name: "Polski", value: "pl" }
+      )
+  ),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -619,8 +694,6 @@ function splitMessage(text: string, maxLength = 2000): string[] {
 }
 
 async function canUseSetupVerification(interaction: any): Promise<boolean> {
-  if (!isUsedOnAServer(interaction)) return false;
-
   const permission = getSetupPermissionStmt.get(
     interaction.guild.id,
     interaction.user.id
@@ -776,26 +849,28 @@ function buildDisabledDecisionButtonsRow(finalAction: "approved" | "rejected" | 
 }
 
 function isGuildOwner(interaction: any): boolean {
-  if (!isUsedOnAServer(interaction)) return false;
   return interaction.guild.ownerId === interaction.user.id;
 }
 
+async function replyEphemeral(interaction: any, content: string) {
+  await interaction.reply({
+    content,
+    flags: MessageFlags.Ephemeral,
+  });
+}
+
 function isBasilicOrAuthorizedGuildOwner(interaction: any): boolean {
-  if (!isUsedOnAServer(interaction)) return false;
+  if (isBasilic(interaction)) return true;
 
-  if (isBasilic(interaction)) {
-    return true;
-  }
+  return isAuthorizedServer(interaction) && isGuildOwner(interaction);
+}
 
+function isAuthorizedServer(interaction: any): boolean {
   const guildAllowed = getSetupPermissionStmt.get(
     interaction.guild.id
   ) as SetupVerificationPermissionRow | undefined;
 
-  if (!guildAllowed) {
-    return false;
-  }
-
-  return isGuildOwner(interaction);
+  return !!guildAllowed;
 }
 
 //si c'est moi
@@ -819,6 +894,81 @@ function isAdministrator(member: any, interaction: any): boolean {
   return member.permissions.has(PermissionFlagsBits.Administrator) || isBasilic(interaction);
 }
 
+async function requireGuild(
+  interaction: any,
+  msg: string
+): Promise<boolean> {
+  if (isUsedOnAServer(interaction)) return true;
+
+  await replyEphemeral(interaction, msg);
+  return false;
+}
+
+async function getGuildVerificationSettingsOrReply(
+  interaction: any,
+  msgIn: any
+): Promise<GuildVerificationSettingsRow | null> {
+  const settings = getGuildVerificationSettingsStmt.get(
+    interaction.guild.id
+  ) as GuildVerificationSettingsRow | undefined;
+
+  if (!settings) {
+    await replyEphemeral(interaction, msgIn.verificationNotConfigured);
+    return null;
+  }
+
+  return settings;
+}
+
+async function getCallingMember(interaction: any) {
+  return interaction.guild.members.fetch(interaction.user.id);
+}
+
+async function requireAuthorizedGuildOwner(
+  interaction: any,
+  deniedMessage: string
+): Promise<boolean> {
+  if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
+    await replyEphemeral(interaction, deniedMessage);
+    return false;
+  }
+
+  return true;
+}
+
+async function requireStaffOnConfiguredGuild(
+  interaction: any,
+  msgIn: any
+): Promise<{ member: any; settings: GuildVerificationSettingsRow } | null> {
+  const member = await getCallingMember(interaction);
+  const settings = await getGuildVerificationSettingsOrReply(interaction, msgIn);
+
+  if (!settings) return null;
+
+  if (
+    !isAdministrator(member, interaction) &&
+    !member.roles.cache.has(settings.staff_role_id)
+  ) {
+    await replyEphemeral(interaction, msgIn.onlyStaffCanUseCommand);
+    return null;
+  }
+
+  return { member, settings };
+}
+
+async function requireAdminOnGuild(
+  interaction: any,
+  msgIn: any
+): Promise<any | null> {
+  const member = await getCallingMember(interaction);
+
+  if (!isAdministrator(member, interaction)) {
+    await replyEphemeral(interaction, msgIn.onlyStaffCanUseCommand);
+    return null;
+  }
+
+  return member;
+}
 
 // =========================
 // READY
@@ -918,11 +1068,9 @@ if (interaction.isButton()) {
 
   // ===== BAN =====
   if (interaction.customId.startsWith("spam:ban:")) {
-      if (!isUsedOnAServer(interaction)) return;
-
       const [, action, guildId, userId] = interaction.customId.split(":");
 
-      const member = await interaction.guild.members.fetch(userId).catch(() => null);
+      const member = await interaction.guild!.members.fetch(userId).catch(() => null);
 
       if (member?.bannable) {
         await member.ban({
@@ -955,15 +1103,24 @@ if (interaction.isButton()) {
     // 1) COMMANDES SLASH
     // =========================================
     if (interaction.isChatInputCommand()) {
-      if (interaction.commandName === "setup-verification") {
+        
+      //on veut que les commandes soient utilisées sur un serveur, pas en MP
         if (!isUsedOnAServer(interaction)) {
-          await interaction.reply({
-            content: msgIn.commandMustBeUsedInServer,
-            flags: MessageFlags.Ephemeral,
-          });
+          await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
           return;
         }
 
+        //sur toutes les commandes autres que "allow-setup-verification"
+        if (
+          interaction.commandName !== "allow-setup-verification" &&
+          !isBasilic(interaction) &&
+          !isAuthorizedServer(interaction)
+        ) {
+          await replyEphemeral(interaction, msgIn.NotAuthorizedServer);
+          return;
+        }
+
+      if (interaction.commandName === "setup-verification") {
         if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
           await interaction.reply({
             content: msgIn.notAllowedConfigureVerification,
@@ -980,7 +1137,7 @@ if (interaction.isButton()) {
         const nowIso = new Date().toISOString();
 
         upsertGuildVerificationSettingsStmt.run(
-          interaction.guild.id,
+          interaction.guild!.id,
           verifiedRoleId.id,
           staffCategoryId,
           staffRoleId.id,
@@ -1020,143 +1177,80 @@ if (interaction.isButton()) {
       }
 
       if (interaction.commandName === "check-member") {
-		  if (!isUsedOnAServer(interaction)) {
-			await interaction.reply({
-			  content: msgIn.commandMustBeUsedInServer,
-			  flags: MessageFlags.Ephemeral,
-			});
-			return;
-		  }
+        if (!(await requireGuild(interaction, msgIn.commandMustBeUsedInServer))) return;
 
-		  const member = await interaction.guild.members.fetch(interaction.user.id);
+        const context = await requireStaffOnConfiguredGuild(interaction, msgIn);
+        if (!context) return;
 
-		  const guildSettings = getGuildVerificationSettingsStmt.get(interaction.guild.id) as
-			| GuildVerificationSettingsRow
-			| undefined;
+        const targetUserId = interaction.options.getString("user_id", true);
 
-		  if (!guildSettings) {
-			await interaction.reply({
-			  content: msgIn.verificationNotConfigured,
-			  flags: MessageFlags.Ephemeral,
-			});
-			return;
-		  }
+        const verifiedRecord = getVerifiedUserStmt.get(targetUserId) as VerifiedUserRow | undefined;
+        const blacklistedHere = getBlacklistedUserStmt.get(
+          interaction.guild!.id,
+          targetUserId
+        ) as BlacklistedUserRow | undefined;
+        const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
+          targetUserId
+        ) as BlacklistedUserRow[];
+        const foundGuilds = await findUserGuilds(targetUserId);
 
-		  if (
-			!isAdministrator(member, interaction) &&
-			!member.roles.cache.has(guildSettings.staff_role_id)
-		  ) {
-			await interaction.reply({
-			  content: msgIn.onlyStaffCanUseCommand,
-			  flags: MessageFlags.Ephemeral,
-			});
-			return;
-		  }
+        let content = "";
 
-		  const targetUserId = interaction.options.getString("user_id", true);
+        if (verifiedRecord) {
+          content += msgIn.VerifiedUserFound(
+            verifiedRecord.user_id,
+            verifiedRecord.username,
+            verifiedRecord.verified_at,
+            verifiedRecord.verified_by
+          );
+        } else {
+          content += msgIn.userUnknownToTheBot(targetUserId);
+        }
 
-		  const verifiedRecord = getVerifiedUserStmt.get(targetUserId) as VerifiedUserRow | undefined;
-		  const blacklistedHere = getBlacklistedUserStmt.get(
-			interaction.guild.id,
-			targetUserId
-		  ) as BlacklistedUserRow | undefined;
-		  const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
-			targetUserId
-		  ) as BlacklistedUserRow[];
-		  const foundGuilds = await findUserGuilds(targetUserId);
+        if (blacklistedHere) {
+          content +=
+            "\n\n" +
+            msgIn.BlacklistedUserFound(
+              blacklistedHere.user_id,
+              blacklistedHere.username,
+              blacklistedHere.blacklisted_at,
+              blacklistedHere.blacklisted_by,
+              blacklistedHere.reason ?? msgIn.noReasonProvided
+            );
+        }
 
-		  let content = "";
+        if (blacklistedEverywhere.length > 0) {
+          const blacklistLines = blacklistedEverywhere.map(
+            (entry) =>
+              `${entry.guild_id} — ${entry.blacklisted_at} — ${entry.reason ?? msgIn.noReasonProvided}`
+          );
 
-		  if (verifiedRecord) {
-			content += msgIn.VerifiedUserFound(
-			  verifiedRecord.user_id,
-			  verifiedRecord.username,
-			  verifiedRecord.verified_at,
-			  verifiedRecord.verified_by
-			);
-		  } else {
-			content += msgIn.userUnknownToTheBot(targetUserId);
-		  }
+          content +=
+            "\n\n" +
+            msgIn.memberBlacklistedOnServers(formatGuildList(blacklistLines));
+        }
 
-		  if (blacklistedHere) {
-			content +=
-			  "\n\n" +
-			  msgIn.BlacklistedUserFound(
-				blacklistedHere.user_id,
-				blacklistedHere.username,
-				blacklistedHere.blacklisted_at,
-				blacklistedHere.blacklisted_by,
-				blacklistedHere.reason ?? msgIn.noReasonProvided
-			  );
-		  }
+        content += "\n\n" + msgIn.memberPresentOnServers(formatGuildList(foundGuilds));
 
-		  if (blacklistedEverywhere.length > 0) {
-			const blacklistLines = blacklistedEverywhere.map(
-			  (entry) =>
-				`${entry.guild_id} — ${entry.blacklisted_at} — ${
-				  entry.reason ?? msgIn.noReasonProvided
-				}`
-			);
+        const chunks = splitMessage(content);
 
-			content +=
-			  "\n\n" +
-			  msgIn.memberBlacklistedOnServers(formatGuildList(blacklistLines));
-		  }
+        await replyEphemeral(interaction, chunks[0]);
 
-		  content +=
-			"\n\n" +
-			msgIn.memberPresentOnServers(formatGuildList(foundGuilds));
+        for (let i = 1; i < chunks.length; i++) {
+          await interaction.followUp({
+            content: chunks[i],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
 
-      const chunks = splitMessage(content);
-
-      await interaction.reply({
-        content: chunks[0],
-        flags: MessageFlags.Ephemeral,
-      });
-
-      for (let i = 1; i < chunks.length; i++) {
-        await interaction.followUp({
-          content: chunks[i],
-          flags: MessageFlags.Ephemeral,
-        });
+        return;
       }
 
-		  return;
-		}
-
       if (interaction.commandName === "blacklist-member") {
-        if (!isUsedOnAServer(interaction)) {
-          await interaction.reply({
-            content: msgIn.commandMustBeUsedInServer,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
+        if (!(await requireGuild(interaction, msgIn.commandMustBeUsedInServer))) return;
 
-        const staffMember = await interaction.guild.members.fetch(interaction.user.id);
-
-        const guildSettings = getGuildVerificationSettingsStmt.get(interaction.guild.id) as
-          | GuildVerificationSettingsRow
-          | undefined;
-
-        if (!guildSettings) {
-          await interaction.reply({
-            content: msgIn.verificationNotConfigured,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        if (
-          !isAdministrator(staffMember, interaction) &&
-          !staffMember.roles.cache.has(guildSettings.staff_role_id)
-        ) {
-          await interaction.reply({
-            content: msgIn.onlyStaffCanUseCommand,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
+        const context = await requireStaffOnConfiguredGuild(interaction, msgIn);
+        if (!context) return;
 
         const targetUserId = interaction.options.getString("user_id", true);
         const reason = interaction.options.getString("reason", false);
@@ -1167,15 +1261,15 @@ if (interaction.isButton()) {
           moderatorId: interaction.user.id,
           moderatorTag: interaction.user.tag,
           reason,
-		  msgInternal
+          msgInternal,
         });
 
-        await interaction.reply({
-          content: result.kicked
+        await replyEphemeral(
+          interaction,
+          result.kicked
             ? msgIn.blacklistMemberSuccess(targetUserId, result.username)
-            : msgIn.blacklistMemberSavedButKickFailed(targetUserId, result.username),
-          flags: MessageFlags.Ephemeral,
-        });
+            : msgIn.blacklistMemberSavedButKickFailed(targetUserId, result.username)
+        );
 
         return;
       }
@@ -1205,68 +1299,35 @@ if (interaction.isButton()) {
       }
 
       if (interaction.commandName === "add-verification-question") {
-        if (!isUsedOnAServer(interaction)) {
-          await interaction.reply({
-            content: msgIn.commandMustBeUsedInServer,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
+        if (!(await requireGuild(interaction, msgIn.commandMustBeUsedInServer))) return;
+        if (!(await requireAuthorizedGuildOwner(interaction, msgIn.notAllowedManageQuestions))) return;
 
-        if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
-          await interaction.reply({
-            content: msgIn.notAllowedManageQuestions,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        const guildSettings = getGuildVerificationSettingsStmt.get(interaction.guild.id) as
-          | GuildVerificationSettingsRow
-          | undefined;
-
-        if (!guildSettings) {
-          await interaction.reply({
-            content: msgIn.verificationNotConfigured,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
+        const guildSettings = await getGuildVerificationSettingsOrReply(interaction, msgIn);
+        if (!guildSettings) return;
 
         const questions = getGuildVerificationQuestionsStmt.all(
-          interaction.guild.id
+          interaction.guild!.id
         ) as GuildVerificationQuestionRow[];
 
         if (questions.length >= 5) {
-          await interaction.reply({
-            content: msgIn.YouCannotConfigureMoreThanFiveQuestions,
-            flags: MessageFlags.Ephemeral,
-          });
+          await replyEphemeral(interaction, msgIn.YouCannotConfigureMoreThanFiveQuestions);
           return;
         }
 
         const label = interaction.options.getString("label", true).trim();
         const type = interaction.options.getString("type", true);
         const required = interaction.options.getBoolean("required", true);
-		
-		if (label.length > 45) {
-		  await interaction.reply({
-			content: "Can't exceed 45 characters", // à ajouter dans tes fichiers de langue
-			flags: MessageFlags.Ephemeral,
-		  });
-		  return;
-		}
 
-        const existingQuestions = getGuildVerificationQuestionsStmt.all(
-          interaction.guild.id
-        ) as GuildVerificationQuestionRow[];
+        if (label.length > 45) {
+          await replyEphemeral(interaction, "Can't exceed 45 characters");
+          return;
+        }
 
-        const nextOrder = existingQuestions.length + 1;
-
+        const nextOrder = questions.length + 1;
         const questionKey = `question_${Date.now()}`;
 
         insertGuildVerificationQuestionStmt.run(
-          interaction.guild.id,
+          interaction.guild!.id,
           nextOrder,
           questionKey,
           label,
@@ -1274,23 +1335,11 @@ if (interaction.isButton()) {
           required ? 1 : 0
         );
 
-        await interaction.reply({
-          content: msgIn.QuestionAddedAtIndex(nextOrder),
-          flags: MessageFlags.Ephemeral,
-        });
-
+        await replyEphemeral(interaction, msgIn.QuestionAddedAtIndex(nextOrder));
         return;
       }
 
       if (interaction.commandName === "list-verification-questions") {
-        if (!isUsedOnAServer(interaction)) {
-          await interaction.reply({
-            content: msgIn.commandMustBeUsedInServer,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
         if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
           await interaction.reply({
             content: msgIn.YouAreNotAllowedToViewVerificationQuestionsOnThisServer,
@@ -1300,7 +1349,7 @@ if (interaction.isButton()) {
         }
 
         const questions = getGuildVerificationQuestionsStmt.all(
-          interaction.guild.id
+          interaction.guild!.id
         ) as GuildVerificationQuestionRow[];
 
         if (questions.length === 0) {
@@ -1329,14 +1378,6 @@ if (interaction.isButton()) {
       }
 
       if (interaction.commandName === "edit-verification-question") {
-        if (!isUsedOnAServer(interaction)) {
-          await interaction.reply({
-            content: msgIn.commandMustBeUsedInServer,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
         if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
           await interaction.reply({
             content: msgIn.YouAreNotAllowedtoEditVerificationQuestionsOnThisServer,
@@ -1346,20 +1387,18 @@ if (interaction.isButton()) {
         }
 
         const index = interaction.options.getInteger("index", true);
-        const newLabel = interaction.options.getString("label", true).trim();
+        const newLabelRaw = interaction.options.getString("label", false);
+        const newLabel = newLabelRaw?.trim();
         const newType = interaction.options.getString("type");
         const newRequired = interaction.options.getBoolean("required");
 		
-		if (newLabel.length > 45) {
-		  await interaction.reply({
-			content: "Can't exceed 45 characters", // à ajouter dans tes fichiers de langue
-			flags: MessageFlags.Ephemeral,
-		  });
-		  return;
-		}
+        if (newLabel && newLabel.length > 45) {
+          await replyEphemeral(interaction, "Can't exceed 45 characters");
+          return;
+        }
 
         const question = getGuildVerificationQuestionByIndexStmt.get(
-          interaction.guild.id,
+          interaction.guild!.id,
           index - 1
         ) as GuildVerificationQuestionRow | undefined;
 
@@ -1387,26 +1426,10 @@ if (interaction.isButton()) {
       }
 
       if (interaction.commandName === "delete-verification-question") {
-        if (!isUsedOnAServer(interaction)) {
-          await interaction.reply({
-            content: msgIn.commandMustBeUsedInServer,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
-          await interaction.reply({
-            content: msgIn.commandMustBeUsedInServer,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
         const index = interaction.options.getInteger("index", true);
 
         const question = getGuildVerificationQuestionByIndexStmt.get(
-          interaction.guild.id,
+          interaction.guild!.id,
           index - 1
         ) as GuildVerificationQuestionRow | undefined;
 
@@ -1421,7 +1444,7 @@ if (interaction.isButton()) {
         deleteGuildVerificationQuestionByIdStmt.run(question.id);
 
         const remainingQuestions = getGuildVerificationQuestionsStmt.all(
-          interaction.guild.id
+          interaction.guild!.id
         ) as GuildVerificationQuestionRow[];
 
         for (let i = 0; i < remainingQuestions.length; i++) {
@@ -1439,10 +1462,7 @@ if (interaction.isButton()) {
       if (interaction.commandName === "bot-help") {
         const chunks = splitMessage(msgIn.helpMessage, 2000);
 
-        await interaction.reply({
-          content: chunks[0],
-          flags: MessageFlags.Ephemeral,
-        });
+        await replyEphemeral(interaction, chunks[0]);
 
         for (let i = 1; i < chunks.length; i++) {
           await interaction.followUp({
@@ -1452,77 +1472,34 @@ if (interaction.isButton()) {
         }
 
         return;
-      } 
+      }
 		  
 	if (interaction.commandName === "unblacklist-member") {
-	  if (!isUsedOnAServer(interaction)) {
-		await interaction.reply({
-		  content: msgIn.commandMustBeUsedInServer,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
+    if (!(await requireGuild(interaction, msgIn.commandMustBeUsedInServer))) return;
 
-	  const member = await interaction.guild.members.fetch(interaction.user.id);
+    const context = await requireStaffOnConfiguredGuild(interaction, msgIn);
+    if (!context) return;
 
-	  const guildSettings = getGuildVerificationSettingsStmt.get(interaction.guild.id) as
-		| GuildVerificationSettingsRow
-		| undefined;
+    const targetUserId = interaction.options.getString("user_id", true);
 
-	  if (!guildSettings) {
-		await interaction.reply({
-		  content: msgIn.verificationNotConfigured,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
+    const blacklistedRecord = getBlacklistedUserStmt.get(
+      interaction.guild!.id,
+      targetUserId
+    ) as BlacklistedUserRow | undefined;
 
-	  if (
-		!isAdministrator(member, interaction) &&
-		!member.roles.cache.has(guildSettings.staff_role_id)
-	  ) {
-		await interaction.reply({
-		  content: msgIn.onlyStaffCanUseCommand,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
+    if (!blacklistedRecord) {
+      await replyEphemeral(interaction, msgIn.userNotBlacklisted(targetUserId));
+      return;
+    }
 
-	  const targetUserId = interaction.options.getString("user_id", true);
+    deleteBlacklistedUserStmt.run(interaction.guild!.id, targetUserId);
 
-	  const blacklistedRecord = getBlacklistedUserStmt.get(
-		  interaction.guild.id,
-		  targetUserId
-		) as BlacklistedUserRow | undefined;
-
-		if (!blacklistedRecord) {
-		  await interaction.reply({
-			content: msgIn.userNotBlacklisted(targetUserId),
-			flags: MessageFlags.Ephemeral,
-		  });
-		  return;
-		}
-
-		deleteBlacklistedUserStmt.run(interaction.guild.id, targetUserId);
-
-	  await interaction.reply({
-		content: msgIn.userRemovedFromBlacklist(targetUserId),
-		flags: MessageFlags.Ephemeral,
-	  });
-
-	  return;
-	}
+    await replyEphemeral(interaction, msgIn.userRemovedFromBlacklist(targetUserId));
+    return;
+  }
 	
 	if (interaction.commandName === "setup-spam-detection") {
-	  if (!isUsedOnAServer(interaction)) {
-		await interaction.reply({
-		  content: msgIn.commandMustBeUsedInServer,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
-
-	  const member = await interaction.guild.members.fetch(interaction.user.id);
+	  const member = await interaction.guild!.members.fetch(interaction.user.id);
 
 	  if (!isAdministrator(member, interaction)) {
 		await interaction.reply({
@@ -1538,7 +1515,7 @@ if (interaction.isButton()) {
     const messageThreshold = interaction.options.getInteger("number", false) ?? 6;
     const windowSeconds = interaction.options.getInteger("duration", false) ?? 20;
 
-	  const existingSpamSettings = getGuildSpamSettingsStmt.get(interaction.guild.id) as
+	  const existingSpamSettings = getGuildSpamSettingsStmt.get(interaction.guild!.id) as
 		| GuildSpamSettingsRow
 		| undefined;
 
@@ -1557,7 +1534,7 @@ if (interaction.isButton()) {
 	  }
 
     upsertGuildSpamSettingsStmt.run(
-      interaction.guild.id,
+      interaction.guild!.id,
       enabled ? 1 : 0,
       alertChannel?.id ?? null,
       staffRole?.id ?? null,
@@ -1580,16 +1557,8 @@ if (interaction.isButton()) {
 	}
 
   if (interaction.commandName === "view-setup-verification") {
-    if (!isUsedOnAServer(interaction)) {
-      await interaction.reply({
-        content: msgIn.commandMustBeUsedInServer,
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-
     const settings = getGuildVerificationSettingsStmt.get(
-      interaction.guild.id
+      interaction.guild!.id
     ) as GuildVerificationSettingsRow | undefined;
 
     if (!settings) {
@@ -1600,8 +1569,8 @@ if (interaction.isButton()) {
       return;
     }
 
-    const verifiedRole = interaction.guild.roles.cache.get(settings.verified_role_id);
-    const staffRole = interaction.guild.roles.cache.get(settings.staff_role_id);
+    const verifiedRole = interaction.guild!.roles.cache.get(settings.verified_role_id);
+    const staffRole = interaction.guild!.roles.cache.get(settings.staff_role_id);
 
     const verifiedRoleDisplay = verifiedRole
       ? `<@&${settings.verified_role_id}>`

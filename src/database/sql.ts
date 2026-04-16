@@ -85,6 +85,16 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS guild_welcome_messages (
+    guild_id TEXT NOT NULL,
+    locale TEXT NOT NULL,
+    dm_message TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (guild_id, locale)
+  );
+`);
+
 export const getVerifiedUserStmt = db.prepare(
   "SELECT * FROM verified_users WHERE user_id = ?"
 );
@@ -128,15 +138,37 @@ export const getBlacklistedUsersEverywhereStmt = db.prepare(`
   ORDER BY blacklisted_at DESC
 `);
 
+export const getGuildWelcomeMessageStmt = db.prepare(`
+  SELECT * FROM guild_welcome_messages  
+  WHERE guild_id = ? AND locale  = ?
+`);
+
+export const getGuildWelcomeMessagesAllStmt = db.prepare(`
+  SELECT * FROM guild_welcome_messages
+  WHERE guild_id = ?
+  ORDER BY locale ASC
+`);
+
 export const insertBlacklistedUserStmt = db.prepare(`
   INSERT OR REPLACE INTO blacklisted_users
   (guild_id, user_id, username, blacklisted_at, blacklisted_by, reason)
   VALUES (?, ?, ?, ?, ?, ?)
 `);
 
+export const upsertGuildWelcomeMessageStmt = db.prepare(`
+  INSERT OR REPLACE INTO guild_welcome_messages  
+  (guild_id, locale, dm_message, updated_at)
+  VALUES (?, ?, ?, ?)
+`);
+
 export const deleteBlacklistedUserStmt = db.prepare(`
   DELETE FROM blacklisted_users
   WHERE guild_id = ? AND user_id = ?
+`);
+
+export const deleteGuildWelcomeMessageStmt = db.prepare(`
+  DELETE FROM guild_welcome_messages  
+  WHERE guild_id = ? AND locale = ?
 `);
 
 export const upsertGuildVerificationSettingsStmt = db.prepare(`
@@ -275,5 +307,12 @@ export type GuildSpamSettingsRow = {
   message_threshold: number;
   window_seconds: number;
   created_by: string;
+  updated_at: string;
+};
+
+export type GuildWelcomeMessageRow = {
+  guild_id: string;
+  locale: string;
+  dm_message: string;
   updated_at: string;
 };

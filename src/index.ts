@@ -1910,6 +1910,7 @@ if (interaction.isButton()) {
                 PermissionFlagsBits.SendMessages,
                 PermissionFlagsBits.ReadMessageHistory,
                 PermissionFlagsBits.ManageChannels,
+                PermissionFlagsBits.MentionEveryone,
               ],
             },
           ],

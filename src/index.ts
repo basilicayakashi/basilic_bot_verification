@@ -226,6 +226,7 @@ const commands = [
       .setRequired(false)
   ),
 
+  /*
   new SlashCommandBuilder()
     .setName("allow-setup-verification")
     .setDescription(cmd_en.allowSetupVerificationDescription)
@@ -248,7 +249,7 @@ const commands = [
 		})
         .setRequired(true)
     ),
-
+  */
   new SlashCommandBuilder()
     .setName("add-verification-question")
     .setDescription(cmd_en.addVerificationQuestionDescription)
@@ -911,21 +912,31 @@ async function replyEphemeral(interaction: any, content: string) {
 }
 
 function isBasilicOrAuthorizedGuildOwner(interaction: any): boolean {
+  /*
   if (isBasilic(interaction)) return true;
 
   return isAuthorizedServer(interaction) && isGuildOwner(interaction);
+  */
+
+  return isGuildOwner(interaction);
 }
 
 function isAuthorizedServer(interaction: any): boolean {
+  /*
   const guildAllowed = getSetupPermissionStmt.get(
     interaction.guild.id
   ) as SetupVerificationPermissionRow | undefined;
 
   return !!guildAllowed;
+  */
+
+  //au autorise tout serveur à utiliser le bot, sans condition
+  return true;
 }
 
 //si c'est moi
 function isBasilic(interaction: any): boolean{
+  /*
   const BASILIC_IDS: string[] = [
     "260716512711540736", // compte principal
     "1482664456998621325", // compte secondaire
@@ -933,6 +944,9 @@ function isBasilic(interaction: any): boolean{
   ];
   
   return BASILIC_IDS.includes(interaction.user.id);
+  */
+
+  return false;
 }
 
 function isUsedOnAServer(
@@ -942,7 +956,8 @@ function isUsedOnAServer(
 }
 
 function isAdministrator(member: any, interaction: any): boolean {
-  return member.permissions.has(PermissionFlagsBits.Administrator) || isBasilic(interaction);
+  //return member.permissions.has(PermissionFlagsBits.Administrator) || isBasilic(interaction);
+  return member.permissions.has(PermissionFlagsBits.Administrator);
 }
 
 async function requireGuild(
@@ -1321,6 +1336,7 @@ if (interaction.isButton()) {
         return;
       }
 
+      /*
       if (interaction.commandName === "allow-setup-verification") {
         if (!isBasilic(interaction)) {
           await interaction.reply({
@@ -1344,6 +1360,7 @@ if (interaction.isButton()) {
 
         return;
       }
+      */
 
       if (interaction.commandName === "add-verification-question") {
         if (!(await requireAuthorizedGuildOwner(interaction, msgIn.notAllowedManageQuestions))) return;
@@ -1649,7 +1666,7 @@ if (interaction.isButton()) {
 	  upsertGuildWelcomeMessageStmt.run(
 		interaction.guild.id,
 		locale,
-		dmMessage,
+		dmMessage.replaceAll("{n}", "\n").replaceAll("{N}", "\n"),
 		new Date().toISOString()
 	  );
 
@@ -1803,10 +1820,13 @@ if (interaction.isButton()) {
     // =========================================  
       if (interaction.isModalSubmit()) {
         if (!isUsedOnAServer(interaction)) {
+          await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
+          /*
           await interaction.reply({
             content: msgIn.actionMustBeUsedInServer,
             flags: MessageFlags.Ephemeral,
           });
+          */
           return;
         }
 

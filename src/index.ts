@@ -578,10 +578,10 @@ new SlashCommandBuilder()
   .setName("set-welcome-message")
   .setDescription("Create or update a welcome DM message for this server (add {n} or {N} for a line break)")
   .setDescriptionLocalizations({
-    [Locale.French]: "Crée ou met à jour un message de bienvenue privé pour ce serveur (ajouter {n} ou {N} pour faire un retour à la ligne)",
-    [Locale.SpanishES]: "Crea o actualiza un mensaje privado de bienvenida para este servidor (agrega {n} o {N} para un salto de línea)",
-    [Locale.German]: "Erstellt oder aktualisiert eine private Willkommensnachricht für diesen Server (füge {n} oder {N} hinzu für einen Zeilenumbruch)",
-    [Locale.Polish]: "Tworzy lub aktualizuje prywatną wiadomość powitalną dla tego serwera (dodaj {n} lub {N} dla nowego wiersza)",
+    [Locale.French]: "Crée ou met à jour un message de bienvenue privé pour ce serveur (ajouter {n} pour un saut de ligne)",
+    [Locale.SpanishES]: "Crea o actualiza un mensaje privado de bienvenida para este servidor. Usa {n} para saltos de línea",
+    [Locale.German]: "Erstellt oder aktualisiert eine private Willkommensnachricht. Nutze {n} für Umbrüche",
+    [Locale.Polish]: "Tworzy lub aktualizuje prywatną wiadomość powitalną dla tego serwera. Użyj {n} dla nowej linii",
   })
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
   .addStringOption((option) =>

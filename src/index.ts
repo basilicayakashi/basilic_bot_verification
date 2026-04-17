@@ -574,6 +574,7 @@ new SlashCommandBuilder()
     [Locale.Polish]: "Wyświetla obecną konfigurację weryfikacji tego serwera",
   })
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  /*
   new SlashCommandBuilder()
   .setName("set-welcome-message")
   .setDescription("Create or update a welcome DM message for this server (add {n} or {N} for a line break)")
@@ -684,6 +685,7 @@ new SlashCommandBuilder()
 			{ name: "Polski", value: "pl" }
 		  )
 	  ),
+  */
 ].map((command) => command.toJSON());
 
 // =========================

@@ -385,7 +385,7 @@ export async function handleVerificationButtons({
 			  PermissionFlagsBits.AttachFiles,
 			  PermissionFlagsBits.ManageChannels,
         PermissionFlagsBits.MentionEveryone,
-        
+
 			],
 		  },
 		],
@@ -672,6 +672,7 @@ export async function handleVerificationModals({
 			  PermissionFlagsBits.SendMessages,
 			  PermissionFlagsBits.ReadMessageHistory,
 			  PermissionFlagsBits.ManageChannels,
+        PermissionFlagsBits.MentionEveryone,
 			],
 		  },
 		],

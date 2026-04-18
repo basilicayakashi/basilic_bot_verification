@@ -1949,14 +1949,26 @@ if (interaction.isButton()) {
         }
       }
 
-      
+      /*
       content += `\n${msgServer.verificationWaiting(guildSettings.staff_role_id)}`;
 
       await (verificationChannel as TextChannel).send({
         content,
         components: [buildDecisionButtonsRow(member.id, msgServer)],
       });
+      */
 
+      // On retire la mention du contenu principal
+      await (verificationChannel as TextChannel).send({
+        content,
+        components: [buildDecisionButtonsRow(member.id, msgServer)],
+      });
+
+      // La mention est envoyée dans un message séparé → déclenche la notification
+      await (verificationChannel as TextChannel).send({
+        content: msgServer.verificationWaiting(guildSettings.staff_role_id),
+        allowedMentions: { roles: [guildSettings.staff_role_id] },
+      });
       await interaction.reply({
         content: msgIn.verificationRequestSent,
         flags: MessageFlags.Ephemeral,

@@ -108,6 +108,8 @@ export async function handleVerificationButtons({
         );
       }
 
+      deletePendingVerificationSubmissionStmt.run(interaction.guild.id, member.id);
+
       try {
         await member.send(msgOut.YourVerifiedStatusRestored(interaction.guild.name));
       } catch {}

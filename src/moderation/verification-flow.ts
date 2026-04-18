@@ -373,6 +373,7 @@ export async function handleVerificationButtons({
 			  PermissionFlagsBits.SendMessages,
 			  PermissionFlagsBits.ReadMessageHistory,
 			  PermissionFlagsBits.AttachFiles,
+        PermissionFlagsBits.MentionEveryone,
 			],
 		  },
 		  {

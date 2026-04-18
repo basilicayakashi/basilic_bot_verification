@@ -383,6 +383,7 @@ export async function handleVerificationButtons({
 			  PermissionFlagsBits.ReadMessageHistory,
 			  PermissionFlagsBits.AttachFiles,
 			  PermissionFlagsBits.ManageChannels,
+        PermissionFlagsBits.MentionEveryone,
 			],
 		  },
 		],
@@ -707,12 +708,24 @@ export async function handleVerificationModals({
 		}
 	  }
 
+    /*
 	  content += `\n${msgServer.verificationWaiting(guildSettings.staff_role_id)}`;
 
 	  await (verificationChannel as TextChannel).send({
 		content,
 		components: [deps.buildDecisionButtonsRow(member.id, msgServer)],
 	  });
+    */
+
+    await (verificationChannel as TextChannel).send({
+      content,
+      components: [deps.buildDecisionButtonsRow(member.id, msgServer)],
+    });
+
+    await (verificationChannel as TextChannel).send({
+      content: msgServer.verificationWaiting(guildSettings.staff_role_id),
+      allowedMentions: { roles: [guildSettings.staff_role_id] },
+    });
 
 	  await interaction.reply({
 		content: msgIn.verificationRequestSent,

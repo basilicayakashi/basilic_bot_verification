@@ -385,6 +385,7 @@ export async function handleVerificationButtons({
 			  PermissionFlagsBits.AttachFiles,
 			  PermissionFlagsBits.ManageChannels,
         PermissionFlagsBits.MentionEveryone,
+        
 			],
 		  },
 		],

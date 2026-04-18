@@ -1901,6 +1901,7 @@ if (interaction.isButton()) {
                 PermissionFlagsBits.ViewChannel,
                 PermissionFlagsBits.SendMessages,
                 PermissionFlagsBits.ReadMessageHistory,
+                PermissionFlagsBits.MentionEveryone,
               ],
             },
             {

@@ -711,15 +711,15 @@ export async function handleVerificationModals({
 		}
 	  }
 
-    /*
+    
 	  content += `\n${msgServer.verificationWaiting(guildSettings.staff_role_id)}`;
 
 	  await (verificationChannel as TextChannel).send({
 		content,
 		components: [deps.buildDecisionButtonsRow(member.id, msgServer)],
 	  });
-    */
-
+    
+    /*
     await (verificationChannel as TextChannel).send({
       content,
       components: [deps.buildDecisionButtonsRow(member.id, msgServer)],
@@ -729,6 +729,7 @@ export async function handleVerificationModals({
       content: msgServer.verificationWaiting(guildSettings.staff_role_id),
       allowedMentions: { roles: [guildSettings.staff_role_id] },
     });
+    */
 
 	  await interaction.reply({
 		content: msgIn.verificationRequestSent,

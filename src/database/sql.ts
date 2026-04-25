@@ -7,11 +7,13 @@ export const db = new Database(dbPath);
 // Table pour stocker les utilisateurs vérifiés et une trace de leur vérification (qui, quand)
 db.exec(`
   CREATE TABLE IF NOT EXISTS verified_users (
-    user_id TEXT PRIMARY KEY,
-    username TEXT NOT NULL,
-    verified_at TEXT NOT NULL,
-    verified_by TEXT NOT NULL
-  )
+  guild_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  username TEXT NOT NULL,
+  verified_at TEXT NOT NULL,
+  verified_by TEXT NOT NULL,
+  PRIMARY KEY (guild_id, user_id)
+)
 `);
 
 // Table pour stocker les permissions de qui peut utiliser la commande de setup
@@ -96,12 +98,12 @@ db.exec(`
 `);
 
 export const getVerifiedUserStmt = db.prepare(
-  "SELECT * FROM verified_users WHERE user_id = ?"
+  "SELECT * FROM verified_users WHERE guild_id = ? AND user_id = ?"
 );
 
 export const insertVerifiedUserStmt = db.prepare(`
-  INSERT OR REPLACE INTO verified_users (user_id, username, verified_at, verified_by)
-  VALUES (?, ?, ?, ?)
+  INSERT OR REPLACE INTO verified_users (guild_id, user_id, username, verified_at, verified_by)
+  VALUES (?, ?, ?, ?, ?)
 `);
 
 export const insertSetupPermissionStmt = db.prepare(`

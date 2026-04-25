@@ -1250,7 +1250,7 @@ if (interaction.isButton()) {
 
         const targetUserId = interaction.options.getString("user_id", true);
 
-        const verifiedRecord = getVerifiedUserStmt.get(targetUserId) as VerifiedUserRow | undefined;
+        const verifiedRecord = getVerifiedUserStmt.get(interaction.guild!.id, targetUserId) as VerifiedUserRow | undefined;
         const blacklistedHere = getBlacklistedUserStmt.get(
           interaction.guild!.id,
           targetUserId

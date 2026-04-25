@@ -89,7 +89,7 @@ export async function handleVerificationButtons({
       return true;
     }
 
-    const existingVerification = deps.getVerifiedUserStmt.get(member.id);
+    const existingVerification = deps.getVerifiedUserStmt.get(interaction.guild.id, member.id);
     const guildSettings = deps.getGuildVerificationSettingsStmt.get(interaction.guild.id);
 
     if (!guildSettings) {
@@ -146,7 +146,7 @@ export async function handleVerificationButtons({
           .setPlaceholder(msgServer.answerPlaceholder)
           .setStyle(TextInputStyle.Short)
           .setRequired(question.required === 1)
-          .setMaxLength(200);
+          .setMaxLength(50);
 
         labelComponents.push(
           new LabelBuilder()
@@ -162,7 +162,7 @@ export async function handleVerificationButtons({
           .setPlaceholder(msgServer.answerPlaceholder)
           .setStyle(TextInputStyle.Paragraph)
           .setRequired(question.required === 1)
-          .setMaxLength(1000);
+          .setMaxLength(150);
 
         labelComponents.push(
           new LabelBuilder()
@@ -290,6 +290,7 @@ export async function handleVerificationButtons({
       const nowIso = new Date().toISOString();
 
       deps.insertVerifiedUserStmt.run(
+        guildSettings.guild_id,
         targetMember.id,
         targetMember.user.tag,
         nowIso,

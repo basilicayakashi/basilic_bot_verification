@@ -162,6 +162,24 @@ Esta función envía alertas al staff cuando un usuario envía muchos mensajes e
 2) Rol utilizado para notificar al equipo de moderación : ${staffRoleDisplay}
 3) Tiempo máximo permitido para iniciar la verificación : ${verification_timeout_hours} hora(s)`,
 NotAuthorizedServer: "El servidor no ha sido autorizado, es imposible usar ningún comando",
+ManualVerificationProcessed: (
+  targetUserId: string,
+  existingVerification: boolean,
+  targetMember: boolean,
+  roleAdded: boolean
+) =>
+  `✅ Verificación manual procesada para \`${targetUserId}\`.\n` +
+  `- Eliminación de verificación pendiente: completada\n` +
+  `- Entrada en verified_users: ${
+    existingVerification ? "ya existente" : "añadida"
+  }\n` +
+  `- Rol verificado: ${
+    targetMember
+      ? roleAdded
+        ? "añadido"
+        : "ya presente"
+      : "no añadido, miembro ausente del servidor"
+  }`,
 };
 
 const es_out = {

@@ -1446,17 +1446,12 @@ if (interaction.isButton()) {
         }
 
         await commandInteraction.reply({
-          content:
-            `✅ Vérification manuelle traitée pour \`${targetUserId}\`.\n` +
-            `- Suppression pending : effectuée\n` +
-            `- Entrée verified_users : ${existingVerification ? "déjà existante" : "ajoutée"}\n` +
-            `- Rôle vérifié : ${
-              targetMember
-                ? roleAdded
-                  ? "ajouté"
-                  : "déjà présent"
-                : "non ajouté, membre absent du serveur"
-            }`,
+          content: msgIn.ManualVerificationProcessed(
+            targetUserId,
+            !!existingVerification,
+            !!targetMember,
+            roleAdded
+          ),
           flags: MessageFlags.Ephemeral,
         });
 

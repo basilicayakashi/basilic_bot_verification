@@ -163,6 +163,24 @@ Diese Funktion benachrichtigt das Team, wenn ein Nutzer viele Nachrichten in kur
 2) Rolle zur Benachrichtigung des Moderationsteams : ${staffRoleDisplay}
 3) Maximale Zeit, um die Verifizierung zu starten : ${verification_timeout_hours} Stunde(n)`,
 NotAuthorizedServer: "Der Server wurde nicht autorisiert, es ist nicht möglich, irgendeinen Befehl zu verwenden",
+ManualVerificationProcessed: (
+  targetUserId: string,
+  existingVerification: boolean,
+  targetMember: boolean,
+  roleAdded: boolean
+) =>
+  `✅ Manuelle Verifizierung verarbeitet für \`${targetUserId}\`.\n` +
+  `- Ausstehende Verifizierung entfernt: abgeschlossen\n` +
+  `- verified_users-Eintrag: ${
+    existingVerification ? "bereits vorhanden" : "hinzugefügt"
+  }\n` +
+  `- Verifizierte Rolle: ${
+    targetMember
+      ? roleAdded
+        ? "hinzugefügt"
+        : "bereits vorhanden"
+      : "nicht hinzugefügt, Mitglied nicht auf dem Server"
+  }`,
 };
 
 const de_out = {

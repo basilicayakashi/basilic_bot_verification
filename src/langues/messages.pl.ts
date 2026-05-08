@@ -170,6 +170,24 @@ Funkcja ta wysyła alerty do administracji, gdy użytkownik wysyła dużą liczb
 2) Rola używana do powiadamiania zespołu moderacji : ${staffRoleDisplay}
 3) Maksymalny czas na rozpoczęcie weryfikacji : ${verification_timeout_hours} godzina(y)`,
 NotAuthorizedServer: "Serwer nie został autoryzowany, nie można używać żadnej komendy",
+ManualVerificationProcessed: (
+  targetUserId: string,
+  existingVerification: boolean,
+  targetMember: boolean,
+  roleAdded: boolean
+) =>
+  `✅ Ręczna weryfikacja została przetworzona dla \`${targetUserId}\`.\n` +
+  `- Usunięcie oczekującej weryfikacji: zakończone\n` +
+  `- Wpis w verified_users: ${
+    existingVerification ? "już istniał" : "dodany"
+  }\n` +
+  `- Zweryfikowana rola: ${
+    targetMember
+      ? roleAdded
+        ? "dodana"
+        : "już obecna"
+      : "nie dodano, członek nie jest obecny na serwerze"
+  }`,
 };
 
 const pl_out = {

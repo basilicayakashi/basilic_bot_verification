@@ -162,6 +162,24 @@ This feature sends alerts to staff when a user sends an unusually high number of
 2) Role used to notify the moderation team : ${staffRoleDisplay}
 3) Maximum time allowed to start verification : ${verification_timeout_hours} hour(s)`,
   NotAuthorizedServer: "The server has not been authorized, it is impossible to use any command",
+ManualVerificationProcessed: (
+  targetUserId: string,
+  existingVerification: boolean,
+  targetMember: boolean,
+  roleAdded: boolean
+) =>
+  `✅ Manual verification processed for \`${targetUserId}\`.\n` +
+  `- Pending verification removal: completed\n` +
+  `- verified_users entry: ${
+    existingVerification ? "already existed" : "added"
+  }\n` +
+  `- Verified role: ${
+    targetMember
+      ? roleAdded
+        ? "added"
+        : "already present"
+      : "not added, member not present on the server"
+  }`,
 };
 
 const en_out = {

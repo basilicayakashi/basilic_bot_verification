@@ -163,6 +163,24 @@ Cette fonctionnalité permet d’envoyer des alertes au staff lorsqu’un membre
 2) Rôle utilisé pour signaler l'équipe de modération : ${staffRoleDisplay}
 3) Délai maximal pour lancer la vérification : ${verification_timeout_hours} heure(s)`,
 NotAuthorizedServer: "Le serveur n'a pas été autorisé, impossible d'utiliser la moindre commande",
+ManualVerificationProcessed: (
+  targetUserId: string,
+  existingVerification: boolean,
+  targetMember: boolean,
+  roleAdded: boolean
+) =>
+  `✅ Vérification manuelle traitée pour \`${targetUserId}\`.\n` +
+  `- Suppression pending : effectuée\n` +
+  `- Entrée verified_users : ${
+    existingVerification ? "déjà existante" : "ajoutée"
+  }\n` +
+  `- Rôle vérifié : ${
+    targetMember
+      ? roleAdded
+        ? "ajouté"
+        : "déjà présent"
+      : "non ajouté, membre absent du serveur"
+  }`,
 };
 
 const fr_out = {

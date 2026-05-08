@@ -15,7 +15,8 @@ import {
   MessageFlags,
   BaseInteraction,
   CacheType,
-  Locale
+  Locale,
+  ChatInputCommandInteraction 
 } from "discord.js";
 
 import { SpamAlertService } from "./moderation/spam-alert.js";
@@ -224,6 +225,29 @@ const commands = [
         [Locale.Polish]: cmd_pl.blacklistReasonDescription,
       })
       .setRequired(false)
+  ),
+
+  new SlashCommandBuilder()
+  .setName("verify-member")
+  .setDescription("Manually verify a member")
+  .setDescriptionLocalizations({
+    [Locale.French]: "Vérifier manuellement un membre",
+    [Locale.SpanishES]: "Verificar manualmente a un miembro",
+    [Locale.German]: "Ein Mitglied manuell verifizieren",
+    [Locale.Polish]: "Ręcznie zweryfikuj członka",
+  })
+  .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
+  .addStringOption((option) =>
+    option
+      .setName("user_id")
+      .setDescription("Discord ID of the member to verify")
+      .setDescriptionLocalizations({
+        [Locale.French]: "ID Discord du membre à vérifier",
+        [Locale.SpanishES]: "ID de Discord del miembro a verificar",
+        [Locale.German]: "Discord-ID des zu verifizierenden Mitglieds",
+        [Locale.Polish]: "ID Discord członka do zweryfikowania",
+      })
+      .setRequired(true)
   ),
 
   /*
@@ -1334,6 +1358,107 @@ if (interaction.isButton()) {
             ? msgIn.blacklistMemberSuccess(targetUserId, result.username)
             : msgIn.blacklistMemberSavedButKickFailed(targetUserId, result.username)
         );
+
+        return;
+      }
+
+      if (interaction.commandName === "verify-member") {
+        const commandInteraction = interaction as ChatInputCommandInteraction;
+
+        if (!isUsedOnAServer(commandInteraction)) {
+          await commandInteraction.reply({
+            content: msgIn.commandMustBeUsedInServer,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const guild = commandInteraction.guild!;
+        const targetUserId = commandInteraction.options.getString("user_id", true);
+
+        const guildSettings = getGuildVerificationSettingsStmt.get(
+          guild.id
+        ) as GuildVerificationSettingsRow | undefined;
+
+        if (!guildSettings) {
+          await commandInteraction.reply({
+            content: msgIn.verificationNotConfigured,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const staffMember = commandInteraction.member;
+
+        if (
+          !staffMember ||
+          !("roles" in staffMember) ||
+          !staffMember.roles.cache.has(guildSettings.staff_role_id)
+        ) {
+          await commandInteraction.reply({
+            content: msgIn.onlyStaffCanUseCommand,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        // 1) Supprimer de pending_verification_submissions
+        deletePendingVerificationSubmissionStmt.run(guild.id, targetUserId);
+
+        // 2) Ajouter dans verified_users seulement si absent
+        const existingVerification = getVerifiedUserStmt.get(
+          guild.id,
+          targetUserId
+        ) as VerifiedUserRow | undefined;
+
+        const targetMember = await guild.members.fetch(targetUserId).catch(() => null);
+
+        let username = targetUserId;
+
+        if (targetMember) {
+          username = targetMember.user.tag;
+        } else {
+          const user = await client.users.fetch(targetUserId).catch(() => null);
+          if (user) username = user.tag;
+        }
+
+        if (!existingVerification) {
+          insertVerifiedUserStmt.run(
+            guild.id,
+            targetUserId,
+            username,
+            new Date().toISOString(),
+            `${commandInteraction.user.tag} (${commandInteraction.user.id})`
+          );
+        }
+
+        // 3) Ajouter le rôle si le membre est présent sur le serveur
+        let roleAdded = false;
+
+        if (targetMember) {
+          if (!targetMember.roles.cache.has(guildSettings.verified_role_id)) {
+            await targetMember.roles.add(
+              guildSettings.verified_role_id,
+              msgInternal.verifiedBy(commandInteraction.user.tag)
+            );
+            roleAdded = true;
+          }
+        }
+
+        await commandInteraction.reply({
+          content:
+            `✅ Vérification manuelle traitée pour \`${targetUserId}\`.\n` +
+            `- Suppression pending : effectuée\n` +
+            `- Entrée verified_users : ${existingVerification ? "déjà existante" : "ajoutée"}\n` +
+            `- Rôle vérifié : ${
+              targetMember
+                ? roleAdded
+                  ? "ajouté"
+                  : "déjà présent"
+                : "non ajouté, membre absent du serveur"
+            }`,
+          flags: MessageFlags.Ephemeral,
+        });
 
         return;
       }

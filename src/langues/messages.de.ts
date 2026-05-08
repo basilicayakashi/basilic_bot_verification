@@ -3,9 +3,7 @@ const de_in = {
 **Bot-Einrichtungsanleitung**
 
 **Erste Schritte**
-1. Bitte zuerst **basilic** um die Erlaubnis, den Bot auf deinem Server zu nutzen.
-2. Gib dabei die **Server-ID** an, auf dem der Bot verwendet wird.
-3. Nach der Freigabe kann der **Serverbesitzer** den Befehl \`/setup-verification\` verwenden, um die Verifizierung neuer Mitglieder zu aktivieren.
+Der Serverbesitzer kann \`/setup-verification\` verwenden, um die Verifizierung neuer Mitglieder zu aktivieren.
 
 **Verifizierung konfigurieren**
 Nach der Aktivierung mit \`/setup-verification\` kann der Serverbesitzer die Fragen anpassen:
@@ -28,6 +26,11 @@ Der Bot kann auch verdächtige Aktivitäten erkennen mit:
 - \`/setup-spam-detection\` → aktiviert und konfiguriert die Spam-Erkennung
 
 Diese Funktion benachrichtigt das Team, wenn ein Nutzer viele Nachrichten in kurzer Zeit sendet.
+
+**Manuelle Verifizierung eines Mitglieds**
+
+Es ist möglich, ein Mitglied manuell zu verifizieren, unabhängig davon, ob es sich derzeit auf dem Server befindet oder nicht.  
+Der Befehl \`/verify-member\` mit der Discord-ID des Mitglieds als Parameter ermöglicht entweder eine automatische Verifizierung, wenn das Mitglied später dem Server beitritt und auf den Verifizierungsbutton klickt, oder weist sofort die Rolle eines verifizierten Mitglieds zu, falls das Mitglied bereits auf dem Server vorhanden ist.
 `,
 
     commandMustBeUsedInServer: "Dieser Befehl muss innerhalb eines Servers verwendet werden.",

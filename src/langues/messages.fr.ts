@@ -3,9 +3,7 @@ const fr_in = {
 **Guide de démarrage du bot**
 
 **Comment débuter**
-1. Demandez d’abord à **basilic** l’autorisation d’utiliser le bot sur votre serveur.
-2. Lors de votre demande, fournissez-lui **l’ID du serveur** sur lequel le bot sera utilisé.
-3. Une fois l’autorisation accordée, le **créateur du serveur** peut utiliser \`/setup-verification\` pour activer la vérification des nouveaux membres.
+Le créateur du serveur peut utiliser \`/setup-verification\` pour activer la vérification des nouveaux membres.
 
 **Configurer la vérification**
 Après avoir activé la vérification avec \`/setup-verification\`, le créateur du serveur peut personnaliser les questions posées aux nouveaux membres :
@@ -28,6 +26,11 @@ Le bot peut aussi surveiller les comportements suspects grâce à la commande :
 - \`/setup-spam-detection\` → active et configure la détection anti-spam sur le serveur
 
 Cette fonctionnalité permet d’envoyer des alertes au staff lorsqu’un membre envoie un volume anormal de messages dans une courte période.
+
+**Vérification manuelle d'un membre**
+
+Il est possible de vérifier manuellement un membre, qu'il soit ou non présent sur le serveur.  
+La commande \`/verify-member\`, avec en paramètre l’ID Discord du membre, permettra soit de le vérifier automatiquement lorsqu’il cliquera sur le bouton de vérification s’il rejoint le serveur plus tard, soit de lui attribuer immédiatement le rôle de membre vérifié s’il est déjà présent sur le serveur.
 `,
 
     commandMustBeUsedInServer: "Cette commande doit être utilisée dans un serveur.",

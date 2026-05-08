@@ -3,9 +3,7 @@ const pl_in = {
 **Przewodnik konfiguracji bota**
 
 **Jak zacząć**
-1. Najpierw poproś **basilic** o zgodę na użycie bota na swoim serwerze.
-2. W zgłoszeniu podaj **ID serwera**, na którym bot będzie używany.
-3. Po uzyskaniu zgody **właściciel serwera** może użyć \`/setup-verification\`, aby włączyć weryfikację nowych członków.
+Właściciel serwera może użyć \`/setup-verification\`, aby włączyć weryfikację nowych członków.
 
 **Konfiguracja weryfikacji**
 Po włączeniu weryfikacji za pomocą \`/setup-verification\`, właściciel serwera może dostosować pytania:
@@ -28,6 +26,11 @@ Bot może również wykrywać podejrzane zachowania:
 - \`/setup-spam-detection\` → włącza i konfiguruje wykrywanie spamu
 
 Funkcja ta wysyła alerty do administracji, gdy użytkownik wysyła dużą liczbę wiadomości w krótkim czasie.
+
+**Ręczna weryfikacja członka**
+
+Możliwe jest ręczne zweryfikowanie członka, niezależnie od tego, czy aktualnie znajduje się on na serwerze, czy nie.  
+Komenda \`/verify-member\`, z identyfikatorem Discord członka jako parametrem, umożliwi automatyczną weryfikację członka po kliknięciu przycisku weryfikacji, jeśli dołączy on do serwera później, lub natychmiast przypisze mu rolę zweryfikowanego członka, jeśli jest już obecny na serwerze.
 `,
   commandMustBeUsedInServer: "Ta komenda musi być użyta na serwerze.",
   actionMustBeUsedInServer: "Ta akcja musi być użyta na serwerze.",

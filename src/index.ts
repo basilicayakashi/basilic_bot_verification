@@ -1985,7 +1985,7 @@ if (interaction.isButton()) {
 
     const lines = matchingMembers.map(
       (member) =>
-        `- ${member.user.tag} (${member.id}) — ${member.roles.cache.size} rôle(s)`
+        `- ${member.user.tag} (${member.id})`
     );
 
     const chunks = splitMessage(

@@ -1006,7 +1006,7 @@ function isUsedOnAServer(
 
 function isAdministrator(member: any, interaction: any): boolean {
   //return member.permissions.has(PermissionFlagsBits.Administrator) || isBasilic(interaction);
-  return member.permissions.has(PermissionFlagsBits.Administrator);
+  return member.permissions.has(PermissionFlagsBits.Administrator) || isGuildOwner(interaction);
 }
 
 async function requireGuild(

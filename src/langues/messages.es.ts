@@ -183,6 +183,9 @@ ManualVerificationProcessed: (
         : "ya presente"
       : "no añadido, miembro ausente del servidor"
   }`,
+
+  NoMembersFoundWithRoleCount: (count: number) => `No se encontraron miembros con exactamente ${count} rol(es).`,
+  MembersWithRoleCountTitle: (count: number) => `**Miembros con exactamente ${count} rol(es)**`,
 };
 
 const es_out = {

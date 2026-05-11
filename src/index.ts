@@ -710,6 +710,29 @@ new SlashCommandBuilder()
 		  )
 	  ),
   */
+ new SlashCommandBuilder()
+  .setName("list-members-by-role-count")
+  .setDescription("List members having exactly N roles")
+  .setDescriptionLocalizations({
+    [Locale.French]: "Lister les membres ayant exactement N rôles",
+    [Locale.SpanishES]: "Listar miembros con exactamente N roles",
+    [Locale.German]: "Mitglieder mit genau N Rollen auflisten",
+    [Locale.Polish]: "Wyświetl członków posiadających dokładnie N ról",
+  })
+  .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
+  .addIntegerOption((option) =>
+    option
+      .setName("number")
+      .setDescription("Exact number of roles")
+      .setDescriptionLocalizations({
+        [Locale.French]: "Nombre exact de rôles",
+        [Locale.SpanishES]: "Número exacto de roles",
+        [Locale.German]: "Exakte Anzahl von Rollen",
+        [Locale.Polish]: "Dokładna liczba ról",
+      })
+      .setRequired(true)
+      .setMinValue(1)
+  ),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -1257,8 +1280,6 @@ if (interaction.isButton()) {
           content: msgServer.startVerificationMessage,
           components: [row],
         });
-
-
 
         await interaction.reply({
           content: msgIn.verificationSettingsSaved,
@@ -1927,6 +1948,61 @@ if (interaction.isButton()) {
 
 	  return;
 	}
+
+  if (interaction.commandName === "list-members-by-role-count") {
+    const commandInteraction = interaction as ChatInputCommandInteraction;
+
+    if (!isUsedOnAServer(commandInteraction)) {
+      await commandInteraction.reply({
+        content: msgIn.commandMustBeUsedInServer,
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    const roleCount = commandInteraction.options.getInteger(
+      "number",
+      true
+    );
+
+    await commandInteraction.deferReply({
+      flags: MessageFlags.Ephemeral,
+    });
+
+    await interaction.guild!.members.fetch();
+
+    const matchingMembers = interaction.guild!.members.cache.filter(
+      (member) => !member.user.bot &&
+        member.roles.cache.size -1 === roleCount
+    );
+
+    if (matchingMembers.size === 0) {
+      await commandInteraction.editReply(
+        msgIn.NoMembersFoundWithRoleCount(roleCount)
+      );
+      return;
+    }
+
+    const lines = matchingMembers.map(
+      (member) =>
+        `- ${member.user.tag} (${member.id}) — ${member.roles.cache.size} rôle(s)`
+    );
+
+    const chunks = splitMessage(
+      `${msgIn.MembersWithRoleCountTitle(roleCount)}\n\n${lines.join("\n")}`
+    );
+
+    await commandInteraction.editReply(chunks[0]);
+
+    for (let i = 1; i < chunks.length; i++) {
+      await commandInteraction.followUp({
+        content: chunks[i],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    return;
+  }
 
       return;
     }

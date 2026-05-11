@@ -184,6 +184,9 @@ ManualVerificationProcessed: (
         : "déjà présent"
       : "non ajouté, membre absent du serveur"
   }`,
+
+  NoMembersFoundWithRoleCount: (count: number) => `Aucun membre trouvé avec exactement ${count} rôle(s).`,
+  MembersWithRoleCountTitle: (count: number) => `**Membres ayant exactement ${count} rôle(s)**`,
 };
 
 const fr_out = {

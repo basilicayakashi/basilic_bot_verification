@@ -191,6 +191,9 @@ ManualVerificationProcessed: (
         : "już obecna"
       : "nie dodano, członek nie jest obecny na serwerze"
   }`,
+
+  NoMembersFoundWithRoleCount: (count: number) => `Nie znaleziono członków posiadających dokładnie ${count} rol(i).`,
+  MembersWithRoleCountTitle: (count: number) => `**Członkowie posiadający dokładnie ${count} rol(i)**`,
 };
 
 const pl_out = {

@@ -183,6 +183,9 @@ ManualVerificationProcessed: (
         : "already present"
       : "not added, member not present on the server"
   }`,
+
+  NoMembersFoundWithRoleCount: (count: number) => `No members found with exactly ${count} role(s).`,
+  MembersWithRoleCountTitle: (count: number) => `**Members having exactly ${count} role(s)**`,
 };
 
 const en_out = {

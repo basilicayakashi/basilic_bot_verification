@@ -1983,10 +1983,15 @@ if (interaction.isButton()) {
       return;
     }
 
-    const lines = matchingMembers.map(
-      (member) =>
-        `- ${member.user.tag} (${member.id})`
-    );
+    const locale = interaction.locale ?? "fr";
+
+    const lines = matchingMembers.map((member) => {
+      const joinedDate = member.joinedAt
+        ? member.joinedAt.toLocaleString(locale)
+        : "??????";
+
+      return `- ${member.user.tag} (${member.id}) — ${joinedDate}`;
+    });
 
     const chunks = splitMessage(
       `${msgIn.MembersWithRoleCountTitle(roleCount)}\n\n${lines.join("\n")}`

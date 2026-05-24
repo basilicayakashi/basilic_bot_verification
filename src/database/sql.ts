@@ -97,6 +97,36 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS free_games_settings (
+    guild_id TEXT PRIMARY KEY,
+    channel_id TEXT NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    include_steam BOOLEAN NOT NULL DEFAULT TRUE,
+    include_epicgames BOOLEAN NOT NULL DEFAULT TRUE,
+    include_itchio BOOLEAN NOT NULL DEFAULT FALSE,
+    include_gog BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+    CHECK (enabled IN (0, 1)),
+    CHECK (include_steam IN (0, 1)),
+    CHECK (include_epicgames IN (0, 1)),
+    CHECK (include_itchio IN (0, 1)),
+    CHECK (include_gog IN (0, 1))
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS free_games_publications (
+    guild_id TEXT NOT NULL,
+    free_game_id INTEGER NOT NULL,
+    published_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (guild_id, free_game_id),
+    FOREIGN KEY (free_game_id) REFERENCES free_games(id) ON DELETE CASCADE
+  );
+`);
+
 export const getVerifiedUserStmt = db.prepare(
   "SELECT * FROM verified_users WHERE guild_id = ? AND user_id = ?"
 );
@@ -254,6 +284,67 @@ export const getExpiredPendingVerificationSubmissionsStmt = db.prepare(`
   WHERE expires_at <= ?
 `);
 
+export const upsertFreeGamesSettingsStmt = db.prepare(`
+  INSERT INTO free_games_settings (
+    guild_id,
+    channel_id,
+    enabled,
+    include_steam,
+    include_epicgames,
+    include_itchio,
+    include_gog,
+    created_at,
+    updated_at
+  )
+  VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+  ON CONFLICT(guild_id) DO UPDATE SET
+    channel_id = excluded.channel_id,
+    enabled = excluded.enabled,
+    include_steam = excluded.include_steam,
+    include_epicgames = excluded.include_epicgames,
+    include_itchio = excluded.include_itchio,
+    include_gog = excluded.include_gog,
+    updated_at = CURRENT_TIMESTAMP
+`);
+
+export const getFreeGamesSettingsStmt = db.prepare(`
+  SELECT *
+  FROM free_games_settings
+  WHERE guild_id = ?
+`);
+
+export const getEnabledFreeGamesSettingsStmt = db.prepare(`
+  SELECT *
+  FROM free_games_settings
+  WHERE enabled = 1
+`);
+
+export const getUnpublishedFreeGamesForGuildStmt = db.prepare(`
+  SELECT fg.*
+  FROM free_games fg
+  LEFT JOIN free_games_publications fgp
+    ON fgp.free_game_id = fg.id
+    AND fgp.guild_id = ?
+  WHERE fgp.free_game_id IS NULL
+    AND fg.expires_at > CURRENT_TIMESTAMP
+    AND (
+      (? = 1 AND fg.provider_code = 'STEAM')
+      OR (? = 1 AND fg.provider_code = 'EPICGAMES')
+      OR (? = 1 AND fg.provider_code = 'ITCHIO')
+      OR (? = 1 AND fg.provider_code = 'GOG')
+    )
+  ORDER BY fg.expires_at ASC
+`);
+
+export const insertFreeGamePublicationStmt = db.prepare(`
+  INSERT OR IGNORE INTO free_games_publications (
+    guild_id,
+    free_game_id,
+    published_at
+  )
+  VALUES (?, ?, CURRENT_TIMESTAMP)
+`);
+
 export type VerifiedUserRow = {
   user_id: string;
   username: string;
@@ -316,5 +407,15 @@ export type GuildWelcomeMessageRow = {
   guild_id: string;
   locale: string;
   dm_message: string;
+  updated_at: string;
+};
+
+export type GuildFreeGamesSettingsRow = {
+  guild_id: string;
+  channel_id: string;
+  enabled: number;
+  include_free_to_keep: number;
+  include_play_for_free: number;
+  created_at: string;
   updated_at: string;
 };

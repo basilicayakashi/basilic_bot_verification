@@ -16,7 +16,8 @@ import {
   BaseInteraction,
   CacheType,
   Locale,
-  ChatInputCommandInteraction 
+  ChatInputCommandInteraction ,
+  EmbedBuilder,
 } from "discord.js";
 
 import { SpamAlertService } from "./moderation/spam-alert.js";
@@ -50,7 +51,10 @@ import {
   getGuildWelcomeMessagesAllStmt,
   upsertGuildWelcomeMessageStmt,
   deleteGuildWelcomeMessageStmt,
-
+  getFreeGamesSettingsStmt,
+  insertFreeGamePublicationStmt,
+  getEnabledFreeGamesSettingsStmt,
+  getUnpublishedFreeGamesForGuildStmt,
 } from "./database/sql.js";
 
 import type {
@@ -80,6 +84,10 @@ const TOKEN = process.env.DISCORD_TOKEN!;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID!;
 const GUILD_ID = process.env.DISCORD_GUILD_ID!;
 const isProduction = process.env.BOT_EN_PRODUCTION === "1";
+
+const STEAM_FREE_CHECK_INTERVAL_MINUTES = Number(
+  process.env.STEAM_FREE_CHECK_INTERVAL_MINUTES ?? "60"
+);
 
 // =========================
 // CLIENT
@@ -1007,6 +1015,110 @@ function isUsedOnAServer(
 function isAdministrator(member: any, interaction: any): boolean {
   //return member.permissions.has(PermissionFlagsBits.Administrator) || isBasilic(interaction);
   return member.permissions.has(PermissionFlagsBits.Administrator) || isGuildOwner(interaction);
+}
+
+type FreeGameRow = {
+  id: number;
+  provider_code: string;
+  title: string;
+  promo_url: string;
+  expires_at: string;
+  promo_type: string;
+};
+
+function discordTimestamp(dateIso: string, style: "F" | "R" = "F"): string {
+  const unix = Math.floor(new Date(dateIso).getTime() / 1000);
+  return `<t:${unix}:${style}>`;
+}
+
+function providerLabel(providerCode: string): string {
+  switch (providerCode) {
+    case "STEAM":
+      return "Steam";
+    case "EPICGAMES":
+      return "Epic Games";
+    case "ITCHIO":
+      return "itch.io";
+    case "GOG":
+      return "GOG";
+    default:
+      return providerCode;
+  }
+}
+
+function promoTypeLabel(promoType: string): string {
+  switch (promoType) {
+    case "FREE_TO_KEEP":
+      return "Free to keep";
+    case "PLAY_FOR_FREE":
+      return "Play for free";
+    default:
+      return promoType;
+  }
+}
+
+function buildFreeGameEmbed(game: FreeGameRow): EmbedBuilder {
+  const isFreeToKeep = game.promo_type === "FREE_TO_KEEP";
+
+  return new EmbedBuilder()
+    .setTitle(
+      isFreeToKeep
+        ? `🎁 ${game.title}`
+        : `🕹️ ${game.title}`
+    )
+    .setURL(game.promo_url)
+    .setDescription(
+      isFreeToKeep
+        ? `Available for free until ${discordTimestamp(game.expires_at, "F")}.\nEnds ${discordTimestamp(game.expires_at, "R")}.`
+        : `Playable for free until ${discordTimestamp(game.expires_at, "F")}.\nEnds ${discordTimestamp(game.expires_at, "R")}.`
+    )
+    .addFields(
+      {
+        name: "Platform",
+        value: providerLabel(game.provider_code),
+        inline: true
+      },
+      {
+        name: "Promotion type",
+        value: promoTypeLabel(game.promo_type),
+        inline: true
+      }
+    )
+    .setTimestamp(new Date());
+}
+
+async function publishFreeGamesForGuild(guildId: string): Promise<void> {
+  const settings = getFreeGamesSettingsStmt.get(guildId) as any;
+
+  if (!settings || settings.enabled !== 1) return;
+
+  const channel = await client.channels.fetch(settings.channel_id).catch(() => null);
+
+  if (!channel || !("send" in channel)) return;
+
+  const games = getUnpublishedFreeGamesForGuildStmt.all(
+    guildId,
+    settings.include_steam,
+    settings.include_epicgames,
+    settings.include_itchio,
+    settings.include_gog
+  ) as FreeGameRow[];
+
+  for (const game of games) {
+    await channel.send({
+      embeds: [buildFreeGameEmbed(game)]
+    });
+
+    insertFreeGamePublicationStmt.run(guildId, game.id);
+  }
+}
+
+async function publishFreeGamesForAllGuilds(): Promise<void> {
+  const settingsRows = getEnabledFreeGamesSettingsStmt.all() as any[];
+
+  for (const settings of settingsRows) {
+    await publishFreeGamesForGuild(settings.guild_id);
+  }
 }
 
 async function requireGuild(
@@ -2271,6 +2383,9 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
     // 0 = désactivé
     if (guildSettings.verification_timeout_hours === 0) return;
+
+    // Ne pas enregistrer les bots dans le timeout de vérification
+    if (member.user.bot) return;
 
     const joinedAt = new Date();
     const expiresAt = new Date(

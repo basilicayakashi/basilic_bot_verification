@@ -5,7 +5,7 @@ const dbPath = path.resolve(process.cwd(), "verification.db");
 export const db = new Database(dbPath);
 
 const freeGamesDbPath = process.env.FREE_GAMES_DB_PATH!;
-export const freeGamesDb = new Database(freeGamesDbPath, { readonly: true });
+export const freeGamesDb = new Database(freeGamesDbPath, { fileMustExist: true });
 
 console.log("FREE_GAMES_DB_PATH =", freeGamesDbPath);
 

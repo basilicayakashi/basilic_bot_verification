@@ -127,6 +127,19 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS free_games_manual_publish_settings (
+    guild_id TEXT NOT NULL,
+    channel_id TEXT NOT NULL,
+    from_steam INTEGER NOT NULL DEFAULT 1,
+    from_epic_games INTEGER NOT NULL DEFAULT 1,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (guild_id),
+    CHECK (from_steam IN (0, 1)),
+    CHECK (from_epic_games IN (0, 1))
+  );
+`);
+
 export const getVerifiedUserStmt = db.prepare(
   "SELECT * FROM verified_users WHERE guild_id = ? AND user_id = ?"
 );
@@ -345,6 +358,22 @@ export const insertFreeGamePublicationStmt = db.prepare(`
   VALUES (?, ?, CURRENT_TIMESTAMP)
 `);
 
+export const upsertFreeGamesManualPublishSettingsStmt = db.prepare(`
+  INSERT OR REPLACE INTO free_games_manual_publish_settings
+    (guild_id, channel_id, from_steam, from_epic_games, updated_at)
+  VALUES (?, ?, ?, ?, ?)
+`);
+
+export const deleteFreeGamesManualPublishSettingsStmt = db.prepare(`
+  DELETE FROM free_games_manual_publish_settings
+  WHERE guild_id = ?
+`);
+
+export const getFreeGamesManualPublishSettingsStmt = db.prepare(`
+  SELECT * FROM free_games_manual_publish_settings
+  WHERE guild_id = ?
+`);
+
 export type VerifiedUserRow = {
   user_id: string;
   username: string;
@@ -365,8 +394,6 @@ export type BlacklistedUserRow = {
   blacklisted_by: string;
   reason: string | null;
 };
-
-
 
 export type AuthorizedGuildRow = {
   guild_id: string;
@@ -417,5 +444,13 @@ export type GuildFreeGamesSettingsRow = {
   include_free_to_keep: number;
   include_play_for_free: number;
   created_at: string;
+  updated_at: string;
+};
+
+export type FreeGamesManualPublishSettingsRow = {
+  guild_id: string;
+  channel_id: string;
+  from_steam: number;
+  from_epic_games: number;
   updated_at: string;
 };

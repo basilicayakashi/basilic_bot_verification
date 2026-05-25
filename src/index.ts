@@ -55,6 +55,8 @@ import {
   insertFreeGamePublicationStmt,
   getEnabledFreeGamesSettingsStmt,
   getUnpublishedFreeGamesForGuildStmt,
+  deleteFreeGamesManualPublishSettingsStmt,
+  upsertFreeGamesManualPublishSettingsStmt
 } from "./database/sql.js";
 
 import type {
@@ -119,59 +121,59 @@ const cmd_pl = getMessagesUser({ locale: "pl" });
 const commands = [
   new SlashCommandBuilder()
     .setName("setup-verification")
-    .setDescription(cmd_en.setupVerificationDescription)
+    .setDescription("Configure verification for this server")
     .setDescriptionLocalizations({
-      [Locale.French]: cmd_fr.setupVerificationDescription,
-      [Locale.SpanishES]: cmd_es.setupVerificationDescription,
-      [Locale.German]: cmd_de.setupVerificationDescription,
-      [Locale.Polish]: cmd_pl.setupVerificationDescription,
+      [Locale.French]: "Configurer la vérification pour ce serveur",
+      [Locale.SpanishES]: "Configurar la verificación para este servidor",
+      [Locale.German]: "Die Verifizierung für diesen Server konfigurieren",
+      [Locale.Polish]: "Skonfiguruj weryfikację",
     })
 	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addRoleOption((option) =>
       option
         .setName("verified_role")
-        .setDescription(cmd_en.verifiedRoleIdDescription)
+        .setDescription("Role to grant after approval")
 		.setDescriptionLocalizations({
-		  [Locale.French]: cmd_fr.verifiedRoleIdDescription,
-		  [Locale.SpanishES]: cmd_es.verifiedRoleIdDescription,
-		  [Locale.German]: cmd_de.verifiedRoleIdDescription,
-		  [Locale.Polish]: cmd_pl.verifiedRoleIdDescription,
+		  [Locale.French]: "Rôle à attribuer après approbation",
+		  [Locale.SpanishES]: "Rol que se asignará tras la aprobación",
+		  [Locale.German]: "Rolle, die nach der Genehmigung vergeben wird",
+		  [Locale.Polish]: "Rola przyznawana po zatwierdzeniu",
 		})
         .setRequired(true)
     )
     .addStringOption((option) =>
       option
         .setName("staff_category_id")
-        .setDescription(cmd_en.staffCategoryIdDescription)
+        .setDescription("Category ID where staff channels will be created")
 		.setDescriptionLocalizations({
-		  [Locale.French]: cmd_fr.staffCategoryIdDescription,
-		  [Locale.SpanishES]: cmd_es.staffCategoryIdDescription,
-		  [Locale.German]: cmd_de.staffCategoryIdDescription,
-		  [Locale.Polish]: cmd_pl.staffCategoryIdDescription,
+		  [Locale.French]: "ID de la catégorie dans laquelle les salons du staff seront créés",
+		  [Locale.SpanishES]: "ID de la categoría donde se crearán los canales del staff",
+		  [Locale.German]: "Kategorie-ID, in der die Staff-Kanäle erstellt werden",
+		  [Locale.Polish]: "ID kategorii, w której tworzone będą kanały personelu",
 		})
         .setRequired(true)
     )
     .addRoleOption((option) =>
       option
         .setName("staff_role")
-        .setDescription(cmd_en.staffRoleIdDescription)
+        .setDescription("Staff role to notify")
 		.setDescriptionLocalizations({
-		  [Locale.French]: cmd_fr.staffRoleIdDescription,
-		  [Locale.SpanishES]: cmd_es.staffRoleIdDescription,
-		  [Locale.German]: cmd_de.staffRoleIdDescription,
-		  [Locale.Polish]: cmd_pl.staffRoleIdDescription,
+		  [Locale.French]: "Rôle du staff à notifier",
+		  [Locale.SpanishES]: "Rol del staff a notificar",
+		  [Locale.German]: "Staff-Rolle, die benachrichtigt werden soll",
+		  [Locale.Polish]: "Rola administracji do powiadomienia",
 		})
         .setRequired(true)
     )
     .addIntegerOption((option) =>
     option
       .setName("verification_timeout_hours")
-      .setDescription(cmd_en.DelaiDescriptionCommande)
+      .setDescription("Time limit in hours to submit verification responses")
       .setDescriptionLocalizations({
-		  [Locale.French]: cmd_fr.DelaiDescriptionCommande,
-		  [Locale.SpanishES]: cmd_es.DelaiDescriptionCommande,
-		  [Locale.German]: cmd_de.DelaiDescriptionCommande,
-		  [Locale.Polish]: cmd_pl.DelaiDescriptionCommande,
+		  [Locale.French]: "Délai en heures pour soumettre les réponses de vérification",
+		  [Locale.SpanishES]: "Tiempo en horas para enviar las respuestas de verificación",
+		  [Locale.German]: "Zeitlimit in Stunden zum Einreichen der Verifizierungsantworten",
+		  [Locale.Polish]: "Czas w godzinach na przesłanie odpowiedzi weryfikacyjnych",
 		})
       .setRequired(false)
       .setMinValue(0)
@@ -179,35 +181,35 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("check-member")
-    .setDescription(cmd_en.checkVerifiedDescription)
+    .setDescription("Check a user's verification, blacklist status, and shared servers")
 	.setDescriptionLocalizations({
-		  [Locale.French]: cmd_fr.checkVerifiedDescription,
-		  [Locale.SpanishES]: cmd_es.checkVerifiedDescription,
-		  [Locale.German]: cmd_de.checkVerifiedDescription,
-		  [Locale.Polish]: cmd_pl.checkVerifiedDescription,
+		  [Locale.French]: "Vérification, liste noire et serveurs communs d'un utilisateur",
+		  [Locale.SpanishES]: "Verificación, lista negra y servidores compartidos de un usuario",
+		  [Locale.German]: "Verifizierung, Sperrliste und gemeinsame Server eines Nutzers",
+		  [Locale.Polish]: "Weryfikacja, czarna lista i wspólne serwery użytkownika",
 		})
 	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((option) =>
       option
         .setName("user_id")
-        .setDescription(cmd_en.userIdLookupDescription)
+        .setDescription("The user ID to look up")
 		.setDescriptionLocalizations({
-		  [Locale.French]: cmd_fr.userIdLookupDescription,
-		  [Locale.SpanishES]: cmd_es.userIdLookupDescription,
-		  [Locale.German]: cmd_de.userIdLookupDescription,
-		  [Locale.Polish]: cmd_pl.userIdLookupDescription,
+		  [Locale.French]: "ID de l'utilisateur à rechercher",
+		  [Locale.SpanishES]: "ID del usuario que se debe buscar",
+		  [Locale.German]: "Die Benutzer-ID, nach der gesucht werden soll",
+		  [Locale.Polish]: "ID użytkownika",
 		})
         .setRequired(true)
     ),
 
   new SlashCommandBuilder()
   .setName("blacklist-member")
-  .setDescription(cmd_en.blacklistMemberDescription)
+  .setDescription("Blacklist a user on this server")
   .setDescriptionLocalizations({
-    [Locale.French]: cmd_fr.blacklistMemberDescription,
-    [Locale.SpanishES]: cmd_es.blacklistMemberDescription,
-    [Locale.German]: cmd_de.blacklistMemberDescription,
-    [Locale.Polish]: cmd_pl.blacklistMemberDescription,
+    [Locale.French]: "Mettre un utilisateur sur liste noire sur ce serveur",
+    [Locale.SpanishES]: "Poner un usuario en la lista negra en este servidor",
+    [Locale.German]: "Einen Benutzer auf diesem Server auf die schwarze Liste setzen",
+    [Locale.Polish]: "Dodać użytkownika do czarnej listy na tym serwerze",
   })
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
   .addStringOption((option) =>
@@ -225,12 +227,12 @@ const commands = [
   .addStringOption((option) =>
     option
       .setName("reason")
-      .setDescription(cmd_en.blacklistReasonDescription)
+      .setDescription("Add a reason (optional)")
       .setDescriptionLocalizations({
-        [Locale.French]: cmd_fr.blacklistReasonDescription,
-        [Locale.SpanishES]: cmd_es.blacklistReasonDescription,
-        [Locale.German]: cmd_de.blacklistReasonDescription,
-        [Locale.Polish]: cmd_pl.blacklistReasonDescription,
+        [Locale.French]: "Ajouter une raison (optionnel)",
+        [Locale.SpanishES]: "Agregar una razón (opcional)",
+        [Locale.German]: "Grund hinzufügen (optional)",
+        [Locale.Polish]: "Dodaj powód (opcjonalnie)",
       })
       .setRequired(false)
   ),
@@ -284,66 +286,66 @@ const commands = [
   */
   new SlashCommandBuilder()
     .setName("add-verification-question")
-    .setDescription(cmd_en.addVerificationQuestionDescription)
+    .setDescription("Add a verification question for this server")
 	.setDescriptionLocalizations({
-		  [Locale.French]: cmd_fr.addVerificationQuestionDescription,
-		  [Locale.SpanishES]: cmd_es.addVerificationQuestionDescription,
-		  [Locale.German]: cmd_de.addVerificationQuestionDescription,
-		  [Locale.Polish]: cmd_pl.addVerificationQuestionDescription,
+		  [Locale.French]: "Ajouter une question de vérification pour ce serveur",
+		  [Locale.SpanishES]: "Agregar una pregunta de verificación para este servidor",
+		  [Locale.German]: "Eine Verifikationsfrage für diesen Server hinzufügen",
+		  [Locale.Polish]: "Dodaj pytanie weryfikacyjne dla tego serwera",
 		})
 	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((option) =>
       option
         .setName("label")
-        .setDescription(cmd_en.questionLabelDescription)
+        .setDescription("Question label shown to the user")
 		.setDescriptionLocalizations({
-		  [Locale.French]: cmd_fr.questionLabelDescription,
-		  [Locale.SpanishES]: cmd_es.questionLabelDescription,
-		  [Locale.German]: cmd_de.questionLabelDescription,
-		  [Locale.Polish]: cmd_pl.questionLabelDescription,
+		  [Locale.French]: "Libellé de la question affiché à l'utilisateur",
+		  [Locale.SpanishES]: "Etiqueta de la pregunta mostrada al usuario",
+		  [Locale.German]: "Fragebeschriftung, die dem Benutzer angezeigt wird",
+		  [Locale.Polish]: "Etykieta pytania wyświetlana użytkownikowi",
 		})
         .setRequired(true)
     )
     .addStringOption((option) =>
       option
         .setName("type")
-        .setDescription(cmd_en.questionTypeDescription)
+        .setDescription("Question type")
 		.setDescriptionLocalizations({
-		  [Locale.French]: cmd_fr.questionTypeDescription,
-		  [Locale.SpanishES]: cmd_es.questionTypeDescription,
-		  [Locale.German]: cmd_de.questionTypeDescription,
-		  [Locale.Polish]: cmd_pl.questionTypeDescription,
+		  [Locale.French]: "Type de question",
+		  [Locale.SpanishES]: "Tipo de pregunta",
+		  [Locale.German]: "Fragetyp",
+		  [Locale.Polish]: "Typ pytania",
 		})
         .setRequired(true)
 		.addChoices(
 		  {
-			name: cmd_en.choiceShortText,
+			name: "Short text",
 			value: "text_short",
 			name_localizations: {
-			  [Locale.French]: cmd_fr.choiceShortText,
-			  [Locale.SpanishES]: cmd_es.choiceShortText,
-			  [Locale.German]: cmd_de.choiceShortText,
-			  [Locale.Polish]: cmd_pl.choiceShortText,
+			  [Locale.French]: "Texte court",
+			  [Locale.SpanishES]: "Texto corto",
+			  [Locale.German]: "Kurzer Text",
+			  [Locale.Polish]: "Krótki tekst",
 			},
 		  },
 		  {
-			name: cmd_en.choiceParagraph,
+			name: "Paragraph",
 			value: "text_paragraph",
 			name_localizations: {
-			  [Locale.French]: cmd_fr.choiceParagraph,
-			  [Locale.SpanishES]: cmd_es.choiceParagraph,
-			  [Locale.German]: cmd_de.choiceParagraph,
-			  [Locale.Polish]: cmd_pl.choiceParagraph,
+			  [Locale.French]: "Paragraphe",
+			  [Locale.SpanishES]: "Párrafo",
+			  [Locale.German]: "Absatz",
+			  [Locale.Polish]: "Paragraf",
 			},
 		  },
 		  {
-			name: cmd_en.choiceImageUpload,
+			name: "Image upload",
 			value: "file_image",
 			name_localizations: {
-			  [Locale.French]: cmd_fr.choiceImageUpload,
-			  [Locale.SpanishES]: cmd_es.choiceImageUpload,
-			  [Locale.German]: cmd_de.choiceImageUpload,
-			  [Locale.Polish]: cmd_pl.choiceImageUpload,
+			  [Locale.French]: "Téléchargement d'image",
+			  [Locale.SpanishES]: "Carga de imagen",
+			  [Locale.German]: "Bild hochladen",
+			  [Locale.Polish]: "Przesłanie obrazu",
 			},
 		  }
 		)
@@ -741,6 +743,53 @@ new SlashCommandBuilder()
       .setRequired(true)
       .setMinValue(1)
   ),
+new SlashCommandBuilder()
+  .setName("publish-new-free-games-notifications")
+  .setDescription("Publish notifications for new free games (if enabled)")
+  .setDescriptionLocalizations({
+    [Locale.French]: "Publier les notifications de jeux gratuits (si activé)",
+    [Locale.SpanishES]: "Publicar notificaciones de juegos gratuitos (si activado)",
+    [Locale.German]: "Benachrichtigungen für kostenlose Spiele veröffentlichen",
+    [Locale.Polish]: "Publikuj powiadomienia o darmowych grach (jeśli włączone)",
+  })
+  .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
+  .addChannelOption((option) =>
+    option
+      .setName("channel")
+      .setDescription("Channel to publish notifications (leave empty to skip)")
+      .setDescriptionLocalizations({
+        [Locale.French]: "Salon pour publier les notifications (vide = ignorer)",
+        [Locale.SpanishES]: "Canal para publicar notificaciones (vacío = omitir)",
+        [Locale.German]: "Kanal für Benachrichtigungen (leer lassen = überspringen)",
+        [Locale.Polish]: "Kanał do publikowania powiadomień (puste = pomiń)",
+      })
+      .addChannelTypes(ChannelType.GuildText)
+      .setRequired(false)
+  )
+  .addBooleanOption((option) =>
+    option
+      .setName("from_steam")
+      .setDescription("Publish Steam free games notifications")
+      .setDescriptionLocalizations({
+        [Locale.French]: "Publier les notifications de jeux gratuits Steam",
+        [Locale.SpanishES]: "Publicar notificaciones de juegos gratuitos de Steam",
+        [Locale.German]: "Steam-Benachrichtigungen für kostenlose Spiele veröffentlichen",
+        [Locale.Polish]: "Publikuj powiadomienia o darmowych grach Steam",
+      })
+      .setRequired(false)
+  )
+  .addBooleanOption((option) =>
+    option
+      .setName("from_epic_games")
+      .setDescription("Publish Epic Games free games notifications")
+      .setDescriptionLocalizations({
+        [Locale.French]: "Publier les notifications de jeux gratuits Epic Games",
+        [Locale.SpanishES]: "Publicar notificaciones de juegos gratuitos de Epic Games",
+        [Locale.German]: "Epic Games-Benachrichtigungen für kostenlose Spiele veröffentlichen",
+        [Locale.Polish]: "Publikuj powiadomienia o darmowych grach Epic Games",
+      })
+      .setRequired(false)
+  )
 ].map((command) => command.toJSON());
 
 // =========================
@@ -2121,14 +2170,34 @@ if (interaction.isButton()) {
     return;
   }
 
+  if (interaction.commandName === "publish-new-free-games-notifications") {
+    if (!isUsedOnAServer(interaction)) {
+      await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
       return;
     }
 
-    // =========================================
-    // 2) BOUTONS
-    // =========================================
-	
-	// dans verification-flow.ts
+    const channel = interaction.options.getChannel("channel");
+    const fromSteam = interaction.options.getBoolean("from_steam") ?? true;
+    const fromEpicGames = interaction.options.getBoolean("from_epic_games") ?? true;
+
+    if (!channel) {
+      deleteFreeGamesManualPublishSettingsStmt.run(interaction.guild.id);
+      await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsDeleted);
+      return;
+    }
+
+    upsertFreeGamesManualPublishSettingsStmt.run(
+      interaction.guild.id,
+      channel.id,
+      fromSteam ? 1 : 0,
+      fromEpicGames ? 1 : 0,
+      new Date().toISOString()
+    );
+
+    await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsSaved);
+    return;
+  }
+}
 
     // =========================================
     // 3) SOUMISSION DU MODAL
@@ -2136,12 +2205,6 @@ if (interaction.isButton()) {
       if (interaction.isModalSubmit()) {
         if (!isUsedOnAServer(interaction)) {
           await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
-          /*
-          await interaction.reply({
-            content: msgIn.actionMustBeUsedInServer,
-            flags: MessageFlags.Ephemeral,
-          });
-          */
           return;
         }
 

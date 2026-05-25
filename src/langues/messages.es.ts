@@ -186,6 +186,8 @@ ManualVerificationProcessed: (
 
   NoMembersFoundWithRoleCount: (count: number) => `No se encontraron miembros con exactamente ${count} rol(es).`,
   MembersWithRoleCountTitle: (count: number) => `**Miembros con exactamente ${count} rol(es)**`,
+  freeGamesManualPublishSettingsDeleted : "Configuración de publicación eliminada",
+  freeGamesManualPublishSettingsSaved : "Configuración de publicación guardada",
 };
 
 const es_out = {

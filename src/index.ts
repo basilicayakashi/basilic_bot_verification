@@ -746,7 +746,7 @@ new SlashCommandBuilder()
       .setMinValue(1)
   ),
 new SlashCommandBuilder()
-  .setName("publish-new-free-games-notifications")
+  .setName("freegames-publish")
   .setDescription("Publish notifications for new free games (if enabled)")
   .setDescriptionLocalizations({
     [Locale.French]: "Publier les notifications de jeux gratuits (si activé)",
@@ -2177,7 +2177,7 @@ if (interaction.isButton()) {
     return;
   }
 
-  if (interaction.commandName === "publish-new-free-games-notifications") {
+  if (interaction.commandName === "freegames-publish") {
     if (!isUsedOnAServer(interaction)) {
       await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
       return;

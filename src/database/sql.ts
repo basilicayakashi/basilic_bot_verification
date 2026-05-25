@@ -1,18 +1,9 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import Database from "better-sqlite3";
 import path from "node:path";
 
 
 const dbPath = path.resolve(process.cwd(), "verification.db");
 export const db = new Database(dbPath);
-
-const freeGamesDbPath = process.env.FREE_GAMES_DB_PATH!;
-export const freeGamesDb = new Database(freeGamesDbPath, { fileMustExist: true });
-
-console.log("SQL.ts → FREE_GAMES_DB_PATH =", process.env.FREE_GAMES_DB_PATH);
-
 
 // Table pour stocker les utilisateurs vérifiés et une trace de leur vérification (qui, quand)
 db.exec(`
@@ -135,6 +126,26 @@ db.exec(`
     published_at TEXT DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (guild_id, free_game_id)
   );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS free_games (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      provider_code TEXT NOT NULL,
+      title TEXT NOT NULL,
+      promo_url TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      promo_type TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+      UNIQUE(provider_code, promo_url, promo_type)
+  );
+`);
+
+export const getAllFreeGamesStmt = db.prepare(`
+  SELECT *
+  FROM free_games
 `);
 
 export const getVerifiedUserStmt = db.prepare(
@@ -429,11 +440,6 @@ export type GuildFreeGamesSettingsRow = {
   created_at: string;
   updated_at: string;
 };
-
-export const getAllActiveFreeGamesStmt = freeGamesDb.prepare(`
-  SELECT * FROM free_games
-  ORDER BY created_at ASC
-`);
 
 export const getPublishedFreeGameIdsForGuildStmt = db.prepare(`
   SELECT free_game_id FROM free_games_publications

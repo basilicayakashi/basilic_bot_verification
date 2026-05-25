@@ -58,8 +58,8 @@ import {
   insertFreeGamePublicationStmt,
   getEnabledFreeGamesSettingsStmt,
   upsertFreeGamesSettingsStmt,
-  getAllActiveFreeGamesStmt,
   getPublishedFreeGameIdsForGuildStmt,
+  getAllFreeGamesStmt,
 } from "./database/sql.js";
 
 import type {
@@ -1146,7 +1146,7 @@ async function publishFreeGamesForGuild(guildId: string): Promise<void> {
   const channel = await client.channels.fetch(settings.channel_id).catch(() => null);
   if (!channel || !("send" in channel)) return;
 
-  const allGames = getAllActiveFreeGamesStmt.all() as FreeGameRow[];
+  const allGames = getAllFreeGamesStmt.all() as FreeGameRow[];
 
   const publishedIds = (
     getPublishedFreeGameIdsForGuildStmt.all(guildId) as { free_game_id: number }[]

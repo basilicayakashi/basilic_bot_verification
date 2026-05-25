@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -74,10 +77,6 @@ import { handleVerificationButtons, handleVerificationModals} from "./moderation
 
 //les messages envoyés à la personne qui fait appel au bot
 import { getMessagesUser, getMessagesOut, getMessagesServer, getMessagesInternal} from "./langues/index.js";
-
-import dotenv from "dotenv";
-
-dotenv.config();
 
 // =========================
 // CONFIG

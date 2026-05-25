@@ -1,7 +1,5 @@
 import Database from "better-sqlite3";
 import path from "node:path";
-import dotenv from "dotenv";
-dotenv.config();
 
 const dbPath = path.resolve(process.cwd(), "verification.db");
 export const db = new Database(dbPath);

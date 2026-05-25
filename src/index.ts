@@ -2176,42 +2176,43 @@ if (interaction.isButton()) {
   }
 
   if (interaction.commandName === "publish-new-free-games-notifications") {
-  if (!isUsedOnAServer(interaction)) {
-    await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
-    return;
-  }
+    if (!isUsedOnAServer(interaction)) {
+      await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
+      return;
+    }
 
-  const channel = interaction.options.getChannel("channel");
-  const fromSteam = interaction.options.getBoolean("from_steam") ?? true;
-  const fromEpicGames = interaction.options.getBoolean("from_epic_games") ?? true;
+    const channel = interaction.options.getChannel("channel");
+    const fromSteam = interaction.options.getBoolean("from_steam") ?? true;
+    const fromEpicGames = interaction.options.getBoolean("from_epic_games") ?? true;
 
-  if (!channel) {
+    if (!channel) {
+      upsertFreeGamesSettingsStmt.run(
+        interaction.guild.id,
+        "",    // channel_id vide
+        0,     // enabled = false
+        fromSteam ? 1 : 0,
+        fromEpicGames ? 1 : 0,
+        0,     // itchio
+        0      // gog
+      );
+      await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsDeleted);
+      return;
+    }
+
     upsertFreeGamesSettingsStmt.run(
       interaction.guild.id,
-      "",    // channel_id vide
-      0,     // enabled = false
+      channel.id,
+      1,     // enabled = true
       fromSteam ? 1 : 0,
       fromEpicGames ? 1 : 0,
       0,     // itchio
       0      // gog
     );
-    await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsDeleted);
+
+    await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsSaved);
     return;
   }
-
-  upsertFreeGamesSettingsStmt.run(
-    interaction.guild.id,
-    channel.id,
-    1,     // enabled = true
-    fromSteam ? 1 : 0,
-    fromEpicGames ? 1 : 0,
-    0,     // itchio
-    0      // gog
-  );
-
-  await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsSaved);
-  return;
-}
+    }
 
     // =========================================
     // 3) SOUMISSION DU MODAL

@@ -7,7 +7,7 @@ export const db = new Database(dbPath);
 const freeGamesDbPath = process.env.FREE_GAMES_DB_PATH!;
 export const freeGamesDb = new Database(freeGamesDbPath, { fileMustExist: true });
 
-console.log("FREE_GAMES_DB_PATH =", freeGamesDbPath);
+console.log("SQL.ts → FREE_GAMES_DB_PATH =", process.env.FREE_GAMES_DB_PATH);
 
 
 // Table pour stocker les utilisateurs vérifiés et une trace de leur vérification (qui, quand)

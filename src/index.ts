@@ -90,6 +90,9 @@ const STEAM_FREE_CHECK_INTERVAL_MINUTES = Number(
   process.env.STEAM_FREE_CHECK_INTERVAL_MINUTES ?? "60"
 );
 
+console.log("index.ts → FREE_GAMES_DB_PATH =", process.env.FREE_GAMES_DB_PATH);
+
+
 // =========================
 // CLIENT
 // =========================

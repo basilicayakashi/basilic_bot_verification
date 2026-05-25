@@ -54,9 +54,9 @@ import {
   getFreeGamesSettingsStmt,
   insertFreeGamePublicationStmt,
   getEnabledFreeGamesSettingsStmt,
-  getUnpublishedFreeGamesForGuildStmt,
-  deleteFreeGamesManualPublishSettingsStmt,
-  upsertFreeGamesManualPublishSettingsStmt
+  upsertFreeGamesSettingsStmt,
+  getAllActiveFreeGamesStmt,
+  getPublishedFreeGameIdsForGuildStmt,
 } from "./database/sql.js";
 
 import type {
@@ -1142,22 +1142,27 @@ async function publishFreeGamesForGuild(guildId: string): Promise<void> {
   if (!settings || settings.enabled !== 1) return;
 
   const channel = await client.channels.fetch(settings.channel_id).catch(() => null);
-
   if (!channel || !("send" in channel)) return;
 
-  const games = getUnpublishedFreeGamesForGuildStmt.all(
-    guildId,
-    settings.include_steam,
-    settings.include_epicgames,
-    settings.include_itchio,
-    settings.include_gog
-  ) as FreeGameRow[];
+  const allGames = getAllActiveFreeGamesStmt.all() as FreeGameRow[];
+
+  const publishedIds = (
+    getPublishedFreeGameIdsForGuildStmt.all(guildId) as { free_game_id: number }[]
+  ).map(r => r.free_game_id);
+
+  const games = allGames.filter(game => {
+    if (publishedIds.includes(game.id)) return false;
+    if (game.provider_code === "STEAM" && !settings.include_steam) return false;
+    if (game.provider_code === "EPICGAMES" && !settings.include_epicgames) return false;
+    if (game.provider_code === "ITCHIO" && !settings.include_itchio) return false;
+    if (game.provider_code === "GOG" && !settings.include_gog) return false;
+    return true;
+  });
 
   for (const game of games) {
     await channel.send({
       embeds: [buildFreeGameEmbed(game)]
     });
-
     insertFreeGamePublicationStmt.run(guildId, game.id);
   }
 }
@@ -2171,32 +2176,41 @@ if (interaction.isButton()) {
   }
 
   if (interaction.commandName === "publish-new-free-games-notifications") {
-    if (!isUsedOnAServer(interaction)) {
-      await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
-      return;
-    }
-
-    const channel = interaction.options.getChannel("channel");
-    const fromSteam = interaction.options.getBoolean("from_steam") ?? true;
-    const fromEpicGames = interaction.options.getBoolean("from_epic_games") ?? true;
-
-    if (!channel) {
-      deleteFreeGamesManualPublishSettingsStmt.run(interaction.guild.id);
-      await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsDeleted);
-      return;
-    }
-
-    upsertFreeGamesManualPublishSettingsStmt.run(
-      interaction.guild.id,
-      channel.id,
-      fromSteam ? 1 : 0,
-      fromEpicGames ? 1 : 0,
-      new Date().toISOString()
-    );
-
-    await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsSaved);
+  if (!isUsedOnAServer(interaction)) {
+    await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
     return;
   }
+
+  const channel = interaction.options.getChannel("channel");
+  const fromSteam = interaction.options.getBoolean("from_steam") ?? true;
+  const fromEpicGames = interaction.options.getBoolean("from_epic_games") ?? true;
+
+  if (!channel) {
+    upsertFreeGamesSettingsStmt.run(
+      interaction.guild.id,
+      "",    // channel_id vide
+      0,     // enabled = false
+      fromSteam ? 1 : 0,
+      fromEpicGames ? 1 : 0,
+      0,     // itchio
+      0      // gog
+    );
+    await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsDeleted);
+    return;
+  }
+
+  upsertFreeGamesSettingsStmt.run(
+    interaction.guild.id,
+    channel.id,
+    1,     // enabled = true
+    fromSteam ? 1 : 0,
+    fromEpicGames ? 1 : 0,
+    0,     // itchio
+    0      // gog
+  );
+
+  await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsSaved);
+  return;
 }
 
     // =========================================

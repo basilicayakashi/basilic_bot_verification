@@ -1,8 +1,13 @@
 import Database from "better-sqlite3";
 import path from "node:path";
+import dotenv from "dotenv";
+dotenv.config();
 
 const dbPath = path.resolve(process.cwd(), "verification.db");
 export const db = new Database(dbPath);
+
+const freeGamesDbPath = process.env.FREE_GAMES_DB_PATH!;
+export const freeGamesDb = new Database(freeGamesDbPath, { readonly: true });
 
 // Table pour stocker les utilisateurs vérifiés et une trace de leur vérification (qui, quand)
 db.exec(`
@@ -117,26 +122,13 @@ db.exec(`
   );
 `);
 
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS free_games_publications (
     guild_id TEXT NOT NULL,
     free_game_id INTEGER NOT NULL,
     published_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (guild_id, free_game_id),
-    FOREIGN KEY (free_game_id) REFERENCES free_games(id) ON DELETE CASCADE
-  );
-`);
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS free_games_manual_publish_settings (
-    guild_id TEXT NOT NULL,
-    channel_id TEXT NOT NULL,
-    from_steam INTEGER NOT NULL DEFAULT 1,
-    from_epic_games INTEGER NOT NULL DEFAULT 1,
-    updated_at TEXT NOT NULL,
-    PRIMARY KEY (guild_id),
-    CHECK (from_steam IN (0, 1)),
-    CHECK (from_epic_games IN (0, 1))
+    PRIMARY KEY (guild_id, free_game_id)
   );
 `);
 
@@ -332,6 +324,7 @@ export const getEnabledFreeGamesSettingsStmt = db.prepare(`
   WHERE enabled = 1
 `);
 
+/*
 export const getUnpublishedFreeGamesForGuildStmt = db.prepare(`
   SELECT fg.*
   FROM free_games fg
@@ -348,6 +341,7 @@ export const getUnpublishedFreeGamesForGuildStmt = db.prepare(`
     )
   ORDER BY fg.expires_at ASC
 `);
+*/
 
 export const insertFreeGamePublicationStmt = db.prepare(`
   INSERT OR IGNORE INTO free_games_publications (
@@ -356,22 +350,6 @@ export const insertFreeGamePublicationStmt = db.prepare(`
     published_at
   )
   VALUES (?, ?, CURRENT_TIMESTAMP)
-`);
-
-export const upsertFreeGamesManualPublishSettingsStmt = db.prepare(`
-  INSERT OR REPLACE INTO free_games_manual_publish_settings
-    (guild_id, channel_id, from_steam, from_epic_games, updated_at)
-  VALUES (?, ?, ?, ?, ?)
-`);
-
-export const deleteFreeGamesManualPublishSettingsStmt = db.prepare(`
-  DELETE FROM free_games_manual_publish_settings
-  WHERE guild_id = ?
-`);
-
-export const getFreeGamesManualPublishSettingsStmt = db.prepare(`
-  SELECT * FROM free_games_manual_publish_settings
-  WHERE guild_id = ?
 `);
 
 export type VerifiedUserRow = {
@@ -447,10 +425,12 @@ export type GuildFreeGamesSettingsRow = {
   updated_at: string;
 };
 
-export type FreeGamesManualPublishSettingsRow = {
-  guild_id: string;
-  channel_id: string;
-  from_steam: number;
-  from_epic_games: number;
-  updated_at: string;
-};
+export const getAllActiveFreeGamesStmt = freeGamesDb.prepare(`
+  SELECT * FROM free_games
+  ORDER BY created_at ASC
+`);
+
+export const getPublishedFreeGameIdsForGuildStmt = db.prepare(`
+  SELECT free_game_id FROM free_games_publications
+  WHERE guild_id = ?
+`);

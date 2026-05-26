@@ -1317,6 +1317,9 @@ client.once(Events.ClientReady, async (readyClient) => {
 
   await publishFreeGamesForAllGuilds();
 
+  const ONE_MINUTE = 60 * 1000;
+  const ONE_HOUR = 60 * ONE_MINUTE;
+
   // Puis toutes les 10 minutes
   setInterval(async () => {
     try {
@@ -1324,7 +1327,7 @@ client.once(Events.ClientReady, async (readyClient) => {
     } catch (error) {
       console.error("❌ Erreur publication jeux gratuits :", error);
     }
-  }, 10 * 60 * 1000);
+  }, ONE_HOUR);
 });
 
 

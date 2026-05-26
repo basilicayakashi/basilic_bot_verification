@@ -130,6 +130,7 @@ db.exec(`
 db.exec(`
   CREATE TABLE IF NOT EXISTS free_games (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      image_url TEXT,
       provider_code TEXT NOT NULL,
       title TEXT NOT NULL,
       promo_url TEXT NOT NULL,

@@ -117,40 +117,6 @@ const spamAlertService = new SpamAlertService({
 
 export const commands = [
   new SlashCommandBuilder()
-    .setName("freegames")
-    .setDescription("Manage free games notifications")
-    .setDescriptionLocalizations({
-      [Locale.French]: "Gérer les notifications de jeux gratuits",
-      [Locale.SpanishES]: "Gestionar las notificaciones de juegos gratuitos",
-      [Locale.German]: "Benachrichtigungen für kostenlose Spiele verwalten",
-      [Locale.Polish]: "Zarządzaj powiadomieniami o darmowych grach",
-    })
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName("config")
-        .setDescription("Configure free games notifications")
-        .setDescriptionLocalizations({
-          [Locale.French]: "Configurer les notifications de jeux gratuits",
-          [Locale.SpanishES]: "Configurar las notificaciones de juegos gratuitos",
-          [Locale.German]: "Benachrichtigungen für kostenlose Spiele konfigurieren",
-          [Locale.Polish]: "Skonfiguruj powiadomienia o darmowych grach",
-        })
-        .addChannelOption((option) =>
-          option
-            .setName("channel")
-            .setDescription("Notification channel")
-            .setDescriptionLocalizations({
-              [Locale.French]: "Salon des notifications",
-              [Locale.SpanishES]: "Canal de notificaciones",
-              [Locale.German]: "Benachrichtigungskanal",
-              [Locale.Polish]: "Kanał powiadomień",
-            })
-            .addChannelTypes(ChannelType.GuildText)
-            .setRequired(true)
-        )
-    ),
-new SlashCommandBuilder()
     .setName("setup-verification")
     .setDescription("Configure verification for this server")
     .setDescriptionLocalizations({
@@ -1099,6 +1065,7 @@ function isAdministrator(member: any, interaction: any): boolean {
 
 type FreeGameRow = {
   id: number;
+  image_url: string | null;
   provider_code: string;
   title: string;
   promo_url: string;
@@ -1140,7 +1107,7 @@ function promoTypeLabel(promoType: string): string {
 function buildFreeGameEmbed(game: FreeGameRow): EmbedBuilder {
   const isFreeToKeep = game.promo_type === "FREE_TO_KEEP";
 
-  return new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setTitle(
       isFreeToKeep
         ? `🎁 ${game.title}`
@@ -1165,6 +1132,12 @@ function buildFreeGameEmbed(game: FreeGameRow): EmbedBuilder {
       }
     )
     .setTimestamp(new Date());
+
+  if (game.image_url && /^https?:\/\//i.test(game.image_url)) {
+    embed.setImage(game.image_url);
+  }
+
+  return embed;
 }
 
 async function publishFreeGamesForGuild(guildId: string): Promise<void> {

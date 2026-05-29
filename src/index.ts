@@ -1143,16 +1143,28 @@ function buildFreeGameEmbed(game: FreeGameRow): EmbedBuilder {
 async function publishFreeGamesForGuild(guildId: string): Promise<void> {
   const settings = getFreeGamesSettingsStmt.get(guildId) as any;
 
+  console.log(`[FREEGAMES] settings for ${guildId}:`, settings);
+
   if (!settings || settings.enabled !== 1) return;
 
-  const channel = await client.channels.fetch(settings.channel_id).catch(() => null);
-  if (!channel || !("send" in channel)) return;
+  const channel = await client.channels.fetch(settings.channel_id).catch((error) => {
+    console.error(`[FREEGAMES] cannot fetch channel ${settings.channel_id}:`, error);
+    return null;
+  });
+
+  if (!channel || !("send" in channel)) {
+    console.warn(`[FREEGAMES] invalid channel for guild ${guildId}`);
+    return;
+  }
 
   const allGames = getAllFreeGamesStmt.all() as FreeGameRow[];
+  console.log(`[FREEGAMES] games in db: ${allGames.length}`);
 
   const publishedIds = (
     getPublishedFreeGameIdsForGuildStmt.all(guildId) as { free_game_id: number }[]
   ).map(r => r.free_game_id);
+
+  console.log(`[FREEGAMES] already published for ${guildId}: ${publishedIds.length}`);
 
   const games = allGames.filter(game => {
     if (publishedIds.includes(game.id)) return false;
@@ -1163,10 +1175,15 @@ async function publishFreeGamesForGuild(guildId: string): Promise<void> {
     return true;
   });
 
+  console.log(`[FREEGAMES] games to publish for ${guildId}: ${games.length}`);
+
   for (const game of games) {
+    console.log(`[FREEGAMES] publishing ${game.title} to ${settings.channel_id}`);
+
     await channel.send({
       embeds: [buildFreeGameEmbed(game)]
     });
+
     insertFreeGamePublicationStmt.run(guildId, game.id);
   }
 }
@@ -1174,7 +1191,10 @@ async function publishFreeGamesForGuild(guildId: string): Promise<void> {
 async function publishFreeGamesForAllGuilds(): Promise<void> {
   const settingsRows = getEnabledFreeGamesSettingsStmt.all() as any[];
 
+  console.log(`[FREEGAMES] enabled guilds: ${settingsRows.length}`);
+
   for (const settings of settingsRows) {
+    console.log(`[FREEGAMES] checking guild ${settings.guild_id}`);
     await publishFreeGamesForGuild(settings.guild_id);
   }
 }

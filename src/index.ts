@@ -60,6 +60,8 @@ import {
   upsertFreeGamesSettingsStmt,
   getPublishedFreeGameIdsForGuildStmt,
   getAllFreeGamesStmt,
+  getExpiredFreeGamePublicationsStmt,
+  deleteFreeGamePublicationStmt,
 } from "./database/sql.js";
 
 import type {
@@ -89,9 +91,6 @@ const isProduction = process.env.BOT_EN_PRODUCTION === "1";
 const STEAM_FREE_CHECK_INTERVAL_MINUTES = Number(
   process.env.STEAM_FREE_CHECK_INTERVAL_MINUTES ?? "60"
 );
-
-console.log("index.ts → FREE_GAMES_DB_PATH =", process.env.FREE_GAMES_DB_PATH);
-
 
 // =========================
 // CLIENT
@@ -1180,11 +1179,16 @@ async function publishFreeGamesForGuild(guildId: string): Promise<void> {
   for (const game of games) {
     console.log(`[FREEGAMES] publishing ${game.title} to ${settings.channel_id}`);
 
-    await channel.send({
+    const sentMessage = await channel.send({
       embeds: [buildFreeGameEmbed(game)]
     });
 
-    insertFreeGamePublicationStmt.run(guildId, game.id);
+    insertFreeGamePublicationStmt.run(
+      guildId,
+      game.id,
+      settings.channel_id,
+      sentMessage.id
+    );
   }
 }
 
@@ -1275,6 +1279,28 @@ async function requireAdminOnGuild(
   return member;
 }
 
+async function cleanupExpiredFreeGameMessages(): Promise<void> {
+  const rows = getExpiredFreeGamePublicationsStmt.all() as {
+    guild_id: string;
+    free_game_id: number;
+    channel_id: string;
+    message_id: string;
+  }[];
+
+  for (const row of rows) {
+    const channel = await client.channels.fetch(row.channel_id).catch(() => null);
+
+    if (!channel || !("messages" in channel)) continue;
+
+    const message = await channel.messages.fetch(row.message_id).catch(() => null);
+
+    if (message) {
+      await message.delete().catch(() => null);
+    }
+
+    deleteFreeGamePublicationStmt.run(row.guild_id, row.free_game_id);
+  }
+}
 
 
 // =========================
@@ -1289,12 +1315,6 @@ client.once(Events.ClientReady, async (readyClient) => {
     // isProduction : 1 en production, 0 pour en test
 
     const rest = new REST({ version: "10" }).setToken(TOKEN);
-    /*
-    await rest.put(
-      Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
-      { body: commands }
-    );
-    */
 
   await rest.put(
     isProduction
@@ -1308,17 +1328,19 @@ client.once(Events.ClientReady, async (readyClient) => {
     console.error("❌ Erreur enregistrement commandes :", error);
   }
 
+  await cleanupExpiredFreeGameMessages();
   await publishFreeGamesForAllGuilds();
 
   const ONE_MINUTE = 60 * 1000;
   const ONE_HOUR = 60 * ONE_MINUTE;
 
-  // Puis toutes les 10 minutes
+  // tâche réccurrente pour publier les jeux gratuits et nettoyer les anciens messages
   setInterval(async () => {
     try {
+      await cleanupExpiredFreeGameMessages();
       await publishFreeGamesForAllGuilds();
     } catch (error) {
-      console.error("❌ Erreur publication jeux gratuits :", error);
+      console.error("❌ Erreur dnas la tâche réccurrente :", error);
     }
   }, ONE_HOUR);
 });

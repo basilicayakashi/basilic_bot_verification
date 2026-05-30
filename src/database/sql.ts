@@ -121,6 +121,8 @@ db.exec(`
 db.exec(`
   CREATE TABLE IF NOT EXISTS free_games_publications (
     guild_id TEXT NOT NULL,
+    channel_id TEXT NULL,
+    message_id TEXT NULL,
     free_game_id INTEGER NOT NULL,
     published_at TEXT DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (guild_id, free_game_id)
@@ -146,6 +148,7 @@ db.exec(`
 export const getAllFreeGamesStmt = db.prepare(`
   SELECT *
   FROM free_games
+  ORDER BY datetime(expires_at) ASC
 `);
 
 export const getVerifiedUserStmt = db.prepare(
@@ -340,32 +343,39 @@ export const getEnabledFreeGamesSettingsStmt = db.prepare(`
   WHERE enabled = 1
 `);
 
-/*
-export const getUnpublishedFreeGamesForGuildStmt = db.prepare(`
-  SELECT fg.*
-  FROM free_games fg
-  LEFT JOIN free_games_publications fgp
-    ON fgp.free_game_id = fg.id
-    AND fgp.guild_id = ?
-  WHERE fgp.free_game_id IS NULL
-    AND fg.expires_at > CURRENT_TIMESTAMP
-    AND (
-      (? = 1 AND fg.provider_code = 'STEAM')
-      OR (? = 1 AND fg.provider_code = 'EPICGAMES')
-      OR (? = 1 AND fg.provider_code = 'ITCHIO')
-      OR (? = 1 AND fg.provider_code = 'GOG')
-    )
-  ORDER BY fg.expires_at ASC
-`);
-*/
-
 export const insertFreeGamePublicationStmt = db.prepare(`
   INSERT OR IGNORE INTO free_games_publications (
     guild_id,
     free_game_id,
+    channel_id,
+    message_id,
     published_at
   )
-  VALUES (?, ?, CURRENT_TIMESTAMP)
+  VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+`);
+
+export const getPublishedFreeGameIdsForGuildStmt = db.prepare(`
+  SELECT free_game_id FROM free_games_publications
+  WHERE guild_id = ?
+`);
+
+export const getExpiredFreeGamePublicationsStmt = db.prepare(`
+  SELECT
+    fgp.guild_id,
+    fgp.free_game_id,
+    fgp.channel_id,
+    fgp.message_id
+  FROM free_games_publications fgp
+  INNER JOIN free_games fg ON fg.id = fgp.free_game_id
+  WHERE fg.expires_at < CURRENT_TIMESTAMP
+    AND fgp.channel_id IS NOT NULL
+    AND fgp.message_id IS NOT NULL
+`);
+
+export const deleteFreeGamePublicationStmt = db.prepare(`
+  DELETE FROM free_games_publications
+  WHERE guild_id = ?
+    AND free_game_id = ?
 `);
 
 export type VerifiedUserRow = {
@@ -441,7 +451,3 @@ export type GuildFreeGamesSettingsRow = {
   updated_at: string;
 };
 
-export const getPublishedFreeGameIdsForGuildStmt = db.prepare(`
-  SELECT free_game_id FROM free_games_publications
-  WHERE guild_id = ?
-`);

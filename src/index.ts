@@ -604,118 +604,6 @@ new SlashCommandBuilder()
     [Locale.Polish]: "Wyświetl bieżące ustawienia bota dla tego serwera",
   })
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-  /*
-  new SlashCommandBuilder()
-  .setName("set-welcome-message")
-  .setDescription("Create or update a welcome DM message for this server (add {n} or {N} for a line break)")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Crée ou met à jour un message de bienvenue privé pour ce serveur (ajouter {n} pour un saut de ligne)",
-    [Locale.SpanishES]: "Crea o actualiza un mensaje privado de bienvenida para este servidor. Usa {n} para saltos de línea",
-    [Locale.German]: "Erstellt oder aktualisiert eine private Willkommensnachricht. Nutze {n} für Umbrüche",
-    [Locale.Polish]: "Tworzy lub aktualizuje prywatną wiadomość powitalną dla tego serwera. Użyj {n} dla nowej linii",
-  })
-  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-  .addStringOption((option) =>
-    option
-      .setName("language")
-      .setDescription("Language of the welcome message")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Langue du message de bienvenue",
-        [Locale.SpanishES]: "Idioma del mensaje de bienvenida",
-        [Locale.German]: "Sprache der Willkommensnachricht",
-        [Locale.Polish]: "Język wiadomości powitalnej",
-      })
-      .setRequired(true)
-      .addChoices(
-        { name: "Français", value: "fr" },
-        { name: "English", value: "en" },
-        { name: "Español", value: "es" },
-        { name: "Deutsch", value: "de" },
-        { name: "Polski", value: "pl" }
-      )
-  )
-  .addStringOption((option) =>
-    option
-      .setName("message")
-      .setDescription("Private welcome message to send")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Message privé de bienvenue à envoyer",
-        [Locale.SpanishES]: "Mensaje privado de bienvenida para enviar",
-        [Locale.German]: "Private Willkommensnachricht, die gesendet wird",
-        [Locale.Polish]: "Prywatna wiadomość powitalna do wysłania",
-      })
-      .setRequired(true)
-      .setMaxLength(2000)
-  ),
-    new SlashCommandBuilder()
-      .setName("delete-welcome-message")
-      .setDescription("Delete a welcome DM message for this server")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Supprime un message privé de bienvenue pour ce serveur",
-        [Locale.SpanishES]: "Elimina un mensaje privado de bienvenida para este servidor",
-        [Locale.German]: "Löscht eine private Willkommensnachricht für diesen Server",
-        [Locale.Polish]: "Usuwa prywatną wiadomość powitalną dla tego serwera",
-      })
-      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-      .addStringOption((option) =>
-        option
-          .setName("language")
-          .setDescription("Language of the welcome message to delete")
-          .setDescriptionLocalizations({
-            [Locale.French]: "Langue du message de bienvenue à supprimer",
-            [Locale.SpanishES]: "Idioma del mensaje de bienvenida que se eliminará",
-            [Locale.German]: "Sprache der zu löschenden Willkommensnachricht",
-            [Locale.Polish]: "Język wiadomości powitalnej do usunięcia",
-          })
-          .setRequired(true)
-          .addChoices(
-            { name: "Français", value: "fr" },
-            { name: "English", value: "en" },
-            { name: "Español", value: "es" },
-            { name: "Deutsch", value: "de" },
-            { name: "Polski", value: "pl" }
-          )
-      ),
-    new SlashCommandBuilder()
-      .setName("view-welcome-messages")
-      .setDescription("Show configured welcome DM messages for this server")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Affiche les messages privés de bienvenue configurés pour ce serveur",
-        [Locale.SpanishES]: "Muestra los mensajes privados de bienvenida configurados para este servidor",
-        [Locale.German]: "Zeigt die konfigurierten privaten Willkommensnachrichten für diesen Server an",
-        [Locale.Polish]: "Wyświetla skonfigurowane prywatne wiadomości powitalne dla tego serwera",
-      })
-      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-    new SlashCommandBuilder()
-      .setName("test-welcome-message")
-      .setDescription("Preview the welcome DM for a specific language")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Prévisualise le message privé de bienvenue pour une langue donnée",
-        [Locale.SpanishES]: "Previsualiza el mensaje privado de bienvenida para un idioma concreto",
-        [Locale.German]: "Zeigt die private Willkommensnachricht für eine bestimmte Sprache als Vorschau an",
-        [Locale.Polish]: "Wyświetla podgląd prywatnej wiadomości powitalnej dla wybranego języka",
-      })
-      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-      .addStringOption((option) =>
-        option
-          .setName("language")
-          .setDescription("Language to preview")
-          .setDescriptionLocalizations({
-            [Locale.French]: "Langue à prévisualiser",
-            [Locale.SpanishES]: "Idioma para previsualizar",
-            [Locale.German]: "Sprache für die Vorschau",
-            [Locale.Polish]: "Język do podglądu",
-          })
-          .setRequired(true)
-          .addChoices(
-            { name: "Français", value: "fr" },
-            { name: "English", value: "en" },
-            { name: "Español", value: "es" },
-            { name: "Deutsch", value: "de" },
-            { name: "Polski", value: "pl" }
-          )
-      ),
-  */
  new SlashCommandBuilder()
   .setName("list-members-by-role-count")
   .setDescription("List members having exactly N roles")
@@ -785,7 +673,16 @@ new SlashCommandBuilder()
         [Locale.Polish]: "Publikuj powiadomienia o darmowych grach Epic Games",
       })
       .setRequired(false)
-  )
+  ),
+  new SlashCommandBuilder()
+  .setName("donation")
+  .setDescription("Support the bot development")
+  .setDescriptionLocalizations({
+    [Locale.French]: "Soutenir le développement du bot",
+    [Locale.SpanishES]: "Apoyar el desarrollo del bot",
+    [Locale.German]: "Die Entwicklung des Bots unterstützen",
+    [Locale.Polish]: "Wesprzyj rozwój bota",
+  })
 ].map((command) => command.toJSON());
 
 // =========================
@@ -2288,8 +2185,42 @@ if (interaction.isButton()) {
     );
 
     await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsSaved);
+
+    try {
+      await publishFreeGamesForAllGuilds();
+    } catch (error) {
+      console.error("❌ Erreur dnas la commande freegames-publish :", error);
+    }
+
     return;
   }
+
+  if (interaction.commandName === "donation") {
+
+    const v_paypal = "https://www.paypal.com/paypalme/Basilic64";
+    const v_kofi = "https://ko-fi.com/basilic64";
+
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel("PayPal")
+        .setStyle(ButtonStyle.Link)
+        .setURL(v_paypal),
+
+      new ButtonBuilder()
+        .setLabel("Ko-fi")
+        .setStyle(ButtonStyle.Link)
+        .setURL(v_kofi)
+    );
+
+    await interaction.reply({
+      content: "**Support the bot**\n\nThank you for supporting the project ❤️",
+      components: [row],
+      flags: MessageFlags.Ephemeral,
+    });
+
+    return;
+  }
+
     }
 
     // =========================================

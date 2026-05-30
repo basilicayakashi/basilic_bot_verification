@@ -1,36 +1,121 @@
 const pl_in = {
   helpMessage: `
-**Przewodnik konfiguracji bota**
+# 🤖 Przewodnik konfiguracji bota
 
-**Jak zacząć**
-Właściciel serwera może użyć \`/setup-verification\`, aby włączyć weryfikację nowych członków.
+Bot zapewnia **weryfikację członków**, **wykrywanie spamu** oraz **powiadomienia o darmowych grach** dla serwera Discord.
 
-**Konfiguracja weryfikacji**
-Po włączeniu weryfikacji za pomocą \`/setup-verification\`, właściciel serwera może dostosować pytania:
+---
 
-- \`/add-verification-question\` → dodaje pytanie
-- \`/edit-verification-question\` → edytuje pytanie
-- \`/delete-verification-question\` → usuwa pytanie
-- \`/list-verification-questions\` → wyświetla listę pytań
+## 🔐 Weryfikacja członków
 
-**Działanie dla nowych członków**
-1. Bot publikuje przycisk weryfikacji na wybranym kanale.
-2. Nowy członek klika i odpowiada na pytania.
-3. Bot tworzy kanał weryfikacyjny dla administracji.
-4. Administracja może zaakceptować, odrzucić lub zablokować użytkownika.
-5. Po akceptacji rola zostaje nadana automatycznie.
+### Włączanie weryfikacji
 
-**Wykrywanie spamu**
-Bot może również wykrywać podejrzane zachowania:
+Użyj:
 
-- \`/setup-spam-detection\` → włącza i konfiguruje wykrywanie spamu
+\`/setup-verification\`
 
-Funkcja ta wysyła alerty do administracji, gdy użytkownik wysyła dużą liczbę wiadomości w krótkim czasie.
+aby skonfigurować weryfikację nowych członków.
 
-**Ręczna weryfikacja członka**
+Możesz określić:
 
-Możliwe jest ręczne zweryfikowanie członka, niezależnie od tego, czy aktualnie znajduje się on na serwerze, czy nie.  
-Komenda \`/verify-member\`, z identyfikatorem Discord członka jako parametrem, umożliwi automatyczną weryfikację członka po kliknięciu przycisku weryfikacji, jeśli dołączy on do serwera później, lub natychmiast przypisze mu rolę zweryfikowanego członka, jeśli jest już obecny na serwerze.
+- rolę zweryfikowanego użytkownika
+- rolę moderacji
+- kategorię moderacji
+- limit czasu weryfikacji
+
+### Zarządzanie pytaniami
+
+Po aktywacji możesz dostosować pytania:
+
+- \`/add-verification-question\` → dodaj pytanie
+- \`/edit-verification-question\` → edytuj pytanie
+- \`/delete-verification-question\` → usuń pytanie
+- \`/list-verification-questions\` → pokaż wszystkie pytania
+
+### Jak działa weryfikacja
+
+1. Bot publikuje przycisk weryfikacji.
+2. Nowy użytkownik odpowiada na pytania.
+3. Tworzony jest kanał moderacyjny.
+4. Moderacja może:
+   - zaakceptować
+   - odrzucić
+   - dodać do blacklisty
+
+5. Po akceptacji użytkownik otrzymuje odpowiednią rolę.
+
+---
+
+## 🛡️ Wykrywanie spamu
+
+Bot może wykrywać podejrzaną aktywność.
+
+Użyj:
+
+\`/setup-spam-detection\`
+
+aby skonfigurować:
+
+- aktywację wykrywania
+- kanał alertów
+- oznaczanie roli moderacji
+- progi wykrywania
+
+W przypadku wykrycia podejrzanej aktywności moderatorzy otrzymają alert.
+
+---
+
+## 👤 Ręczna weryfikacja użytkownika
+
+Możesz ręcznie zweryfikować użytkownika, niezależnie od tego, czy jest już na serwerze.
+
+Użyj:
+
+\`/verify-member\`
+
+z identyfikatorem Discord użytkownika.
+
+Bot:
+
+- natychmiast przyzna rolę, jeśli użytkownik jest obecny
+- automatycznie zweryfikuje go po dołączeniu później
+
+---
+
+## 🎮 Darmowe gry
+
+Bot może automatycznie publikować promocje darmowych gier z:
+
+- Steam
+- Epic Games
+
+Możesz skonfigurować:
+
+- włączanie lub wyłączanie powiadomień
+- kanał publikacji
+- aktywację platform
+
+Gry są automatycznie:
+
+- publikowane
+- sortowane według końca promocji
+- usuwane po zakończeniu promocji
+
+---
+
+## ⚙️ Ustawienia serwera
+
+Użyj:
+
+\`/view-settings\`
+
+aby wyświetlić aktualną konfigurację bota.
+
+---
+
+## 🔒 Uprawnienia
+
+Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
 `,
   commandMustBeUsedInServer: "Ta komenda musi być użyta na serwerze.",
   actionMustBeUsedInServer: "Ta akcja musi być użyta na serwerze.",
@@ -167,11 +252,28 @@ Komenda \`/verify-member\`, z identyfikatorem Discord członka jako parametrem, 
   spamInfoNombre : "Liczba wiadomości, po której przekroczeniu uruchamiane jest powiadomienie",
   spamInfoDuree : "Czas trwania okna wykrywania w sekundach",
   DelaiDescriptionCommande : "Czas w godzinach na przesłanie odpowiedzi weryfikacyjnych",
-  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Aktualna konfiguracja weryfikacji**
+  ViewSettings: (
+    verifiedRoleDisplay: string,
+    staffRoleDisplay: string,
+    verificationTimeoutHours: number,
+    freeGamesEnabled: boolean,
+    freeGamesChannel: string,
+    includeSteam: boolean,
+    includeEpicGames: boolean
+  ) => `**Aktualna konfiguracja bota**
 
-1) Rola używana do weryfikacji członków : ${verifiedRoleDisplay}
-2) Rola używana do powiadamiania zespołu moderacji : ${staffRoleDisplay}
-3) Maksymalny czas na rozpoczęcie weryfikacji : ${verification_timeout_hours} godzina(y)`,
+  ## Weryfikacja
+
+  1) Zweryfikowana rola: ${verifiedRoleDisplay}
+  2) Rola moderacji: ${staffRoleDisplay}
+  3) Limit czasu weryfikacji: ${verificationTimeoutHours} godz.
+
+  ## Darmowe gry
+
+  1) Włączone: ${freeGamesEnabled ? "tak" : "nie"}
+  2) Kanał publikacji: ${freeGamesChannel}
+  3) Steam: ${includeSteam ? "tak" : "nie"}
+  4) Epic Games: ${includeEpicGames ? "tak" : "nie"}`,
 NotAuthorizedServer: "Serwer nie został autoryzowany, nie można używać żadnej komendy",
 ManualVerificationProcessed: (
   targetUserId: string,

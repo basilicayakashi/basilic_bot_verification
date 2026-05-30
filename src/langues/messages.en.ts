@@ -1,36 +1,125 @@
 const en_in = {
-  helpMessage : `
-**Bot setup guide**
+  helpMessage: `
+# 🤖 Bot setup guide
 
-**Getting started**
-The server owner can use \`/setup-verification\` to enable verification for new members.
+This bot provides **member verification**, **spam detection**, and **free game notifications** for your Discord server.
 
-**Configure verification**
-After enabling verification with \`/setup-verification\`, the server owner can customize the questions asked to new members:
+---
+
+## 🔐 Member verification
+
+### Enable verification
+
+Use:
+
+\`/setup-verification\`
+
+to configure verification for new members.
+
+You can define:
+
+- the verified role assigned after approval
+- the moderation role
+- the moderation category
+- the verification timeout
+
+### Manage verification questions
+
+After enabling verification, you can customize the questions shown to new members:
 
 - \`/add-verification-question\` → add a question
 - \`/edit-verification-question\` → edit an existing question
-- \`/delete-verification-question\` → delete an existing question
-- \`/list-verification-questions\` → list all configured questions
+- \`/delete-verification-question\` → delete a question
+- \`/list-verification-questions\` → view all questions
 
-**How it works for new members**
-1. The bot posts a verification button in the selected channel.
-2. A new member clicks the button and answers the configured questions.
-3. The bot creates a staff verification channel.
-4. Staff members can approve, reject, or blacklist the user.
-5. If approved, the configured role is automatically assigned.
+### How verification works
 
-**Spam detection**
-The bot can also monitor suspicious activity using:
+1. The bot posts a verification button in the configured channel.
+2. A new member clicks the button and answers the questions.
+3. A moderation verification channel is automatically created.
+4. Staff members can:
+   - approve
+   - reject
+   - blacklist
 
-- \`/setup-spam-detection\` → enable and configure spam detection for the server
+5. If approved, the verified role is automatically assigned.
 
-This feature sends alerts to staff when a user sends an unusually high number of messages in a short period.
+---
 
-**Manual member verification**
+## 🛡️ Spam detection
 
-It is possible to manually verify a member, whether they are currently on the server or not.  
-The \`/verify-member\` command, using the member’s Discord ID as a parameter, will either automatically verify the member when they click the verification button if they join the server later, or immediately assign them the verified member role if they are already present on the server.
+The bot can monitor suspicious activity.
+
+Use:
+
+\`/setup-spam-detection\`
+
+to configure:
+
+- detection activation
+- alert channel
+- moderation role mention
+- detection thresholds
+
+When suspicious activity is detected, moderation alerts are automatically sent.
+
+---
+
+## 👤 Manual member verification
+
+You can manually verify a member, whether they are already on the server or not.
+
+Use:
+
+\`/verify-member\`
+
+with a Discord user ID.
+
+The bot will:
+
+- immediately assign the verified role if the member is already on the server
+- automatically verify them later if they join the server
+
+---
+
+## 🎮 Free games notifications
+
+The bot can automatically publish **free game promotions** from:
+
+- Steam
+- Epic Games
+
+Use the free games setup command to:
+
+- enable or disable notifications
+- choose a publication channel
+- enable or disable providers
+
+Games are automatically:
+
+- published in the configured channel
+- sorted by promotion expiration date
+- removed when promotions expire
+
+---
+
+## ⚙️ Server settings overview
+
+Use:
+
+\`/view-settings\`
+
+to display the current bot configuration for the server, including:
+
+- verification settings
+- spam detection settings
+- free games settings
+
+---
+
+## 🔒 Permissions
+
+Most configuration commands require **Administrator** permissions.
 `,
   commandMustBeUsedInServer: "This command must be used inside a server.",
     actionMustBeUsedInServer: "This action must be used inside a server.",
@@ -159,11 +248,28 @@ The \`/verify-member\` command, using the member’s Discord ID as a parameter, 
   spamInfoNombre : "Number of messages required to trigger an alert",
   spamInfoDuree : "Duration in seconds of the detection window",
   DelaiDescriptionCommande : "Time limit in hours to submit verification responses",
-  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Current verification configuration**
+  ViewSettings: (
+    verifiedRoleDisplay: string,
+    staffRoleDisplay: string,
+    verificationTimeoutHours: number,
+    freeGamesEnabled: boolean,
+    freeGamesChannel: string,
+    includeSteam: boolean,
+    includeEpicGames: boolean
+  ) => `**Current bot configuration**
 
-1) Role used to verify members : ${verifiedRoleDisplay}
-2) Role used to notify the moderation team : ${staffRoleDisplay}
-3) Maximum time allowed to start verification : ${verification_timeout_hours} hour(s)`,
+  ## Verification
+
+  1) Verified role: ${verifiedRoleDisplay}
+  2) Moderation role: ${staffRoleDisplay}
+  3) Verification timeout: ${verificationTimeoutHours} hour(s)
+
+  ## Free games
+
+  1) Enabled: ${freeGamesEnabled ? "yes" : "no"}
+  2) Publication channel: ${freeGamesChannel}
+  3) Steam: ${includeSteam ? "yes" : "no"}
+  4) Epic Games: ${includeEpicGames ? "yes" : "no"}`,
   NotAuthorizedServer: "The server has not been authorized, it is impossible to use any command",
 ManualVerificationProcessed: (
   targetUserId: string,

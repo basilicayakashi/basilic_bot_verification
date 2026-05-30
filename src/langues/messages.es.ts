@@ -1,36 +1,125 @@
 const es_in = {
   helpMessage: `
-**Guía de inicio del bot**
+# 🤖 Guía de configuración del bot
 
-**Cómo empezar**
-El propietario del servidor puede usar \`/setup-verification\` para activar la verificación de nuevos miembros.
+Este bot proporciona **verificación de miembros**, **detección de spam** y **notificaciones de juegos gratuitos** para tu servidor de Discord.
 
-**Configurar la verificación**
-Después de activar la verificación con \`/setup-verification\`, el propietario puede personalizar las preguntas:
+---
 
-- \`/add-verification-question\` → añade una pregunta
-- \`/edit-verification-question\` → modifica una pregunta existente
-- \`/delete-verification-question\` → elimina una pregunta existente
-- \`/list-verification-questions\` → muestra las preguntas configuradas
+## 🔐 Verificación de miembros
 
-**Funcionamiento para nuevos miembros**
-1. El bot publica un botón de verificación en el canal elegido.
-2. Un nuevo miembro hace clic y responde a las preguntas.
-3. El bot crea un canal de verificación para el staff.
-4. El staff puede aprobar, rechazar o poner en lista negra al usuario.
-5. Si es aprobado, el rol se asigna automáticamente.
+### Activar la verificación
 
-**Detección de spam**
-El bot también puede detectar comportamientos sospechosos mediante:
+Usa:
 
-- \`/setup-spam-detection\` → activa y configura la detección de spam en el servidor
+\`/setup-verification\`
 
-Esta función envía alertas al staff cuando un usuario envía muchos mensajes en poco tiempo.
+para configurar la verificación de nuevos miembros.
 
-**Verificación manual de un miembro**
+Puedes definir:
 
-Es posible verificar manualmente a un miembro, esté o no presente actualmente en el servidor.  
-El comando \`/verify-member\`, utilizando como parámetro el ID de Discord del miembro, permitirá verificar automáticamente al miembro cuando haga clic en el botón de verificación si se une al servidor más tarde, o asignarle inmediatamente el rol de miembro verificado si ya está presente en el servidor.
+- el rol verificado asignado tras la aprobación
+- el rol de moderación
+- la categoría de moderación
+- el tiempo máximo de verificación
+
+### Gestionar preguntas de verificación
+
+Después de activar la verificación, puedes personalizar las preguntas mostradas a los nuevos miembros:
+
+- \`/add-verification-question\` → añadir una pregunta
+- \`/edit-verification-question\` → editar una pregunta existente
+- \`/delete-verification-question\` → eliminar una pregunta
+- \`/list-verification-questions\` → mostrar todas las preguntas
+
+### Cómo funciona la verificación
+
+1. El bot publica un botón de verificación en el canal configurado.
+2. Un nuevo miembro hace clic y responde las preguntas.
+3. Se crea automáticamente un canal de verificación para moderación.
+4. El equipo de moderación puede:
+   - aprobar
+   - rechazar
+   - poner en lista negra
+
+5. Si es aprobado, el rol verificado se asigna automáticamente.
+
+---
+
+## 🛡️ Detección de spam
+
+El bot puede supervisar actividad sospechosa.
+
+Usa:
+
+\`/setup-spam-detection\`
+
+para configurar:
+
+- activación de la detección
+- canal de alertas
+- mención del rol de moderación
+- umbrales de detección
+
+Cuando se detecta actividad sospechosa, las alertas se envían automáticamente al equipo de moderación.
+
+---
+
+## 👤 Verificación manual de miembros
+
+Puedes verificar manualmente a un miembro, esté o no actualmente en el servidor.
+
+Usa:
+
+\`/verify-member\`
+
+con el ID de Discord del miembro.
+
+El bot:
+
+- asignará inmediatamente el rol verificado si el miembro ya está en el servidor
+- lo verificará automáticamente cuando se una más tarde
+
+---
+
+## 🎮 Notificaciones de juegos gratuitos
+
+El bot puede publicar automáticamente promociones de **juegos gratuitos** de:
+
+- Steam
+- Epic Games
+
+Usa el comando de configuración de juegos gratuitos para:
+
+- activar o desactivar las notificaciones
+- elegir un canal de publicación
+- activar o desactivar plataformas
+
+Los juegos se:
+
+- publican automáticamente
+- ordenan por fecha de finalización de la promoción
+- eliminan cuando la promoción expira
+
+---
+
+## ⚙️ Configuración del servidor
+
+Usa:
+
+\`/view-settings\`
+
+para mostrar la configuración actual del bot del servidor, incluyendo:
+
+- verificación
+- detección de spam
+- juegos gratuitos
+
+---
+
+## 🔒 Permisos
+
+La mayoría de los comandos de configuración requieren permisos de **Administrador**.
 `,
     commandMustBeUsedInServer: "Este comando debe usarse dentro de un servidor.",
     actionMustBeUsedInServer: "Esta acción debe usarse dentro de un servidor.",
@@ -159,11 +248,28 @@ El comando \`/verify-member\`, utilizando como parámetro el ID de Discord del m
   spamInfoNombre : "Número de mensajes a partir del cual se activa una alerta",
   spamInfoDuree : "Duración en segundos de la ventana de detección",
   DelaiDescriptionCommande : "Tiempo en horas para enviar las respuestas de verificación",
-  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Configuración actual de la verificación**
+  ViewSettings: (
+    verifiedRoleDisplay: string,
+    staffRoleDisplay: string,
+    verificationTimeoutHours: number,
+    freeGamesEnabled: boolean,
+    freeGamesChannel: string,
+    includeSteam: boolean,
+    includeEpicGames: boolean
+  ) => `**Configuración actual del bot**
 
-1) Rol utilizado para verificar a los miembros : ${verifiedRoleDisplay}
-2) Rol utilizado para notificar al equipo de moderación : ${staffRoleDisplay}
-3) Tiempo máximo permitido para iniciar la verificación : ${verification_timeout_hours} hora(s)`,
+  ## Verificación
+
+  1) Rol verificado: ${verifiedRoleDisplay}
+  2) Rol de moderación: ${staffRoleDisplay}
+  3) Tiempo de verificación: ${verificationTimeoutHours} hora(s)
+
+  ## Juegos gratuitos
+
+  1) Activado: ${freeGamesEnabled ? "sí" : "no"}
+  2) Canal de publicación: ${freeGamesChannel}
+  3) Steam: ${includeSteam ? "sí" : "no"}
+  4) Epic Games: ${includeEpicGames ? "sí" : "no"}`,
 NotAuthorizedServer: "El servidor no ha sido autorizado, es imposible usar ningún comando",
 ManualVerificationProcessed: (
   targetUserId: string,

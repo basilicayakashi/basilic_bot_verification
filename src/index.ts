@@ -595,13 +595,13 @@ export const commands = [
   ),
   // 1) Dans le tableau commands, ajoute cette commande
 new SlashCommandBuilder()
-  .setName("view-setup-verification")
-  .setDescription("Display the current verification setup for this server")
+  .setName("view-settings")
+  .setDescription("Display the current settings for this server")
   .setDescriptionLocalizations({
-    [Locale.French]: "Affiche la configuration actuelle de vérification de ce serveur",
-    [Locale.SpanishES]: "Muestra la configuración actual de verificación de este servidor",
-    [Locale.German]: "Zeigt die aktuelle Verifizierungskonfiguration dieses Servers an",
-    [Locale.Polish]: "Wyświetla obecną konfigurację weryfikacji tego serwera",
+    [Locale.French]: "Affiche les paramètres actuels de ce serveur",
+    [Locale.SpanishES]: "Muestra los parámetros actuales de este servidor",
+    [Locale.German]: "Zeigt die aktuellen Einstellungen dieses Servers an",
+    [Locale.Polish]: "Wyświetl bieżące ustawienia bota dla tego serwera",
   })
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   /*
@@ -1988,7 +1988,7 @@ if (interaction.isButton()) {
 	  return;
 	}
 
-  if (interaction.commandName === "view-setup-verification") {
+  if (interaction.commandName === "view-settings") {
     const settings = getGuildVerificationSettingsStmt.get(
       interaction.guild!.id
     ) as GuildVerificationSettingsRow | undefined;
@@ -2012,10 +2012,26 @@ if (interaction.isButton()) {
       ? `<@&${settings.staff_role_id}>`
       : `Rôle introuvable (${settings.staff_role_id})`;
 
+    const freeGamesSettings =
+      getFreeGamesSettingsStmt.get(
+        interaction.guild.id
+      ) as any | undefined;
+
+    const freeGamesChannel =
+      freeGamesSettings?.channel_id
+        ? `<#${freeGamesSettings.channel_id}>`
+        : "—";
+
     await interaction.reply({
-      content: msgIn.ViewVeriicationsetup(verifiedRoleDisplay, staffRoleDisplay, settings.verification_timeout_hours),
-      flags: MessageFlags.Ephemeral,
-    });
+      content: msgIn.ViewSettings(verifiedRoleDisplay,
+          staffRoleDisplay,
+          settings.verification_timeout_hours,
+          freeGamesSettings?.enabled === 1,
+          freeGamesChannel,
+          freeGamesSettings?.include_steam === 1,
+          freeGamesSettings?.include_epicgames === 1),
+            flags: MessageFlags.Ephemeral,
+          });
 
     return;
   }

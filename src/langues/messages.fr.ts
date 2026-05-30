@@ -1,36 +1,125 @@
 const fr_in = {
   helpMessage: `
-**Guide de démarrage du bot**
+# 🤖 Guide de configuration du bot
 
-**Comment débuter**
-Le créateur du serveur peut utiliser \`/setup-verification\` pour activer la vérification des nouveaux membres.
+Ce bot fournit des fonctionnalités de **vérification des membres**, **détection de spam** et **notifications de jeux gratuits** pour votre serveur Discord.
 
-**Configurer la vérification**
-Après avoir activé la vérification avec \`/setup-verification\`, le créateur du serveur peut personnaliser les questions posées aux nouveaux membres :
+---
 
-- \`/add-verification-question\` → ajoute une question
-- \`/edit-verification-question\` → modifie une question existante
-- \`/delete-verification-question\` → supprime une question existante
-- \`/list-verification-questions\` → affiche la liste des questions actuellement configurées
+## 🔐 Vérification des membres
 
-**Fonctionnement pour les nouveaux membres**
-1. Le bot publie un bouton de vérification dans le salon choisi.
-2. Un nouveau membre clique sur le bouton et répond aux questions configurées.
-3. Le bot crée ensuite un salon staff de vérification.
-4. Les membres du staff peuvent approuver, refuser ou blacklister la personne.
-5. En cas d’approbation, le rôle configuré est attribué automatiquement.
+### Activer la vérification
 
-**Détection anti-spam**
-Le bot peut aussi surveiller les comportements suspects grâce à la commande :
+Utilisez :
 
-- \`/setup-spam-detection\` → active et configure la détection anti-spam sur le serveur
+\`/setup-verification\`
 
-Cette fonctionnalité permet d’envoyer des alertes au staff lorsqu’un membre envoie un volume anormal de messages dans une courte période.
+pour configurer la vérification des nouveaux membres.
 
-**Vérification manuelle d'un membre**
+Vous pouvez définir :
 
-Il est possible de vérifier manuellement un membre, qu'il soit ou non présent sur le serveur.  
-La commande \`/verify-member\`, avec en paramètre l’ID Discord du membre, permettra soit de le vérifier automatiquement lorsqu’il cliquera sur le bouton de vérification s’il rejoint le serveur plus tard, soit de lui attribuer immédiatement le rôle de membre vérifié s’il est déjà présent sur le serveur.
+- le rôle vérifié attribué après approbation
+- le rôle de modération
+- la catégorie de modération
+- le délai maximal de vérification
+
+### Gérer les questions de vérification
+
+Après avoir activé la vérification, vous pouvez personnaliser les questions affichées aux nouveaux membres :
+
+- \`/add-verification-question\` → ajouter une question
+- \`/edit-verification-question\` → modifier une question existante
+- \`/delete-verification-question\` → supprimer une question
+- \`/list-verification-questions\` → afficher toutes les questions
+
+### Fonctionnement de la vérification
+
+1. Le bot publie un bouton de vérification dans le salon configuré.
+2. Un nouveau membre clique sur le bouton et répond aux questions.
+3. Un salon de vérification pour la modération est automatiquement créé.
+4. L’équipe de modération peut :
+   - approuver
+   - refuser
+   - blacklister
+
+5. Si approuvé, le rôle vérifié est automatiquement attribué.
+
+---
+
+## 🛡️ Détection de spam
+
+Le bot peut surveiller les comportements suspects.
+
+Utilisez :
+
+\`/setup-spam-detection\`
+
+pour configurer :
+
+- l’activation de la détection
+- le salon d’alerte
+- la mention du rôle de modération
+- les seuils de détection
+
+Lorsqu’une activité suspecte est détectée, des alertes sont automatiquement envoyées à la modération.
+
+---
+
+## 👤 Vérification manuelle d’un membre
+
+Vous pouvez vérifier manuellement un membre, qu’il soit déjà présent sur le serveur ou non.
+
+Utilisez :
+
+\`/verify-member\`
+
+avec l’identifiant Discord du membre.
+
+Le bot :
+
+- attribuera immédiatement le rôle vérifié si le membre est déjà présent
+- le vérifiera automatiquement lorsqu’il rejoindra le serveur plus tard
+
+---
+
+## 🎮 Notifications de jeux gratuits
+
+Le bot peut automatiquement publier des promotions de **jeux gratuits** provenant de :
+
+- Steam
+- Epic Games
+
+Utilisez la commande de configuration des jeux gratuits pour :
+
+- activer ou désactiver les notifications
+- choisir un salon de publication
+- activer ou désactiver les plateformes
+
+Les jeux sont automatiquement :
+
+- publiés dans le salon configuré
+- triés selon la date de fin de promotion
+- supprimés lorsque les promotions expirent
+
+---
+
+## ⚙️ Aperçu des paramètres du serveur
+
+Utilisez :
+
+\`/view-settings\`
+
+pour afficher la configuration actuelle du bot pour le serveur, notamment :
+
+- les paramètres de vérification
+- les paramètres anti-spam
+- les paramètres des jeux gratuits
+
+---
+
+## 🔒 Permissions
+
+La plupart des commandes de configuration nécessitent les permissions **Administrateur**.
 `,
 
     commandMustBeUsedInServer: "Cette commande doit être utilisée dans un serveur.",
@@ -160,11 +249,28 @@ La commande \`/verify-member\`, avec en paramètre l’ID Discord du membre, per
   spamInfoNombre : "Nombre de messages à partir duquel une alerte est déclenchée",
   spamInfoDuree : "Durée en secondes de la fenêtre de détection",
   DelaiDescriptionCommande : "Délai en heures pour soumettre les réponses de vérification",
-  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Configuration actuelle de la vérification**
+  ViewSettings: (
+    verifiedRoleDisplay: string,
+    staffRoleDisplay: string,
+    verificationTimeoutHours: number,
+    freeGamesEnabled: boolean,
+    freeGamesChannel: string,
+    includeSteam: boolean,
+    includeEpicGames: boolean
+  ) => `**Configuration actuelle du bot**
 
-1) Rôle utilisé pour vérifier les membres : ${verifiedRoleDisplay}
-2) Rôle utilisé pour signaler l'équipe de modération : ${staffRoleDisplay}
-3) Délai maximal pour lancer la vérification : ${verification_timeout_hours} heure(s)`,
+  ## Vérification
+
+  1) Rôle vérifié : ${verifiedRoleDisplay}
+  2) Rôle de modération : ${staffRoleDisplay}
+  3) Délai de vérification : ${verificationTimeoutHours} heure(s)
+
+  ## Jeux gratuits
+
+  1) Activé : ${freeGamesEnabled ? "oui" : "non"}
+  2) Salon de publication : ${freeGamesChannel}
+  3) Steam : ${includeSteam ? "oui" : "non"}
+  4) Epic Games : ${includeEpicGames ? "oui" : "non"}`,
 NotAuthorizedServer: "Le serveur n'a pas été autorisé, impossible d'utiliser la moindre commande",
 ManualVerificationProcessed: (
   targetUserId: string,

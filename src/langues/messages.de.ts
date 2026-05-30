@@ -1,36 +1,121 @@
 const de_in = {
   helpMessage: `
-**Bot-Einrichtungsanleitung**
+# 🤖 Bot-Einrichtungsanleitung
 
-**Erste Schritte**
-Der Serverbesitzer kann \`/setup-verification\` verwenden, um die Verifizierung neuer Mitglieder zu aktivieren.
+Dieser Bot bietet **Mitgliederverifizierung**, **Spam-Erkennung** und **Benachrichtigungen über kostenlose Spiele** für deinen Discord-Server.
 
-**Verifizierung konfigurieren**
-Nach der Aktivierung mit \`/setup-verification\` kann der Serverbesitzer die Fragen anpassen:
+---
+
+## 🔐 Mitgliederverifizierung
+
+### Verifizierung aktivieren
+
+Verwende:
+
+\`/setup-verification\`
+
+um die Verifizierung neuer Mitglieder einzurichten.
+
+Du kannst festlegen:
+
+- die verifizierte Rolle
+- die Moderationsrolle
+- die Moderationskategorie
+- das Verifizierungszeitlimit
+
+### Verifizierungsfragen verwalten
+
+Nach der Aktivierung kannst du die Fragen anpassen:
 
 - \`/add-verification-question\` → Frage hinzufügen
 - \`/edit-verification-question\` → Frage bearbeiten
 - \`/delete-verification-question\` → Frage löschen
 - \`/list-verification-questions\` → alle Fragen anzeigen
 
-**Ablauf für neue Mitglieder**
-1. Der Bot sendet einen Verifizierungs-Button im gewählten Kanal.
-2. Ein neues Mitglied klickt darauf und beantwortet die Fragen.
-3. Der Bot erstellt einen Verifizierungs-Channel für das Team.
-4. Das Team kann den Nutzer annehmen, ablehnen oder blacklisten.
-5. Bei Annahme wird die entsprechende Rolle automatisch vergeben.
+### So funktioniert die Verifizierung
 
-**Spam-Erkennung**
-Der Bot kann auch verdächtige Aktivitäten erkennen mit:
+1. Der Bot veröffentlicht einen Verifizierungsbutton.
+2. Ein neues Mitglied beantwortet die Fragen.
+3. Ein Moderationskanal wird automatisch erstellt.
+4. Das Moderationsteam kann:
+   - genehmigen
+   - ablehnen
+   - auf die Blacklist setzen
 
-- \`/setup-spam-detection\` → aktiviert und konfiguriert die Spam-Erkennung
+5. Bei Genehmigung wird die verifizierte Rolle automatisch vergeben.
 
-Diese Funktion benachrichtigt das Team, wenn ein Nutzer viele Nachrichten in kurzer Zeit sendet.
+---
 
-**Manuelle Verifizierung eines Mitglieds**
+## 🛡️ Spam-Erkennung
 
-Es ist möglich, ein Mitglied manuell zu verifizieren, unabhängig davon, ob es sich derzeit auf dem Server befindet oder nicht.  
-Der Befehl \`/verify-member\` mit der Discord-ID des Mitglieds als Parameter ermöglicht entweder eine automatische Verifizierung, wenn das Mitglied später dem Server beitritt und auf den Verifizierungsbutton klickt, oder weist sofort die Rolle eines verifizierten Mitglieds zu, falls das Mitglied bereits auf dem Server vorhanden ist.
+Der Bot kann verdächtige Aktivitäten überwachen.
+
+Verwende:
+
+\`/setup-spam-detection\`
+
+um Folgendes zu konfigurieren:
+
+- Aktivierung der Erkennung
+- Alarmkanal
+- Moderationsrollen-Erwähnung
+- Erkennungsschwellenwerte
+
+Bei verdächtigem Verhalten werden automatisch Warnungen gesendet.
+
+---
+
+## 👤 Manuelle Mitgliederverifizierung
+
+Ein Mitglied kann manuell verifiziert werden, unabhängig davon, ob es sich bereits auf dem Server befindet.
+
+Verwende:
+
+\`/verify-member\`
+
+mit der Discord-ID des Mitglieds.
+
+Der Bot:
+
+- weist sofort die verifizierte Rolle zu
+- verifiziert Mitglieder automatisch bei späterem Beitritt
+
+---
+
+## 🎮 Kostenlose Spiele
+
+Der Bot kann automatisch kostenlose Spielaktionen veröffentlichen von:
+
+- Steam
+- Epic Games
+
+Die Konfiguration erlaubt:
+
+- Aktivierung oder Deaktivierung
+- Auswahl des Veröffentlichungskanals
+- Aktivierung oder Deaktivierung von Plattformen
+
+Spiele werden automatisch:
+
+- veröffentlicht
+- nach Ablaufdatum sortiert
+- entfernt, wenn Aktionen enden
+
+---
+
+## ⚙️ Servereinstellungen anzeigen
+
+Verwende:
+
+\`/view-settings\`
+
+um die aktuelle Bot-Konfiguration anzuzeigen.
+
+---
+
+## 🔒 Berechtigungen
+
+Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
 `,
 
     commandMustBeUsedInServer: "Dieser Befehl muss innerhalb eines Servers verwendet werden.",
@@ -160,11 +245,28 @@ Der Befehl \`/verify-member\` mit der Discord-ID des Mitglieds als Parameter erm
   spamInfoNombre : "Anzahl der Nachrichten, ab der eine Warnung ausgelöst wird",
   spamInfoDuree : "Dauer des Erkennungszeitfensters in Sekunden",
   DelaiDescriptionCommande : "Zeitlimit in Stunden zum Einreichen der Verifizierungsantworten",
-  ViewVeriicationsetup: (verifiedRoleDisplay : string, staffRoleDisplay : string, verification_timeout_hours : number) =>  `**Aktuelle Verifizierungskonfiguration**
+  ViewSettings: (
+    verifiedRoleDisplay: string,
+    staffRoleDisplay: string,
+    verificationTimeoutHours: number,
+    freeGamesEnabled: boolean,
+    freeGamesChannel: string,
+    includeSteam: boolean,
+    includeEpicGames: boolean
+  ) => `**Aktuelle Bot-Konfiguration**
 
-1) Rolle zur Verifizierung von Mitgliedern : ${verifiedRoleDisplay}
-2) Rolle zur Benachrichtigung des Moderationsteams : ${staffRoleDisplay}
-3) Maximale Zeit, um die Verifizierung zu starten : ${verification_timeout_hours} Stunde(n)`,
+  ## Verifizierung
+
+  1) Verifizierte Rolle: ${verifiedRoleDisplay}
+  2) Moderationsrolle: ${staffRoleDisplay}
+  3) Verifizierungszeitlimit: ${verificationTimeoutHours} Stunde(n)
+
+  ## Kostenlose Spiele
+
+  1) Aktiviert: ${freeGamesEnabled ? "ja" : "nein"}
+  2) Veröffentlichungskanal: ${freeGamesChannel}
+  3) Steam: ${includeSteam ? "ja" : "nein"}
+  4) Epic Games: ${includeEpicGames ? "ja" : "nein"}`,
 NotAuthorizedServer: "Der Server wurde nicht autorisiert, es ist nicht möglich, irgendeinen Befehl zu verwenden",
 ManualVerificationProcessed: (
   targetUserId: string,

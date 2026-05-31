@@ -2,7 +2,7 @@ const pl_in = {
   helpMessage: `
 # 🤖 Przewodnik konfiguracji bota
 
-Bot zapewnia **weryfikację członków**, **wykrywanie spamu** oraz **powiadomienia o darmowych grach** dla serwera Discord.
+Bot zapewnia funkcje **weryfikacji użytkowników**, **wykrywania spamu**, **analizy użytkowników** oraz **powiadomień o darmowych grach** dla serwera Discord.
 
 ---
 
@@ -30,7 +30,10 @@ Po aktywacji możesz dostosować pytania:
 - \`/add-verification-question\` → dodaj pytanie
 - \`/edit-verification-question\` → edytuj pytanie
 - \`/delete-verification-question\` → usuń pytanie
-- \`/list-verification-questions\` → pokaż wszystkie pytania
+
+Wszystkie skonfigurowane pytania można wyświetlić za pomocą:
+
+\`/view-settings\`
 
 ### Jak działa weryfikacja
 
@@ -38,9 +41,10 @@ Po aktywacji możesz dostosować pytania:
 2. Nowy użytkownik odpowiada na pytania.
 3. Tworzony jest kanał moderacyjny.
 4. Moderacja może:
-   - zaakceptować
-   - odrzucić
-   - dodać do blacklisty
+   - zaakceptować zgłoszenie weryfikacyjne
+   - odrzucić zgłoszenie weryfikacyjne
+   - dodać użytkownika do czarnej listy
+   - otworzyć prywatny kanał rozmowy z użytkownikiem w celu uzyskania dodatkowych informacji
 
 5. Po akceptacji użytkownik otrzymuje odpowiednią rolę.
 
@@ -82,6 +86,23 @@ Bot:
 
 ---
 
+## 🔎 Analiza użytkownika
+
+Użyj:
+
+\`/check-member\`
+
+aby przeanalizować konto Discord.
+
+Ta komenda pozwala:
+
+* sprawdzić, na których serwerach znajduje się użytkownik (wyłącznie serwery, na których zainstalowano bota)
+* ustalić, czy użytkownik został wpisany na czarną listę
+* wyświetlić powody umieszczenia na czarnej liście zapisane na poszczególnych serwerach
+* pomóc moderatorom identyfikować potencjalnie problematycznych użytkowników w wielu społecznościach
+
+---
+
 ## 🎮 Darmowe gry
 
 Bot może automatycznie publikować promocje darmowych gier z:
@@ -103,13 +124,19 @@ Gry są automatycznie:
 
 ---
 
-## ⚙️ Ustawienia serwera
+## ⚙️ Przegląd ustawień serwera
 
 Użyj:
 
 \`/view-settings\`
 
-aby wyświetlić aktualną konfigurację bota.
+aby wyświetlić pełną konfigurację bota dla serwera, w tym:
+
+- ustawienia weryfikacji
+- pytania weryfikacyjne
+- ustawienia darmowych gier
+
+Ta komenda zapewnia scentralizowany widok wszystkich ustawień serwera zarządzanych przez bota.
 
 ---
 
@@ -183,7 +210,7 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
   yes: "tak",
   no: "nie",
   setupVerificationDescription: "Skonfiguruj weryfikację",
-  checkVerifiedDescription: "Sprawdź użytkownika",
+  checkVerifiedDescription: "Sprawdź status weryfikacji, czarnej listy i wspólne serwery użytkownika",
   globalKickDescription: "Wyrzuć użytkownika globalnie",
   allowSetupVerificationDescription: "Nadaj dostęp do konfiguracji",
   addVerificationQuestionDescription: "Dodaj pytanie",
@@ -265,18 +292,18 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
 
 ## Weryfikacja
 
-  1) Zweryfikowana rola: ${verifiedRoleDisplay}
-  2) Rola moderacji: ${staffRoleDisplay}
-  3) Limit czasu weryfikacji: ${verificationTimeoutHours} godz.
+1) Zweryfikowana rola: ${verifiedRoleDisplay}
+2) Rola moderacji: ${staffRoleDisplay}
+3) Limit czasu weryfikacji: ${verificationTimeoutHours} godz.
 
 ${questionsText}
   
 ## Darmowe gry
 
-  1) Włączone: ${freeGamesEnabled ? "tak" : "nie"}
-  2) Kanał publikacji: ${freeGamesChannel}
-  3) Steam: ${includeSteam ? "tak" : "nie"}
-  4) Epic Games: ${includeEpicGames ? "tak" : "nie"}`,
+1) Włączone: ${freeGamesEnabled ? "tak" : "nie"}
+2) Kanał publikacji: ${freeGamesChannel}
+3) Steam: ${includeSteam ? "tak" : "nie"}
+4) Epic Games: ${includeEpicGames ? "tak" : "nie"}`,
 NotAuthorizedServer: "Serwer nie został autoryzowany, nie można używać żadnej komendy",
 ManualVerificationProcessed: (
   targetUserId: string,

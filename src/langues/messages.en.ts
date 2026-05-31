@@ -2,7 +2,7 @@ const en_in = {
   helpMessage: `
 # 🤖 Bot setup guide
 
-This bot provides **member verification**, **spam detection**, and **free game notifications** for your Discord server.
+This bot provides **member verification**, **spam detection**, **member analysis**, and **free game notifications** for your Discord server.
 
 ---
 
@@ -30,17 +30,21 @@ After enabling verification, you can customize the questions shown to new member
 - \`/add-verification-question\` → add a question
 - \`/edit-verification-question\` → edit an existing question
 - \`/delete-verification-question\` → delete a question
-- \`/list-verification-questions\` → view all questions
+
+All configured questions can be viewed using:
+
+\`/view-settings\`
 
 ### How verification works
 
 1. The bot posts a verification button in the configured channel.
-2. A new member clicks the button and answers the questions.
+2. A new member clicks the button and answers the configured questions.
 3. A moderation verification channel is automatically created.
 4. Staff members can:
-   - approve
-   - reject
-   - blacklist
+   - approve the verification request
+   - reject the verification request
+   - blacklist the member
+   - open a private discussion channel with the member to request additional information
 
 5. If approved, the verified role is automatically assigned.
 
@@ -82,6 +86,23 @@ The bot will:
 
 ---
 
+## 🔎 Member analysis
+
+Use:
+
+\`/check-member\`
+
+to analyze a Discord account.
+
+This command allows you to:
+
+- view the servers where the member is present (limited to servers where the bot is installed)
+- identify whether the member has been blacklisted
+- view blacklist reasons recorded on each server
+- help moderators identify suspicious users across multiple communities
+
+---
+
 ## 🎮 Free games notifications
 
 The bot can automatically publish **free game promotions** from:
@@ -89,7 +110,7 @@ The bot can automatically publish **free game promotions** from:
 - Steam
 - Epic Games
 
-Use the free games setup command to:
+Use the free games setup commands to:
 
 - enable or disable notifications
 - choose a publication channel
@@ -109,11 +130,13 @@ Use:
 
 \`/view-settings\`
 
-to display the current bot configuration for the server, including:
+to display the complete bot configuration for the server, including:
 
 - verification settings
-- spam detection settings
+- verification questions
 - free games settings
+
+This command provides a centralized overview of all server-specific settings managed by the bot.
 
 ---
 
@@ -196,7 +219,7 @@ Most configuration commands require **Administrator** permissions.
     questionLabelDescription: "Question label shown to the user",
     questionTypeDescription: "Question type",
     questionRequiredDescription: "Whether the question is required",
-    questionIndexDescription: "Question index shown by /list-verification-questions",
+    questionIndexDescription: "Question index shown by /view-settings",
     newQuestionLabelDescription: "New question label",
     newQuestionTypeDescription: "New question type",
     newQuestionRequiredDescription: "Whether the question is required",
@@ -261,18 +284,18 @@ Most configuration commands require **Administrator** permissions.
 
 ## Verification
 
-  1) Verified role: ${verifiedRoleDisplay}
-  2) Moderation role: ${staffRoleDisplay}
-  3) Verification timeout: ${verificationTimeoutHours} hour(s)
+1) Verified role: ${verifiedRoleDisplay}
+2) Moderation role: ${staffRoleDisplay}
+3) Verification timeout: ${verificationTimeoutHours} hour(s)
 
 ${questionsText}
 
 ## Free games
 
-  1) Enabled: ${freeGamesEnabled ? "yes" : "no"}
-  2) Publication channel: ${freeGamesChannel}
-  3) Steam: ${includeSteam ? "yes" : "no"}
-  4) Epic Games: ${includeEpicGames ? "yes" : "no"}`,
+1) Enabled: ${freeGamesEnabled ? "yes" : "no"}
+2) Publication channel: ${freeGamesChannel}
+3) Steam: ${includeSteam ? "yes" : "no"}
+4) Epic Games: ${includeEpicGames ? "yes" : "no"}`,
   NotAuthorizedServer: "The server has not been authorized, it is impossible to use any command",
 ManualVerificationProcessed: (
   targetUserId: string,

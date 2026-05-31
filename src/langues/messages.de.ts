@@ -2,7 +2,7 @@ const de_in = {
   helpMessage: `
 # 🤖 Bot-Einrichtungsanleitung
 
-Dieser Bot bietet **Mitgliederverifizierung**, **Spam-Erkennung** und **Benachrichtigungen über kostenlose Spiele** für deinen Discord-Server.
+Dieser Bot bietet **Mitgliederverifizierung**, **Spam-Erkennung**, **Mitgliederanalyse** und **Benachrichtigungen über kostenlose Spiele** für deinen Discord-Server.
 
 ---
 
@@ -30,7 +30,10 @@ Nach der Aktivierung kannst du die Fragen anpassen:
 - \`/add-verification-question\` → Frage hinzufügen
 - \`/edit-verification-question\` → Frage bearbeiten
 - \`/delete-verification-question\` → Frage löschen
-- \`/list-verification-questions\` → alle Fragen anzeigen
+
+Alle konfigurierten Fragen können mit folgendem Befehl angezeigt werden:
+
+\`/view-settings\`
 
 ### So funktioniert die Verifizierung
 
@@ -38,9 +41,10 @@ Nach der Aktivierung kannst du die Fragen anpassen:
 2. Ein neues Mitglied beantwortet die Fragen.
 3. Ein Moderationskanal wird automatisch erstellt.
 4. Das Moderationsteam kann:
-   - genehmigen
-   - ablehnen
-   - auf die Blacklist setzen
+   - die Verifizierungsanfrage genehmigen
+   - die Verifizierungsanfrage ablehnen
+   - das Mitglied auf die Blacklist setzen
+   - einen privaten Gesprächskanal mit dem Mitglied eröffnen, um zusätzliche Informationen anzufordern
 
 5. Bei Genehmigung wird die verifizierte Rolle automatisch vergeben.
 
@@ -82,6 +86,23 @@ Der Bot:
 
 ---
 
+## 🔎 Mitgliederanalyse
+
+Verwende:
+
+\`/check-member\`
+
+um ein Discord-Konto zu analysieren.
+
+Mit diesem Befehl kannst du:
+
+* sehen, auf welchen Servern das Mitglied vorhanden ist (nur Server, auf denen der Bot installiert ist)
+* feststellen, ob das Mitglied auf einer Blacklist steht
+* die auf jedem Server gespeicherten Blacklist-Gründe anzeigen
+* Moderatoren dabei unterstützen, problematische Benutzer über mehrere Communities hinweg zu identifizieren
+
+---
+
 ## 🎮 Kostenlose Spiele
 
 Der Bot kann automatisch kostenlose Spielaktionen veröffentlichen von:
@@ -103,13 +124,19 @@ Spiele werden automatisch:
 
 ---
 
-## ⚙️ Servereinstellungen anzeigen
+## ⚙️ Übersicht der Servereinstellungen
 
 Verwende:
 
 \`/view-settings\`
 
-um die aktuelle Bot-Konfiguration anzuzeigen.
+um die vollständige Bot-Konfiguration für den Server anzuzeigen, einschließlich:
+
+- Verifizierungseinstellungen
+- Verifizierungsfragen
+- Einstellungen für kostenlose Spiele
+
+Dieser Befehl bietet eine zentrale Übersicht über alle serverspezifischen Einstellungen, die vom Bot verwaltet werden.
 
 ---
 
@@ -176,7 +203,7 @@ Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
     yes: "ja",
     no: "nein",
 	  setupVerificationDescription: "Die Verifizierung für diesen Server konfigurieren",
-    checkVerifiedDescription: "Prüfen, ob ein Benutzer in der Tabelle verified_users gespeichert ist",
+    checkVerifiedDescription: "Verifizierungsstatus, Blacklist-Status und gemeinsame Server eines Benutzers prüfen",
     globalKickDescription: "Einen Benutzer von allen für den Bot autorisierten Servern kicken",
     allowSetupVerificationDescription: "Einem Benutzer erlauben, die Verifizierung für einen bestimmten Server zu konfigurieren",
     addVerificationQuestionDescription: "Eine Verifizierungsfrage für diesen Server hinzufügen",
@@ -193,7 +220,7 @@ Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
     questionLabelDescription: "Fragetext, der dem Benutzer angezeigt wird",
     questionTypeDescription: "Fragetyp",
     questionRequiredDescription: "Gibt an, ob die Frage erforderlich ist",
-    questionIndexDescription: "Frageindex, der von /list-verification-questions angezeigt wird",
+    questionIndexDescription: "Frageindex, der von /view-settings angezeigt wird",
     newQuestionLabelDescription: "Neuer Fragetext",
     newQuestionTypeDescription: "Neuer Fragetyp",
     newQuestionRequiredDescription: "Gibt an, ob die Frage erforderlich ist",
@@ -258,18 +285,18 @@ Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
 
 ## Verifizierung
 
-  1) Verifizierte Rolle: ${verifiedRoleDisplay}
-  2) Moderationsrolle: ${staffRoleDisplay}
-  3) Verifizierungszeitlimit: ${verificationTimeoutHours} Stunde(n)
+1) Verifizierte Rolle: ${verifiedRoleDisplay}
+2) Moderationsrolle: ${staffRoleDisplay}
+3) Verifizierungszeitlimit: ${verificationTimeoutHours} Stunde(n)
 
 ${questionsText}
 
 ## Kostenlose Spiele
 
-  1) Aktiviert: ${freeGamesEnabled ? "ja" : "nein"}
-  2) Veröffentlichungskanal: ${freeGamesChannel}
-  3) Steam: ${includeSteam ? "ja" : "nein"}
-  4) Epic Games: ${includeEpicGames ? "ja" : "nein"}`,
+1) Aktiviert: ${freeGamesEnabled ? "ja" : "nein"}
+2) Veröffentlichungskanal: ${freeGamesChannel}
+3) Steam: ${includeSteam ? "ja" : "nein"}
+4) Epic Games: ${includeEpicGames ? "ja" : "nein"}`,
 NotAuthorizedServer: "Der Server wurde nicht autorisiert, es ist nicht möglich, irgendeinen Befehl zu verwenden",
 ManualVerificationProcessed: (
   targetUserId: string,

@@ -2,7 +2,7 @@ const es_in = {
   helpMessage: `
 # 🤖 Guía de configuración del bot
 
-Este bot proporciona **verificación de miembros**, **detección de spam** y **notificaciones de juegos gratuitos** para tu servidor de Discord.
+Este bot proporciona funciones de **verificación de miembros**, **detección de spam**, **análisis de miembros** y **notificaciones de juegos gratuitos** para tu servidor de Discord.
 
 ---
 
@@ -30,7 +30,10 @@ Después de activar la verificación, puedes personalizar las preguntas mostrada
 - \`/add-verification-question\` → añadir una pregunta
 - \`/edit-verification-question\` → editar una pregunta existente
 - \`/delete-verification-question\` → eliminar una pregunta
-- \`/list-verification-questions\` → mostrar todas las preguntas
+
+Todas las preguntas configuradas pueden consultarse mediante:
+
+\`/view-settings\`
 
 ### Cómo funciona la verificación
 
@@ -38,9 +41,10 @@ Después de activar la verificación, puedes personalizar las preguntas mostrada
 2. Un nuevo miembro hace clic y responde las preguntas.
 3. Se crea automáticamente un canal de verificación para moderación.
 4. El equipo de moderación puede:
-   - aprobar
-   - rechazar
-   - poner en lista negra
+   - aprobar la solicitud de verificación
+   - rechazar la solicitud de verificación
+   - incluir al miembro en la lista negra
+   - abrir un canal privado de conversación con el miembro para solicitar información adicional
 
 5. Si es aprobado, el rol verificado se asigna automáticamente.
 
@@ -82,6 +86,23 @@ El bot:
 
 ---
 
+## 🔎 Análisis de miembros
+
+Usa:
+
+\`/check-member\`
+
+para analizar una cuenta de Discord.
+
+Este comando permite:
+
+* ver en qué servidores está presente el usuario (solo servidores donde el bot está instalado)
+* identificar si el usuario ha sido incluido en una lista negra
+* consultar los motivos de lista negra registrados en cada servidor
+* ayudar a los moderadores a identificar usuarios potencialmente problemáticos en varias comunidades
+
+---
+
 ## 🎮 Notificaciones de juegos gratuitos
 
 El bot puede publicar automáticamente promociones de **juegos gratuitos** de:
@@ -103,17 +124,19 @@ Los juegos se:
 
 ---
 
-## ⚙️ Configuración del servidor
+## ⚙️ Resumen de la configuración del servidor
 
 Usa:
 
 \`/view-settings\`
 
-para mostrar la configuración actual del bot del servidor, incluyendo:
+para mostrar la configuración completa del bot para el servidor, incluyendo:
 
-- verificación
-- detección de spam
-- juegos gratuitos
+- configuración de verificación
+- preguntas de verificación
+- configuración de juegos gratuitos
+
+Este comando proporciona una vista centralizada de toda la configuración específica del servidor gestionada por el bot.
 
 ---
 
@@ -179,7 +202,7 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
     yes: "sí",
     no: "no",
 	setupVerificationDescription: "Configurar la verificación para este servidor",
-	checkVerifiedDescription: "Comprobar si un usuario está registrado en la tabla verified_users",
+	checkVerifiedDescription: "Comprobar la verificación, el estado de lista negra y los servidores compartidos de un usuario",
 	globalKickDescription: "Expulsar a un usuario de todos los servidores autorizados para el bot",
 	allowSetupVerificationDescription: "Permitir a un usuario configurar la verificación para un servidor específico",
 	addVerificationQuestionDescription: "Añadir una pregunta de verificación para este servidor",
@@ -196,7 +219,7 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
 	questionLabelDescription: "Etiqueta de la pregunta mostrada al usuario",
 	questionTypeDescription: "Tipo de pregunta",
 	questionRequiredDescription: "Indica si la pregunta es obligatoria",
-	questionIndexDescription: "Índice de la pregunta mostrado por /list-verification-questions",
+	questionIndexDescription: "Índice de la pregunta mostrado por /view-settings",
 	newQuestionLabelDescription: "Nueva etiqueta de la pregunta",
 	newQuestionTypeDescription: "Nuevo tipo de pregunta",
 	newQuestionRequiredDescription: "Indica si la pregunta es obligatoria",
@@ -261,18 +284,18 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
 
 ## Verificación
 
-  1) Rol verificado: ${verifiedRoleDisplay}
-  2) Rol de moderación: ${staffRoleDisplay}
-  3) Tiempo de verificación: ${verificationTimeoutHours} hora(s)
+1) Rol verificado: ${verifiedRoleDisplay}
+2) Rol de moderación: ${staffRoleDisplay}
+3) Tiempo de verificación: ${verificationTimeoutHours} hora(s)
 
 ${questionsText}
   
 ## Juegos gratuitos
 
-  1) Activado: ${freeGamesEnabled ? "sí" : "no"}
-  2) Canal de publicación: ${freeGamesChannel}
-  3) Steam: ${includeSteam ? "sí" : "no"}
-  4) Epic Games: ${includeEpicGames ? "sí" : "no"}`,
+1) Activado: ${freeGamesEnabled ? "sí" : "no"}
+2) Canal de publicación: ${freeGamesChannel}
+3) Steam: ${includeSteam ? "sí" : "no"}
+4) Epic Games: ${includeEpicGames ? "sí" : "no"}`,
 NotAuthorizedServer: "El servidor no ha sido autorizado, es imposible usar ningún comando",
 ManualVerificationProcessed: (
   targetUserId: string,

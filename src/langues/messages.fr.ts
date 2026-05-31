@@ -2,7 +2,7 @@ const fr_in = {
   helpMessage: `
 # 🤖 Guide de configuration du bot
 
-Ce bot fournit des fonctionnalités de **vérification des membres**, **détection de spam** et **notifications de jeux gratuits** pour votre serveur Discord.
+Ce bot fournit des fonctionnalités de **vérification des membres**, **détection de spam**, **analyse des membres** et **notifications de jeux gratuits** pour votre serveur Discord.
 
 ---
 
@@ -18,37 +18,45 @@ pour configurer la vérification des nouveaux membres.
 
 Vous pouvez définir :
 
-- le rôle vérifié attribué après approbation
-- le rôle de modération
-- la catégorie de modération
-- le délai maximal de vérification
+* le rôle vérifié attribué après approbation
+* le rôle de modération
+* la catégorie de modération
+* le délai maximal de vérification
 
 ### Gérer les questions de vérification
 
 Après avoir activé la vérification, vous pouvez personnaliser les questions affichées aux nouveaux membres :
 
-- \`/add-verification-question\` → ajouter une question
-- \`/edit-verification-question\` → modifier une question existante
-- \`/delete-verification-question\` → supprimer une question
-- \`/list-verification-questions\` → afficher toutes les questions
+* \`/add-verification-question\` → ajouter une question
+* \`/edit-verification-question\` → modifier une question existante
+* \`/delete-verification-question\` → supprimer une question
+
+Toutes les questions configurées peuvent être consultées avec :
+
+\`/view-settings\`
 
 ### Fonctionnement de la vérification
 
 1. Le bot publie un bouton de vérification dans le salon configuré.
-2. Un nouveau membre clique sur le bouton et répond aux questions.
-3. Un salon de vérification pour la modération est automatiquement créé.
-4. L’équipe de modération peut :
-   - approuver
-   - refuser
-   - blacklister
 
-5. Si approuvé, le rôle vérifié est automatiquement attribué.
+2. Un nouveau membre clique sur le bouton et répond aux questions configurées.
+
+3. Un salon de vérification destiné à la modération est automatiquement créé.
+
+4. L’équipe de modération peut :
+
+   * approuver la demande de vérification
+   * refuser la demande de vérification
+   * blacklister le membre
+   * ouvrir un salon de discussion privé avec le membre afin d’obtenir des informations complémentaires
+
+5. Si la demande est approuvée, le rôle vérifié est automatiquement attribué.
 
 ---
 
 ## 🛡️ Détection de spam
 
-Le bot peut surveiller les comportements suspects.
+Le bot peut surveiller les activités suspectes.
 
 Utilisez :
 
@@ -56,12 +64,12 @@ Utilisez :
 
 pour configurer :
 
-- l’activation de la détection
-- le salon d’alerte
-- la mention du rôle de modération
-- les seuils de détection
+* l’activation de la détection
+* le salon d’alerte
+* la mention du rôle de modération
+* les seuils de détection
 
-Lorsqu’une activité suspecte est détectée, des alertes sont automatiquement envoyées à la modération.
+Lorsqu’une activité suspecte est détectée, des alertes sont automatiquement envoyées à l’équipe de modération.
 
 ---
 
@@ -77,29 +85,46 @@ avec l’identifiant Discord du membre.
 
 Le bot :
 
-- attribuera immédiatement le rôle vérifié si le membre est déjà présent
-- le vérifiera automatiquement lorsqu’il rejoindra le serveur plus tard
+* attribuera immédiatement le rôle vérifié si le membre est déjà présent
+* le vérifiera automatiquement lorsqu’il rejoindra le serveur plus tard
+
+---
+
+## 🔎 Analyse d’un membre
+
+Utilisez :
+
+\`/check-member\`
+
+pour analyser un compte Discord.
+
+Cette commande permet :
+
+* de voir sur quels serveurs le membre est présent (uniquement les serveurs où le bot est installé)
+* d’identifier si le membre a été blacklisté
+* de consulter les motifs de blacklist enregistrés sur chaque serveur
+* d’aider les modérateurs à identifier des utilisateurs potentiellement problématiques dans plusieurs communautés
 
 ---
 
 ## 🎮 Notifications de jeux gratuits
 
-Le bot peut automatiquement publier des promotions de **jeux gratuits** provenant de :
+Le bot peut automatiquement publier des promotions de jeux gratuits provenant de :
 
-- Steam
-- Epic Games
+* Steam
+* Epic Games
 
-Utilisez la commande de configuration des jeux gratuits pour :
+Les commandes dédiées permettent :
 
-- activer ou désactiver les notifications
-- choisir un salon de publication
-- activer ou désactiver les plateformes
+* d’activer ou désactiver les notifications
+* de choisir un salon de publication
+* d’activer ou désactiver les plateformes
 
 Les jeux sont automatiquement :
 
-- publiés dans le salon configuré
-- triés selon la date de fin de promotion
-- supprimés lorsque les promotions expirent
+* publiés dans le salon configuré
+* triés selon leur date de fin de promotion
+* supprimés lorsque la promotion expire
 
 ---
 
@@ -109,11 +134,13 @@ Utilisez :
 
 \`/view-settings\`
 
-pour afficher la configuration actuelle du bot pour le serveur, notamment :
+pour afficher l’intégralité de la configuration du bot sur le serveur, notamment :
 
-- les paramètres de vérification
-- les paramètres anti-spam
-- les paramètres des jeux gratuits
+* les paramètres de vérification
+* les questions de vérification
+* les paramètres des jeux gratuits
+
+Cette commande fournit une vue centralisée de tous les paramètres spécifiques au serveur.
 
 ---
 
@@ -180,7 +207,7 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
     yes: "oui",
     no: "non",
     setupVerificationDescription: "Configurer la vérification pour ce serveur",
-    checkVerifiedDescription: "Vérifier si un utilisateur est enregistré dans la table verified_users",
+    checkVerifiedDescription: "Vérifier la vérification, le statut de blacklist et les serveurs communs d'un utilisateur",
     globalKickDescription: "Expulser un utilisateur de tous les serveurs autorisés pour le bot",
     allowSetupVerificationDescription: "Autoriser un utilisateur à configurer la vérification pour un serveur spécifique",
     addVerificationQuestionDescription: "Ajouter une question de vérification pour ce serveur",
@@ -197,7 +224,7 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
     questionLabelDescription: "Libellé de la question affiché à l'utilisateur",
     questionTypeDescription: "Type de question",
     questionRequiredDescription: "Indique si la question est obligatoire",
-    questionIndexDescription: "Index de la question affiché par /list-verification-questions",
+    questionIndexDescription: "Index de la question affiché par /view-settings",
     newQuestionLabelDescription: "Nouveau libellé de la question",
     newQuestionTypeDescription: "Nouveau type de question",
     newQuestionRequiredDescription: "Indique si la question est obligatoire",
@@ -262,18 +289,18 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
 
 ## Vérification
 
-  1) Rôle vérifié : ${verifiedRoleDisplay}
-  2) Rôle de modération : ${staffRoleDisplay}
-  3) Délai de vérification : ${verificationTimeoutHours} heure(s)
+1) Rôle vérifié : ${verifiedRoleDisplay}
+2) Rôle de modération : ${staffRoleDisplay}
+3) Délai de vérification : ${verificationTimeoutHours} heure(s)
 
 ${questionsText}
   
 ## Jeux gratuits
 
-  1) Activé : ${freeGamesEnabled ? "oui" : "non"}
-  2) Salon de publication : ${freeGamesChannel}
-  3) Steam : ${includeSteam ? "oui" : "non"}
-  4) Epic Games : ${includeEpicGames ? "oui" : "non"}`,
+1) Activé : ${freeGamesEnabled ? "oui" : "non"}
+2) Salon de publication : ${freeGamesChannel}
+3) Steam : ${includeSteam ? "oui" : "non"}
+4) Epic Games : ${includeEpicGames ? "oui" : "non"}`,
 NotAuthorizedServer: "Le serveur n'a pas été autorisé, impossible d'utiliser la moindre commande",
 ManualVerificationProcessed: (
   targetUserId: string,

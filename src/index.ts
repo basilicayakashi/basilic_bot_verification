@@ -358,18 +358,6 @@ export const commands = [
         })
         .setRequired(true)
     ),
-
-  new SlashCommandBuilder()
-    .setName("list-verification-questions")
-    .setDescription("List verification questions for this server")
-    .setDescriptionLocalizations({
-          [Locale.French]: "Lister les questions de vérification pour ce serveur",
-          [Locale.SpanishES]: "Listar las preguntas de verificación para este servidor",
-          [Locale.German]: "Die Verifizierungsfragen für diesen Server auflisten",
-          [Locale.Polish]: "Wyświetl pytania weryfikacyjne dla tego serwera",
-        })
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-
   new SlashCommandBuilder()
     .setName("edit-verification-question")
     .setDescription("Edit a verification question by its index")
@@ -383,12 +371,12 @@ export const commands = [
     .addIntegerOption((option) =>
       option
         .setName("index")
-        .setDescription("Question index shown by /list-verification-questions")
+        .setDescription("Question index shown by /view-settings")
         .setDescriptionLocalizations({
-          [Locale.French]: "Index de la question affiché par /list-verification-questions",
-          [Locale.SpanishES]: "Índice de la pregunta mostrado por /list-verification-questions",
-          [Locale.German]: "Frageindex, der von /list-verification-questions angezeigt wird",
-          [Locale.Polish]: "Indeks pytania",
+          [Locale.French]: "Index de la question affiché par /view-settings",
+          [Locale.SpanishES]: "Índice de la pregunta mostrado por /view-settings",
+          [Locale.German]: "Frageindex, der von /view-settings angezeigt wird",
+          [Locale.Polish]: "Indeks pytania wyświetlany przez /view-settings",
         })
         .setRequired(true)
         .setMinValue(1)
@@ -475,12 +463,12 @@ export const commands = [
     .addIntegerOption((option) =>
       option
         .setName("index")
-        .setDescription("Question index shown by /list-verification-questions")
+        .setDescription("Question index shown by /view-settings")
         .setDescriptionLocalizations({
-          [Locale.French]: "Index de la question affiché par /list-verification-questions",
-          [Locale.SpanishES]: "Índice de la pregunta mostrado por /list-verification-questions",
-          [Locale.German]: "Frageindex, der durch /list-verification-questions angezeigt wird",
-          [Locale.Polish]: "Indeks pytania wyświetlany przez /list-verification-questions",
+          [Locale.French]: "Index de la question affiché par /view-settings",
+          [Locale.SpanishES]: "Índice de la pregunta mostrado por /view-settings",
+          [Locale.German]: "Frageindex, der durch /view-settings angezeigt wird",
+          [Locale.Polish]: "Indeks pytania wyświetlany przez /view-settings",
         })
         .setRequired(true)
         .setMinValue(1)
@@ -997,6 +985,19 @@ function promoTypeLabel(promoType: string): string {
       return "Play for free";
     default:
       return promoType;
+  }
+}
+
+function formatQuestionType(type: string, msgIn: any): string {
+  switch (type) {
+    case "text_short":
+      return msgIn.choiceShortText;
+    case "text_paragraph":
+      return msgIn.choiceParagraph;
+    case "file_image":
+      return msgIn.choiceImageUpload;
+    default:
+      return type;
   }
 }
 
@@ -1604,32 +1605,6 @@ if (interaction.isButton()) {
         return;
       }
 
-      /*
-      if (interaction.commandName === "allow-setup-verification") {
-        if (!isBasilic(interaction)) {
-          await interaction.reply({
-            content: msgIn.CommandReservedByBasilic,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        const guildId = interaction.options.getString("guild_id", true);
-
-        insertSetupPermissionStmt.run(
-          guildId,
-          new Date().toISOString()
-        );
-
-        await interaction.reply({
-          content: msgIn.permissionAdded(guildId),
-          flags: MessageFlags.Ephemeral,
-        });
-
-        return;
-      }
-      */
-
       if (interaction.commandName === "add-verification-question") {
         if (!(await requireAuthorizedGuildOwner(interaction, msgIn.notAllowedManageQuestions))) return;
 
@@ -1667,44 +1642,6 @@ if (interaction.isButton()) {
         );
 
         await replyEphemeral(interaction, msgIn.QuestionAddedAtIndex(nextOrder));
-        return;
-      }
-
-      if (interaction.commandName === "list-verification-questions") {
-        if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
-          await interaction.reply({
-            content: msgIn.YouAreNotAllowedToViewVerificationQuestionsOnThisServer,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        const questions = getGuildVerificationQuestionsStmt.all(
-          interaction.guild!.id
-        ) as GuildVerificationQuestionRow[];
-
-        if (questions.length === 0) {
-          await interaction.reply({
-            content: msgIn.noVerificationQuestions,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        const content = msgIn.verificationQuestionsTitle + `\n\n` +
-          questions
-            .map(
-              (q, index) =>
-                `**${index + 1}.** ${q.question_label}
-              ${msgIn.typeLabel}: \`${q.question_type}\` | ${msgIn.requiredLabel}: \`${q.required === 1 ? msgIn.yes : msgIn.no}\``
-            )
-            .join("\n\n");
-
-        await interaction.reply({
-          content,
-          flags: MessageFlags.Ephemeral,
-        });
-
         return;
       }
 
@@ -1757,6 +1694,14 @@ if (interaction.isButton()) {
       }
 
       if (interaction.commandName === "delete-verification-question") {
+        if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
+          await interaction.reply({
+            content: msgIn.YouAreNotAllowedtoEditVerificationQuestionsOnThisServer,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
         const index = interaction.options.getInteger("index", true);
 
         const question = getGuildVerificationQuestionByIndexStmt.get(
@@ -1919,6 +1864,23 @@ if (interaction.isButton()) {
         ? `<#${freeGamesSettings.channel_id}>`
         : "—";
 
+    const questions =
+      getGuildVerificationQuestionsStmt.all(
+        interaction.guild.id
+      ) as GuildVerificationQuestionRow[];
+
+    const questionsText =
+        questions.length === 0
+          ? msgIn.noVerificationQuestions
+          : msgIn.verificationQuestionsTitle + `\n\n` +
+            questions
+              .map(
+                (q, index) =>
+                  `**${index + 1}.** ${q.question_label}
+      ${msgIn.typeLabel}: \`${formatQuestionType(q.question_type, msgIn)}\` | ${msgIn.requiredLabel}: \`${q.required === 1 ? msgIn.yes : msgIn.no}\``
+              )
+              .join("\n\n");
+
     await interaction.reply({
       content: msgIn.ViewSettings(verifiedRoleDisplay,
           staffRoleDisplay,
@@ -1926,7 +1888,7 @@ if (interaction.isButton()) {
           freeGamesSettings?.enabled === 1,
           freeGamesChannel,
           freeGamesSettings?.include_steam === 1,
-          freeGamesSettings?.include_epicgames === 1),
+          freeGamesSettings?.include_epicgames === 1)+'\n\n'+questionsText,
             flags: MessageFlags.Ephemeral,
           });
 

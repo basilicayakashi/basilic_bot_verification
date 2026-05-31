@@ -249,6 +249,7 @@ Most configuration commands require **Administrator** permissions.
   spamInfoDuree : "Duration in seconds of the detection window",
   DelaiDescriptionCommande : "Time limit in hours to submit verification responses",
   ViewSettings: (
+    questionsText : string,
     verifiedRoleDisplay: string,
     staffRoleDisplay: string,
     verificationTimeoutHours: number,
@@ -263,6 +264,8 @@ Most configuration commands require **Administrator** permissions.
   1) Verified role: ${verifiedRoleDisplay}
   2) Moderation role: ${staffRoleDisplay}
   3) Verification timeout: ${verificationTimeoutHours} hour(s)
+
+  ${questionsText}
 
   ## Free games
 

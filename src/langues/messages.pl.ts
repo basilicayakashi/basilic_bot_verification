@@ -253,6 +253,7 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
   spamInfoDuree : "Czas trwania okna wykrywania w sekundach",
   DelaiDescriptionCommande : "Czas w godzinach na przesłanie odpowiedzi weryfikacyjnych",
   ViewSettings: (
+    questionsText : string,
     verifiedRoleDisplay: string,
     staffRoleDisplay: string,
     verificationTimeoutHours: number,
@@ -268,6 +269,8 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
   2) Rola moderacji: ${staffRoleDisplay}
   3) Limit czasu weryfikacji: ${verificationTimeoutHours} godz.
 
+  ${questionsText}
+  
   ## Darmowe gry
 
   1) Włączone: ${freeGamesEnabled ? "tak" : "nie"}

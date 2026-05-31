@@ -246,6 +246,7 @@ Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
   spamInfoDuree : "Dauer des Erkennungszeitfensters in Sekunden",
   DelaiDescriptionCommande : "Zeitlimit in Stunden zum Einreichen der Verifizierungsantworten",
   ViewSettings: (
+    questionsText : string,
     verifiedRoleDisplay: string,
     staffRoleDisplay: string,
     verificationTimeoutHours: number,
@@ -261,6 +262,8 @@ Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
   2) Moderationsrolle: ${staffRoleDisplay}
   3) Verifizierungszeitlimit: ${verificationTimeoutHours} Stunde(n)
 
+  ${questionsText}
+  
   ## Kostenlose Spiele
 
   1) Aktiviert: ${freeGamesEnabled ? "ja" : "nein"}

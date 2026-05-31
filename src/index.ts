@@ -1882,13 +1882,14 @@ if (interaction.isButton()) {
               .join("\n\n");
 
     await interaction.reply({
-      content: msgIn.ViewSettings(verifiedRoleDisplay,
+      content: msgIn.ViewSettings(questionsText, 
+          verifiedRoleDisplay,
           staffRoleDisplay,
           settings.verification_timeout_hours,
           freeGamesSettings?.enabled === 1,
           freeGamesChannel,
           freeGamesSettings?.include_steam === 1,
-          freeGamesSettings?.include_epicgames === 1)+'\n\n'+questionsText,
+          freeGamesSettings?.include_epicgames === 1),
             flags: MessageFlags.Ephemeral,
           });
 

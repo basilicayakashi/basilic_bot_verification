@@ -250,6 +250,7 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
   spamInfoDuree : "Durée en secondes de la fenêtre de détection",
   DelaiDescriptionCommande : "Délai en heures pour soumettre les réponses de vérification",
   ViewSettings: (
+    questionsText : string,
     verifiedRoleDisplay: string,
     staffRoleDisplay: string,
     verificationTimeoutHours: number,
@@ -265,6 +266,8 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
   2) Rôle de modération : ${staffRoleDisplay}
   3) Délai de vérification : ${verificationTimeoutHours} heure(s)
 
+  ${questionsText}
+  
   ## Jeux gratuits
 
   1) Activé : ${freeGamesEnabled ? "oui" : "non"}

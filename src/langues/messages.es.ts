@@ -249,6 +249,7 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
   spamInfoDuree : "Duración en segundos de la ventana de detección",
   DelaiDescriptionCommande : "Tiempo en horas para enviar las respuestas de verificación",
   ViewSettings: (
+    questionsText : string,
     verifiedRoleDisplay: string,
     staffRoleDisplay: string,
     verificationTimeoutHours: number,
@@ -264,6 +265,8 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
   2) Rol de moderación: ${staffRoleDisplay}
   3) Tiempo de verificación: ${verificationTimeoutHours} hora(s)
 
+  ${questionsText}
+  
   ## Juegos gratuitos
 
   1) Activado: ${freeGamesEnabled ? "sí" : "no"}

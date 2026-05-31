@@ -1872,7 +1872,7 @@ if (interaction.isButton()) {
     const questionsText =
         questions.length === 0
           ? msgIn.noVerificationQuestions
-          :   `### ${msgIn.verificationQuestionsTitle}\n\n` +
+          :   `## ${msgIn.verificationQuestionsTitle}\n\n` +
             questions
               .map(
                 (q, index) =>

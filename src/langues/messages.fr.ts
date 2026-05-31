@@ -325,6 +325,7 @@ ManualVerificationProcessed: (
   MembersWithRoleCountTitle: (count: number) => `**Membres ayant exactement ${count} rôle(s)**`,
   freeGamesManualPublishSettingsDeleted : "Paramètres de publication supprimés",
   freeGamesManualPublishSettingsSaved : "Paramètres de publication sauvegardés",
+  none: "Aucun",
 };
 
 const fr_out = {
@@ -336,7 +337,6 @@ const fr_out = {
   YourVerifiedStatusDeniedAndBlackedListedWithReason: (guildName: string, reason: string) => `❌ Votre demande de vérification pour ${guildName} a été refusée et vous avez été blacklisté.\nMotif : ${reason}`,
   YourVerifiedStatusDeniedWithReason: (guildName: string, reason: string) => `❌ Votre demande de vérification pour ${guildName} a été refusée.\nMotif : ${reason}`,
   verificationTimeoutDM: (guildName: string) => `Vous avez été expulsé du serveur **${guildName}** car vous n’avez pas complété la vérification à temps.`,
-  none: "Aucun",
 };
 
 const fr_server = {

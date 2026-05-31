@@ -263,7 +263,7 @@ Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
   3) Verifizierungszeitlimit: ${verificationTimeoutHours} Stunde(n)
 
   ${questionsText}
-  
+
   ## Kostenlose Spiele
 
   1) Aktiviert: ${freeGamesEnabled ? "ja" : "nein"}

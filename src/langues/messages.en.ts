@@ -320,6 +320,7 @@ ManualVerificationProcessed: (
   MembersWithRoleCountTitle: (count: number) => `**Members having exactly ${count} role(s)**`,
   freeGamesManualPublishSettingsDeleted : "Manual publish settings deleted",
   freeGamesManualPublishSettingsSaved : "Manual publish settings saved",
+  none: "None",
 };
 
 const en_out = {

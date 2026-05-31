@@ -320,6 +320,7 @@ ManualVerificationProcessed: (
   MembersWithRoleCountTitle: (count: number) => `**Miembros con exactamente ${count} rol(es)**`,
   freeGamesManualPublishSettingsDeleted : "Configuración de publicación eliminada",
   freeGamesManualPublishSettingsSaved : "Configuración de publicación guardada",
+  none: "Ninguno",
 };
 
 const es_out = {

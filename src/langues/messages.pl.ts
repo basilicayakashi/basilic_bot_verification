@@ -328,6 +328,7 @@ ManualVerificationProcessed: (
   MembersWithRoleCountTitle: (count: number) => `**Członkowie posiadający dokładnie ${count} rol(i)**`,
   freeGamesManualPublishSettingsDeleted : "Ustawienia publikacji zostały usunięte",
   freeGamesManualPublishSettingsSaved : "Ustawienia publikacji zostały zapisane",
+  none: "Brak",
 };
 
 const pl_out = {

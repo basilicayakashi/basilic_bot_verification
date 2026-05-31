@@ -1421,53 +1421,53 @@ if (interaction.isButton()) {
 
         const targetUserId = interaction.options.getString("user_id", true);
 
+        /*
         const verifiedRecord = getVerifiedUserStmt.get(interaction.guild!.id, targetUserId) as VerifiedUserRow | undefined;
         const blacklistedHere = getBlacklistedUserStmt.get(
           interaction.guild!.id,
           targetUserId
         ) as BlacklistedUserRow | undefined;
+         */
+        
         const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
           targetUserId
         ) as BlacklistedUserRow[];
         const foundGuilds = await findUserGuilds(targetUserId);
 
-        let content = "";
+        const blacklistLines = await Promise.all(
+          blacklistedEverywhere.map(async (entry) => {
+            const guild = await client.guilds.fetch(entry.guild_id).catch(() => null);
 
-        if (verifiedRecord) {
-          content += msgIn.VerifiedUserFound(
-            verifiedRecord.user_id,
-            verifiedRecord.username,
-            verifiedRecord.verified_at,
-            verifiedRecord.verified_by
-          );
-        } else {
-          content += msgIn.userUnknownToTheBot(targetUserId);
-        }
+            const moderator = entry.blacklisted_by
+              ? await client.users.fetch(entry.blacklisted_by).catch(() => null)
+              : null;
 
-        if (blacklistedHere) {
-          content +=
-            "\n\n" +
-            msgIn.BlacklistedUserFound(
-              blacklistedHere.user_id,
-              blacklistedHere.username,
-              blacklistedHere.blacklisted_at,
-              blacklistedHere.blacklisted_by,
-              blacklistedHere.reason ?? msgIn.noReasonProvided
-            );
-        }
+            const guildDisplay = guild
+              ? `${guild.name} (${entry.guild_id})`
+              : `Serveur inconnu (${entry.guild_id})`;
 
-        if (blacklistedEverywhere.length > 0) {
-          const blacklistLines = blacklistedEverywhere.map(
-            (entry) =>
-              `${entry.guild_id} — ${entry.blacklisted_at} — ${entry.reason ?? msgIn.noReasonProvided}`
-          );
+            const moderatorDisplay = moderator
+              ? `@${moderator.username}`
+              : entry.blacklisted_by ?? msgIn.noReasonProvided;
 
-          content +=
-            "\n\n" +
-            msgIn.memberBlacklistedOnServers(formatGuildList(blacklistLines));
-        }
+            return `• ${guildDisplay} — ${entry.blacklisted_at} par ${moderatorDisplay} — ${entry.reason ?? msgIn.noReasonProvided}`;
+          })
+        );
 
-        content += "\n\n" + msgIn.memberPresentOnServers(formatGuildList(foundGuilds));
+        const blacklistText =
+          blacklistLines.length > 0
+            ? blacklistLines.join("\n")
+            : msgIn.none;
+
+        const presentText =
+          foundGuilds.length > 0
+            ? foundGuilds.map((line) => `• ${line}`).join("\n")
+            : msgIn.none;
+
+        const content =
+          msgIn.memberBlacklistedOnServers(blacklistText) +
+          "\n\n" +
+          msgIn.memberPresentOnServers(presentText);
 
         const chunks = splitMessage(content);
 

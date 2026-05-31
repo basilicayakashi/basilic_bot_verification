@@ -259,15 +259,15 @@ Most configuration commands require **Administrator** permissions.
     includeEpicGames: boolean
   ) => `**Current bot configuration**
 
-  ## Verification
+## Verification
 
   1) Verified role: ${verifiedRoleDisplay}
   2) Moderation role: ${staffRoleDisplay}
   3) Verification timeout: ${verificationTimeoutHours} hour(s)
 
-  ${questionsText}
+${questionsText}
 
-  ## Free games
+## Free games
 
   1) Enabled: ${freeGamesEnabled ? "yes" : "no"}
   2) Publication channel: ${freeGamesChannel}

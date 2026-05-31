@@ -260,15 +260,15 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
     includeEpicGames: boolean
   ) => `**Configuration actuelle du bot**
 
-  ## Vérification
+## Vérification
 
   1) Rôle vérifié : ${verifiedRoleDisplay}
   2) Rôle de modération : ${staffRoleDisplay}
   3) Délai de vérification : ${verificationTimeoutHours} heure(s)
 
-  ${questionsText}
+${questionsText}
   
-  ## Jeux gratuits
+## Jeux gratuits
 
   1) Activé : ${freeGamesEnabled ? "oui" : "non"}
   2) Salon de publication : ${freeGamesChannel}

@@ -263,15 +263,15 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
     includeEpicGames: boolean
   ) => `**Aktualna konfiguracja bota**
 
-  ## Weryfikacja
+## Weryfikacja
 
   1) Zweryfikowana rola: ${verifiedRoleDisplay}
   2) Rola moderacji: ${staffRoleDisplay}
   3) Limit czasu weryfikacji: ${verificationTimeoutHours} godz.
 
-  ${questionsText}
+${questionsText}
   
-  ## Darmowe gry
+## Darmowe gry
 
   1) Włączone: ${freeGamesEnabled ? "tak" : "nie"}
   2) Kanał publikacji: ${freeGamesChannel}

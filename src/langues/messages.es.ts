@@ -259,15 +259,15 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
     includeEpicGames: boolean
   ) => `**Configuración actual del bot**
 
-  ## Verificación
+## Verificación
 
   1) Rol verificado: ${verifiedRoleDisplay}
   2) Rol de moderación: ${staffRoleDisplay}
   3) Tiempo de verificación: ${verificationTimeoutHours} hora(s)
 
-  ${questionsText}
+${questionsText}
   
-  ## Juegos gratuitos
+## Juegos gratuitos
 
   1) Activado: ${freeGamesEnabled ? "sí" : "no"}
   2) Canal de publicación: ${freeGamesChannel}

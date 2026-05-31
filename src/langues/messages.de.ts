@@ -256,15 +256,15 @@ Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
     includeEpicGames: boolean
   ) => `**Aktuelle Bot-Konfiguration**
 
-  ## Verifizierung
+## Verifizierung
 
   1) Verifizierte Rolle: ${verifiedRoleDisplay}
   2) Moderationsrolle: ${staffRoleDisplay}
   3) Verifizierungszeitlimit: ${verificationTimeoutHours} Stunde(n)
 
-  ${questionsText}
+${questionsText}
 
-  ## Kostenlose Spiele
+## Kostenlose Spiele
 
   1) Aktiviert: ${freeGamesEnabled ? "ja" : "nein"}
   2) Veröffentlichungskanal: ${freeGamesChannel}

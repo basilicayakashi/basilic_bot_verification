@@ -506,20 +506,21 @@ export async function handleVerificationModals({
       );
     } catch {}
 
-    await interaction.reply({
-      content: msgIn.blacklistReasonSaved,
-      flags: MessageFlags.Ephemeral,
-    });
-
-    const channel = interaction.channel as TextChannel;
-    await channel.send({
+    await interaction.message.edit({
       content:
+        `${interaction.message.content}\n\n` +
         `${msgServer.userBlacklistedBy(staffMember.id, targetUserId)}\n` +
         `**${msgServer.reasonLabel}:** ${reason}`,
       components: [deps.buildDisabledDecisionButtonsRow("blacklisted", msgServer)],
     });
 
+    await interaction.reply({
+      content: msgIn.blacklistReasonSaved,
+      flags: MessageFlags.Ephemeral,
+    });
+
     if (!result.kicked) {
+      const channel = interaction.channel as TextChannel;
       await channel.send({
         content: msgIn.blacklistMemberSavedButKickFailed(targetUserId, result.username),
       });
@@ -574,17 +575,19 @@ export async function handleVerificationModals({
       );
     } catch {}
 
-    await interaction.reply({
-      content: msgIn.refusalReasonSaved,
-      flags: MessageFlags.Ephemeral,
-    });
-
-    const channel = interaction.channel as TextChannel;
-    await channel.send({
+    // 1. Modifier le message original pour désactiver les boutons
+    await interaction.message.edit({
       content:
+        `${interaction.message.content}\n\n` +
         `${msgServer.verificationDeniedBy(staffMember.id, targetMember.id)}\n` +
         `**${msgServer.reasonLabel}:** ${reason || msgServer.noReasonProvided}`,
       components: [deps.buildDisabledDecisionButtonsRow("rejected", msgServer)],
+    });
+
+    // 2. Répondre en éphémère
+    await interaction.reply({
+      content: msgIn.refusalReasonSaved,
+      flags: MessageFlags.Ephemeral,
     });
 
     if (targetMember.kickable) {

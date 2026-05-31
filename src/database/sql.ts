@@ -145,6 +145,32 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS role_panels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id TEXT NOT NULL,
+    channel_id TEXT NOT NULL,
+    message_id TEXT,
+    title TEXT NOT NULL,
+    description TEXT,
+    created_by TEXT NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS role_panel_options (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    panel_id INTEGER NOT NULL,
+    role_id TEXT NOT NULL,
+    label TEXT NOT NULL,
+    emoji TEXT,
+    button_style TEXT DEFAULT 'Secondary',
+    position INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY(panel_id) REFERENCES role_panels(id) ON DELETE CASCADE
+  );
+`);
+
 export const getAllFreeGamesStmt = db.prepare(`
   SELECT *
   FROM free_games

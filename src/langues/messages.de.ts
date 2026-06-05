@@ -322,6 +322,8 @@ ManualVerificationProcessed: (
   freeGamesManualPublishSettingsDeleted : "Veröffentlichungseinstellungen gelöscht",
   freeGamesManualPublishSettingsSaved : "Veröffentlichungseinstellungen gespeichert",
   none: "Keine",
+  SuppressionAutomatiqueMessageMentionRoleActivee: (role_id : string) => `✅ Löschung für Nachrichten aktiviert, die <@&${role_id}> erwähnen`,
+  SuppressionAutomatiqueMessageMentionRoleDesctivee: (role_id : string) => `✅ Löschung für <@&${role_id}> deaktiviert`,
 };
 
 const de_out = {

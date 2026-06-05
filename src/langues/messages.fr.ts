@@ -326,6 +326,8 @@ ManualVerificationProcessed: (
   freeGamesManualPublishSettingsDeleted : "Paramètres de publication supprimés",
   freeGamesManualPublishSettingsSaved : "Paramètres de publication sauvegardés",
   none: "Aucun",
+  SuppressionAutomatiqueMessageMentionRoleActivee: (role_id : string) => `✅ Suppression activée pour les messages mentionnant <@&${role_id}>`,
+  SuppressionAutomatiqueMessageMentionRoleDesctivee: (role_id : string) => `✅ Suppression désactivée pour <@&${role_id}>`,
 };
 
 const fr_out = {

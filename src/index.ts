@@ -2208,8 +2208,8 @@ if (interaction.commandName === "role-used-msg-delete") {
   await replyEphemeral(
     interaction,
     enabled
-      ? `✅ Suppression activée pour les messages mentionnant <@&${role.id}>.`
-      : `✅ Suppression désactivée pour <@&${role.id}>.`
+      ? msgIn.SuppressionAutomatiqueMessageMentionRoleActivee(role.id)
+      : msgIn.SuppressionAutomatiqueMessageMentionRoleDesctivee(role.id)
   );
 
   return;
@@ -2513,8 +2513,16 @@ client.on(Events.MessageCreate, async (message) => {
 
   if (!message.mentions.roles.has(settings.role_id)) return;
 
-  if (message.deletable) {
-    await message.delete().catch(() => null);
+  if (!message.deletable) {
+    console.log("Message non supprimable. Vérifie la permission Gérer les messages.");
+    return;
+  }
+
+  try {
+    await message.delete();
+    console.log("Message supprimé :", message.id);
+  } catch (error) {
+    console.error("Erreur suppression message :", error);
   }
 });
 

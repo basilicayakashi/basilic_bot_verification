@@ -2511,18 +2511,31 @@ client.on(Events.MessageCreate, async (message) => {
 
   if (!settings || settings.enabled !== 1) return;
 
-  if (!message.mentions.roles.has(settings.role_id)) return;
+  // Déterminer si on surveille @everyone/@here ou un rôle classique
+  const isEveryoneOrHere =
+    settings.role_id === message.guild.id || // @everyone a le même ID que le guild
+    settings.role_id === "everyone";
+
+  const mentionsTarget = isEveryoneOrHere
+    ? message.mentions.everyone // true si @everyone ou @here présent dans le message
+    : message.mentions.roles.has(settings.role_id);
+
+  console.log("[role-block] mentions.everyone:", message.mentions.everyone);
+  console.log("[role-block] mentions.roles:", [...message.mentions.roles.keys()]);
+  console.log("[role-block] mentionsTarget:", mentionsTarget);
+
+  if (!mentionsTarget) return;
 
   if (!message.deletable) {
-    console.log("Message non supprimable. Vérifie la permission Gérer les messages.");
+    console.log("[role-block] Message non supprimable — vérifie la permission Gérer les messages.");
     return;
   }
 
   try {
     await message.delete();
-    console.log("Message supprimé :", message.id);
+    console.log("[role-block] Message supprimé :", message.id);
   } catch (error) {
-    console.error("Erreur suppression message :", error);
+    console.error("[role-block] Erreur suppression :", error);
   }
 });
 

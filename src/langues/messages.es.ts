@@ -140,6 +140,10 @@ Este comando proporciona una vista centralizada de toda la configuración espec�
 
 ---
 
+\`/role-used-msg-delete\` — Elimina automáticamente cualquier mensaje nuevo que mencione uno de los roles configurados. Solo el propietario del servidor está exento. Útil para evitar el abuso de menciones masivas como @everyone.
+
+---
+
 ## 🔒 Permisos
 
 La mayoría de los comandos de configuración requieren permisos de **Administrador**.
@@ -279,7 +283,8 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
     freeGamesEnabled: boolean,
     freeGamesChannel: string,
     includeSteam: boolean,
-    includeEpicGames: boolean
+    includeEpicGames: boolean,
+    roleMsgDeleteText: string
   ) => `**Configuración actual del bot**
 
 ## Verificación
@@ -324,7 +329,13 @@ ManualVerificationProcessed: (
   SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Eliminación activada para los mensajes que mencionan: ${rolesDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Eliminación desactivada`,
   FournirAuMoinsUnRole: "Debe proporcionar al menos un rol para mencionar y habilitar la eliminación automática.",
-  AucunRole : "No role",
+  AucunRole : "No rol",
+  RoleIntrouvable: (roleDisplay: string) => `Rol no encontrado (\`${roleDisplay}\`)`,
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled : boolean, rolesDisplay: string) => `## 🚫 Eliminación de mensajes por rol
+      
+      **Activado   :** ${enabled ? "sí" : "no"}
+      **Roles supervisados :** ${rolesDisplay}
+      `,
 };
 
 const es_out = {

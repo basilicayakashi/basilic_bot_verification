@@ -512,3 +512,14 @@ export type GuildFreeGamesSettingsRow = {
   updated_at: string;
 };
 
+export type GuildRoleMessageDeleteSettingsRow = {
+  guild_id: string; 
+  enabled: number;
+  role_id1: string | null;
+  role_id2: string | null;
+  role_id3: string | null;
+  role_id4: string | null;
+  role_id5: string | null;
+  updated_by: string;
+  updated_at: string;
+}

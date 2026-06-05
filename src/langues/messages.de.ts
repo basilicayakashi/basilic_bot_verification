@@ -140,6 +140,10 @@ Dieser Befehl bietet eine zentrale Übersicht über alle serverspezifischen Eins
 
 ---
 
+\`/role-used-msg-delete\` — Löscht automatisch jede neue Nachricht, die eine der konfigurierten Rollen erwähnt. Nur der Serverinhaber ist ausgenommen. Nützlich, um den Missbrauch von Massenerwähnungen wie @everyone zu verhindern.
+
+---
+
 ## 🔒 Berechtigungen
 
 Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
@@ -280,7 +284,8 @@ Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
     freeGamesEnabled: boolean,
     freeGamesChannel: string,
     includeSteam: boolean,
-    includeEpicGames: boolean
+    includeEpicGames: boolean,
+    roleMsgDeleteText: string
   ) => `**Aktuelle Bot-Konfiguration**
 
 ## Verifizierung
@@ -325,7 +330,13 @@ ManualVerificationProcessed: (
   SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Löschung für Nachrichten aktiviert, die folgende Rollen erwähnen: ${rolesDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Löschung deaktiviert`,
   FournirAuMoinsUnRole: "Sie müssen mindestens eine Rolle angeben, um sie zu erwähnen und die automatische Löschung zu aktivieren.",
-  AucunRole : "Keine Rolle"
+  AucunRole : "Keine Rolle",
+  RoleIntrouvable: (roleDisplay: string) => `Rolle nicht gefunden (\`${roleDisplay}\`)`,
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled : boolean, rolesDisplay: string) => `## 🚫 Löschen von Nachrichten nach Rolle
+      
+      **Aktiviert   :** ${enabled ? "ja" : "nein"}
+      **Überwachte Rollen :** ${rolesDisplay}
+      `,
 };
 
 const de_out = {

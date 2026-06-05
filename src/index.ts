@@ -64,6 +64,7 @@ import {
   deleteFreeGamePublicationStmt,
   getGuildRoleMessageDeleteSettingsStmt,
   upsertGuildRoleMessageDeleteSettingsStmt,
+  GuildRoleMessageDeleteSettingsRow,
 } from "./database/sql.js";
 
 import type {
@@ -1865,14 +1866,15 @@ if (interaction.isButton()) {
 
     const verifiedRole = interaction.guild!.roles.cache.get(settings.verified_role_id);
     const staffRole = interaction.guild!.roles.cache.get(settings.staff_role_id);
+    const SettingsMsgDeletedFromRoles = getGuildRoleMessageDeleteSettingsStmt.get(interaction.guild!.id) as GuildRoleMessageDeleteSettingsRow | undefined;
 
     const verifiedRoleDisplay = verifiedRole
       ? `<@&${settings.verified_role_id}>`
-      : `Rôle introuvable (${settings.verified_role_id})`;
+      : msgIn.RoleIntrouvable(settings.verified_role_id);
 
     const staffRoleDisplay = staffRole
       ? `<@&${settings.staff_role_id}>`
-      : `Rôle introuvable (${settings.staff_role_id})`;
+      : msgIn.RoleIntrouvable(settings.staff_role_id);
 
     const freeGamesSettings =
       getFreeGamesSettingsStmt.get(
@@ -1901,6 +1903,35 @@ if (interaction.isButton()) {
               )
               .join("\n\n");
 
+    let roleMsgDeleteText = "";
+
+    if (SettingsMsgDeletedFromRoles) {
+      const enabled = SettingsMsgDeletedFromRoles.enabled === 1;
+
+      const roleIds = [
+        SettingsMsgDeletedFromRoles.role_id1,
+        SettingsMsgDeletedFromRoles.role_id2,
+        SettingsMsgDeletedFromRoles.role_id3,
+        SettingsMsgDeletedFromRoles.role_id4,
+        SettingsMsgDeletedFromRoles.role_id5,
+      ].filter((id): id is string => id !== null);
+
+      const roleDisplays = roleIds.map((id) => {
+        // @everyone a le même ID que le guild
+        if (id === interaction.guild!.id) return "`@everyone`";
+        const role = interaction.guild!.roles.cache.get(id);
+
+        return role ? `<@&${id}>` : msgIn.RoleIntrouvable(id);
+      });
+
+      const rolesLine =
+        roleDisplays.length > 0
+          ? roleDisplays.join(", ")
+          : msgIn.AucunRole;
+
+      roleMsgDeleteText =  msgIn.AffichageParametrageSuppressionMessageRolesUtilises(enabled, rolesLine);         
+      }
+
     await interaction.reply({
       content: msgIn.ViewSettings(questionsText, 
           verifiedRoleDisplay,
@@ -1909,7 +1940,8 @@ if (interaction.isButton()) {
           freeGamesSettings?.enabled === 1,
           freeGamesChannel,
           freeGamesSettings?.include_steam === 1,
-          freeGamesSettings?.include_epicgames === 1),
+          freeGamesSettings?.include_epicgames === 1,
+          roleMsgDeleteText),
             flags: MessageFlags.Ephemeral,
           });
 

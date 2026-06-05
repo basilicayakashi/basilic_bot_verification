@@ -144,6 +144,10 @@ Cette commande fournit une vue centralisée de tous les paramètres spécifiques
 
 ---
 
+\`/role-used-msg-delete\` — Supprime automatiquement tout nouveau message qui mentionne l'un des rôles paramétrés. Seul le propriétaire du serveur n'est pas concerné. Utile pour éviter les abus de mentions de masse comme @everyone.
+
+---
+
 ## 🔒 Permissions
 
 La plupart des commandes de configuration nécessitent les permissions **Administrateur**.
@@ -284,7 +288,8 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
     freeGamesEnabled: boolean,
     freeGamesChannel: string,
     includeSteam: boolean,
-    includeEpicGames: boolean
+    includeEpicGames: boolean,
+    roleMsgDeleteText: string
   ) => `**Configuration actuelle du bot**
 
 ## Vérification
@@ -330,6 +335,12 @@ ManualVerificationProcessed: (
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Suppression désactivée`,
   FournirAuMoinsUnRole: "Vous devez fournir au moins un rôle à mentionner pour activer la suppression automatique.",
   AucunRole : "Aucun rôle",
+  RoleIntrouvable: (roleDisplay: string) => `Rôle introuvable (\`${roleDisplay}\`)`,
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled : boolean, rolesDisplay: string) => `## 🚫 Suppression de messages par rôle
+      
+      **Activé :** ${enabled ? "oui" : "non"}
+      **Rôles surveillés :** ${rolesDisplay}
+      `,
 };
 
 const fr_out = {

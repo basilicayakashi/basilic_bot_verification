@@ -140,6 +140,10 @@ Ta komenda zapewnia scentralizowany widok wszystkich ustawień serwera zarządza
 
 ---
 
+\`/role-used-msg-delete\` — Automatycznie usuwa każdą nową wiadomość, która wspomina jedną ze skonfigurowanych ról. Tylko właściciel serwera jest zwolniony z tej reguły. Przydatne do zapobiegania nadużywaniu masowych wzmianek, takich jak @everyone.
+
+---
+
 ## 🔒 Uprawnienia
 
 Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
@@ -287,7 +291,8 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
     freeGamesEnabled: boolean,
     freeGamesChannel: string,
     includeSteam: boolean,
-    includeEpicGames: boolean
+    includeEpicGames: boolean,
+    roleMsgDeleteText: string
   ) => `**Aktualna konfiguracja bota**
 
 ## Weryfikacja
@@ -333,6 +338,12 @@ ManualVerificationProcessed: (
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Usuwanie wiadomości zostało wyłączone`,
   FournirAuMoinsUnRole: "Musisz podać co najmniej jedną rolę, jeśli usunięcie jest włączone.",
   AucunRole : "Brak roli",
+  RoleIntrouvable: (roleDisplay: string) => `Rola nie została znaleziona (\`${roleDisplay}\`)`,
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled : boolean, rolesDisplay: string) => `## 🚫 Usuwanie wiadomości według roli
+      
+      **Aktywowany :** ${enabled ? "tak" : "nie"}
+      **Monitorowane role :** ${rolesDisplay}
+      `,
 };
 
 const pl_out = {

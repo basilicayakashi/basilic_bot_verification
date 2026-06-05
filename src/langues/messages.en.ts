@@ -140,6 +140,10 @@ This command provides a centralized overview of all server-specific settings man
 
 ---
 
+\`/role-used-msg-delete\` — Automatically deletes any new message that mentions one of the configured roles. Only the server owner is exempt. Useful to prevent abuse of mass mentions such as @everyone.
+
+---
+
 ## 🔒 Permissions
 
 Most configuration commands require **Administrator** permissions.
@@ -279,7 +283,8 @@ Most configuration commands require **Administrator** permissions.
     freeGamesEnabled: boolean,
     freeGamesChannel: string,
     includeSteam: boolean,
-    includeEpicGames: boolean
+    includeEpicGames: boolean,
+    roleMsgDeleteText: string
   ) => `**Current bot configuration**
 
 ## Verification
@@ -325,6 +330,12 @@ ManualVerificationProcessed: (
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Deletion disabled`,
   FournirAuMoinsUnRole: "You must provide at least one role to mention to enable automatic deletion.",
   AucunRole : "No role",
+  RoleIntrouvable: (roleDisplay: string) => `Role not found (\`${roleDisplay}\`)`,
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled : boolean, rolesDisplay: string) => `## 🚫 Deleting Messages by Role
+      
+      **Activated  :** ${enabled ? "yes" : "no"}
+      **Monitored roles :** ${rolesDisplay}
+      `,
 };
 
 const en_out = {

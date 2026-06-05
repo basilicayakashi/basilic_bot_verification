@@ -296,6 +296,8 @@ Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
 
 ${questionsText}
 
+${roleMsgDeleteText}
+
 ## Kostenlose Spiele
 
 1) Aktiviert: ${freeGamesEnabled ? "ja" : "nein"}

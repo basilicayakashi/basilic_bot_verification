@@ -294,6 +294,8 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
 3) Tiempo de verificación: ${verificationTimeoutHours} hora(s)
 
 ${questionsText}
+
+${roleMsgDeleteText}
   
 ## Juegos gratuitos
 

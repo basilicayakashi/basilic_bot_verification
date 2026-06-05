@@ -302,6 +302,8 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
 3) Limit czasu weryfikacji: ${verificationTimeoutHours} godz.
 
 ${questionsText}
+
+${roleMsgDeleteText}
   
 ## Darmowe gry
 

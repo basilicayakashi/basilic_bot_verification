@@ -299,6 +299,8 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
 3) Délai de vérification : ${verificationTimeoutHours} heure(s)
 
 ${questionsText}
+
+${roleMsgDeleteText}
   
 ## Jeux gratuits
 

@@ -295,6 +295,8 @@ Most configuration commands require **Administrator** permissions.
 
 ${questionsText}
 
+${roleMsgDeleteText}
+
 ## Free games
 
 1) Enabled: ${freeGamesEnabled ? "yes" : "no"}

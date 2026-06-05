@@ -171,6 +171,16 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS guild_role_message_delete_settings (
+    guild_id TEXT PRIMARY KEY,
+    enabled INTEGER NOT NULL,
+    role_id TEXT NOT NULL,
+    updated_by TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+`);
+
 export const getAllFreeGamesStmt = db.prepare(`
   SELECT *
   FROM free_games
@@ -402,6 +412,23 @@ export const deleteFreeGamePublicationStmt = db.prepare(`
   DELETE FROM free_games_publications
   WHERE guild_id = ?
     AND free_game_id = ?
+`);
+
+export const getGuildRoleMessageDeleteSettingsStmt = db.prepare(`
+  SELECT * FROM guild_role_message_delete_settings
+  WHERE guild_id = ?
+`);
+
+export const upsertGuildRoleMessageDeleteSettingsStmt = db.prepare(`
+  INSERT INTO guild_role_message_delete_settings (
+    guild_id, enabled, role_id, updated_by, updated_at
+  )
+  VALUES (?, ?, ?, ?, ?)
+  ON CONFLICT(guild_id) DO UPDATE SET
+    enabled = excluded.enabled,
+    role_id = excluded.role_id,
+    updated_by = excluded.updated_by,
+    updated_at = excluded.updated_at
 `);
 
 export type VerifiedUserRow = {

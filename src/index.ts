@@ -62,6 +62,8 @@ import {
   getAllFreeGamesStmt,
   getExpiredFreeGamePublicationsStmt,
   deleteFreeGamePublicationStmt,
+  getGuildRoleMessageDeleteSettingsStmt,
+  upsertGuildRoleMessageDeleteSettingsStmt,
 } from "./database/sql.js";
 
 import type {
@@ -255,31 +257,6 @@ export const commands = [
       })
       .setRequired(true)
   ),
-
-  /*
-  new SlashCommandBuilder()
-    .setName("allow-setup-verification")
-    .setDescription(cmd_en.allowSetupVerificationDescription)
-    .setDescriptionLocalizations({
-        [Locale.French]: cmd_fr.allowSetupVerificationDescription,
-        [Locale.SpanishES]: cmd_es.allowSetupVerificationDescription,
-        [Locale.German]: cmd_de.allowSetupVerificationDescription,
-        [Locale.Polish]: cmd_pl.allowSetupVerificationDescription,
-      })
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addStringOption((option) =>
-      option
-        .setName("guild_id")
-        .setDescription(cmd_en.guildIdDescription)
-        .setDescriptionLocalizations({
-          [Locale.French]: cmd_fr.guildIdDescription,
-          [Locale.SpanishES]: cmd_es.guildIdDescription,
-          [Locale.German]: cmd_de.guildIdDescription,
-          [Locale.Polish]: cmd_pl.guildIdDescription,
-        })
-        .setRequired(true)
-    ),
-  */
   new SlashCommandBuilder()
     .setName("add-verification-question")
     .setDescription("Add a verification question for this server")
@@ -581,7 +558,6 @@ export const commands = [
       .setRequired(false)
       .setMinValue(5)
   ),
-  // 1) Dans le tableau commands, ajoute cette commande
 new SlashCommandBuilder()
   .setName("view-settings")
   .setDescription("Display the current settings for this server")
@@ -670,7 +646,41 @@ new SlashCommandBuilder()
     [Locale.SpanishES]: "Apoyar el desarrollo del bot",
     [Locale.German]: "Die Entwicklung des Bots unterstützen",
     [Locale.Polish]: "Wesprzyj rozwój bota",
+  }),
+new SlashCommandBuilder()
+  .setName("role-used-msg-delete")
+  .setDescription("Delete new messages mentioning a configured role")
+  .setDescriptionLocalizations({
+    [Locale.French]: "Supprimer les nouveaux messages mentionnant un rôle configuré",
+    [Locale.SpanishES]: "Eliminar los nuevos mensajes que mencionan un rol configurado",
+    [Locale.German]: "Neue Nachrichten löschen, die einen konfigurierten Rollen erwähnen",
+    [Locale.Polish]: "Usuń nowe wiadomości wspominające skonfigurowaną rolę",
   })
+  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+  .addBooleanOption((option) =>
+    option
+      .setName("enabled")
+      .setDescription("Enable or disable message deletion")
+      .setDescriptionLocalizations({
+        [Locale.French]: "Activer ou désactiver la suppression des messages",
+        [Locale.SpanishES]: "Habilitar o deshabilitar la eliminación de mensajes",
+        [Locale.German]: "Löschen von Nachrichten aktivieren oder deaktivieren",
+        [Locale.Polish]: "Włącz lub wyłącz usuwanie wiadomości",
+      })
+      .setRequired(true)
+  )
+  .addRoleOption((option) =>
+    option
+      .setName("role")
+      .setDescription("Role that will trigger message deletion")
+      .setDescriptionLocalizations({
+        [Locale.French]: "Rôle qui déclenchera la suppression du message",
+        [Locale.SpanishES]: "Rol que desencadenará la eliminación del mensaje",
+        [Locale.German]: "Rolle, die das Löschen der Nachricht auslösen wird",
+        [Locale.Polish]: "Rola, która spowoduje usunięcie wiadomości",
+      })
+      .setRequired(true)
+  ),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -1420,15 +1430,7 @@ if (interaction.isButton()) {
         if (!context) return;
 
         const targetUserId = interaction.options.getString("user_id", true);
-
-        /*
-        const verifiedRecord = getVerifiedUserStmt.get(interaction.guild!.id, targetUserId) as VerifiedUserRow | undefined;
-        const blacklistedHere = getBlacklistedUserStmt.get(
-          interaction.guild!.id,
-          targetUserId
-        ) as BlacklistedUserRow | undefined;
-         */
-        
+       
         const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
           targetUserId
         ) as BlacklistedUserRow[];
@@ -2184,6 +2186,35 @@ if (interaction.isButton()) {
     return;
   }
 
+if (interaction.commandName === "role-used-msg-delete") {
+  const member = await interaction.guild!.members.fetch(interaction.user.id);
+
+  if (!isAdministrator(member, interaction)) {
+    await replyEphemeral(interaction, msgIn.onlyStaffCanUseCommand);
+    return;
+  }
+
+  const enabled = interaction.options.getBoolean("enabled", true);
+  const role = interaction.options.getRole("role", true);
+
+  upsertGuildRoleMessageDeleteSettingsStmt.run(
+    interaction.guild!.id,
+    enabled ? 1 : 0,
+    role.id,
+    interaction.user.id,
+    new Date().toISOString()
+  );
+
+  await replyEphemeral(
+    interaction,
+    enabled
+      ? `✅ Suppression activée pour les messages mentionnant <@&${role.id}>.`
+      : `✅ Suppression désactivée pour <@&${role.id}>.`
+  );
+
+  return;
+}
+
     }
 
     // =========================================
@@ -2312,15 +2343,6 @@ if (interaction.isButton()) {
           }
         }
       }
-
-      /*
-      content += `\n${msgServer.verificationWaiting(guildSettings.staff_role_id)}`;
-
-      await (verificationChannel as TextChannel).send({
-        content,
-        components: [buildDecisionButtonsRow(member.id, msgServer)],
-      });
-      */
 
       // On retire la mention du contenu principal
       await (verificationChannel as TextChannel).send({
@@ -2477,6 +2499,22 @@ client.on(Events.MessageCreate, async (message) => {
     await spamAlertService.handleMessage(message);
   } catch (error) {
     console.error("❌ Erreur spam detection :", error);
+  }
+});
+
+client.on(Events.MessageCreate, async (message) => {
+  if (!message.guild || message.author.bot) return;
+
+  const settings = getGuildRoleMessageDeleteSettingsStmt.get(
+    message.guild.id
+  ) as { enabled: number; role_id: string } | undefined;
+
+  if (!settings || settings.enabled !== 1) return;
+
+  if (!message.mentions.roles.has(settings.role_id)) return;
+
+  if (message.deletable) {
+    await message.delete().catch(() => null);
   }
 });
 

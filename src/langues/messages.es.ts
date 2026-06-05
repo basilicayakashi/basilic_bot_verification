@@ -323,6 +323,8 @@ ManualVerificationProcessed: (
   none: "Ninguno",
   SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Eliminación activada para los mensajes que mencionan: ${rolesDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Eliminación desactivada`,
+  FournirAuMoinsUnRole: "Debe proporcionar al menos un rol para mencionar y habilitar la eliminación automática.",
+  AucunRole : "No role",
 };
 
 const es_out = {

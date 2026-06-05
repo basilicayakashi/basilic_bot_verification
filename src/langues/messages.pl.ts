@@ -331,6 +331,8 @@ ManualVerificationProcessed: (
   none: "Brak",
   SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Usuwanie wiadomości zawierających wzmiankę o następujących rolach zostało włączone: ${rolesDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Usuwanie wiadomości zostało wyłączone`,
+  FournirAuMoinsUnRole: "Musisz podać co najmniej jedną rolę, jeśli usunięcie jest włączone.",
+  AucunRole : "Brak roli",
 };
 
 const pl_out = {

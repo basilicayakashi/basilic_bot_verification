@@ -328,6 +328,8 @@ ManualVerificationProcessed: (
   none: "Aucun",
   SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Suppression activée pour les messages mentionnant : ${rolesDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Suppression désactivée`,
+  FournirAuMoinsUnRole: "Vous devez fournir au moins un rôle à mentionner pour activer la suppression automatique.",
+  AucunRole : "Aucun rôle",
 };
 
 const fr_out = {

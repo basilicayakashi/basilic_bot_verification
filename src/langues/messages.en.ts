@@ -323,6 +323,8 @@ ManualVerificationProcessed: (
   none: "None",
   SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Deletion enabled for messages mentioning: ${rolesDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Deletion disabled`,
+  FournirAuMoinsUnRole: "You must provide at least one role to mention to enable automatic deletion.",
+  AucunRole : "No role",
 };
 
 const en_out = {

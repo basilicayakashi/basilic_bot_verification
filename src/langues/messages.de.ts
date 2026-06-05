@@ -324,6 +324,8 @@ ManualVerificationProcessed: (
   none: "Keine",
   SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Löschung für Nachrichten aktiviert, die folgende Rollen erwähnen: ${rolesDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Löschung deaktiviert`,
+  FournirAuMoinsUnRole: "Sie müssen mindestens eine Rolle angeben, um sie zu erwähnen und die automatische Löschung zu aktivieren.",
+  AucunRole : "Keine Rolle"
 };
 
 const de_out = {

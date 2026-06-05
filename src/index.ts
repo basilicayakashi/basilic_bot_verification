@@ -2225,7 +2225,7 @@ if (interaction.commandName === "role-used-msg-delete") {
   if (enabled && roles.length === 0) {
     await replyEphemeral(
       interaction,
-      "Tu dois fournir au moins un rôle si la suppression est activée."
+      msgIn.FournirAuMoinsUnRole
     );
     return;
   }
@@ -2247,13 +2247,13 @@ if (interaction.commandName === "role-used-msg-delete") {
   const rolesDisplay =
     roleIds.length > 0
       ? roleIds.map((roleId) => `<@&${roleId}>`).join(", ")
-      : "aucun rôle";
+      : msgIn.AucunRole;
 
   await replyEphemeral(
     interaction,
     enabled
-      ? `✅ Suppression activée pour les messages mentionnant : ${rolesDisplay}.`
-      : "✅ Suppression désactivée."
+      ? msgIn.SuppressionAutomatiqueMessageMentionRoleActivee(rolesDisplay)
+      : msgIn.SuppressionAutomatiqueMessageMentionRoleDesctivee
   );
 
   return;
@@ -2548,6 +2548,9 @@ client.on(Events.MessageCreate, async (message) => {
 
 client.on(Events.MessageCreate, async (message) => {
   if (!message.guild || message.author.bot) return;
+
+  // Le propriétaire du serveur est exempté
+  if (message.author.id === message.guild.ownerId) return;
 
   const settings = getGuildRoleMessageDeleteSettingsStmt.get(
     message.guild.id

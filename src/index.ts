@@ -669,18 +669,36 @@ new SlashCommandBuilder()
       })
       .setRequired(true)
   )
-  .addRoleOption((option) =>
-    option
-      .setName("role")
-      .setDescription("Role that will trigger message deletion")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Rôle qui déclenchera la suppression du message",
-        [Locale.SpanishES]: "Rol que desencadenará la eliminación del mensaje",
-        [Locale.German]: "Rolle, die das Löschen der Nachricht auslösen wird",
-        [Locale.Polish]: "Rola, która spowoduje usunięcie wiadomości",
-      })
-      .setRequired(true)
-  ),
+ .addRoleOption((option) =>
+  option
+    .setName("role_1")
+    .setDescription("First role that will trigger message deletion")
+    .setRequired(false)
+    )
+    .addRoleOption((option) =>
+      option
+        .setName("role_2")
+        .setDescription("Second role that will trigger message deletion")
+        .setRequired(false)
+    )
+    .addRoleOption((option) =>
+      option
+        .setName("role_3")
+        .setDescription("Third role that will trigger message deletion")
+        .setRequired(false)
+    )
+    .addRoleOption((option) =>
+      option
+        .setName("role_4")
+        .setDescription("Fourth role that will trigger message deletion")
+        .setRequired(false)
+    )
+    .addRoleOption((option) =>
+      option
+        .setName("role_5")
+        .setDescription("Fifth role that will trigger message deletion")
+        .setRequired(false)
+    ),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -2195,21 +2213,47 @@ if (interaction.commandName === "role-used-msg-delete") {
   }
 
   const enabled = interaction.options.getBoolean("enabled", true);
-  const role = interaction.options.getRole("role", true);
+
+  const roles = [
+    interaction.options.getRole("role_1"),
+    interaction.options.getRole("role_2"),
+    interaction.options.getRole("role_3"),
+    interaction.options.getRole("role_4"),
+    interaction.options.getRole("role_5"),
+  ].filter((role): role is NonNullable<typeof role> => role !== null);
+
+  if (enabled && roles.length === 0) {
+    await replyEphemeral(
+      interaction,
+      "Tu dois fournir au moins un rôle si la suppression est activée."
+    );
+    return;
+  }
+
+  const roleIds = roles.map((role) => role.id);
 
   upsertGuildRoleMessageDeleteSettingsStmt.run(
     interaction.guild!.id,
     enabled ? 1 : 0,
-    role.id,
+    roleIds[0] ?? null,
+    roleIds[1] ?? null,
+    roleIds[2] ?? null,
+    roleIds[3] ?? null,
+    roleIds[4] ?? null,
     interaction.user.id,
     new Date().toISOString()
   );
 
+  const rolesDisplay =
+    roleIds.length > 0
+      ? roleIds.map((roleId) => `<@&${roleId}>`).join(", ")
+      : "aucun rôle";
+
   await replyEphemeral(
     interaction,
     enabled
-      ? msgIn.SuppressionAutomatiqueMessageMentionRoleActivee(role.id)
-      : msgIn.SuppressionAutomatiqueMessageMentionRoleDesctivee(role.id)
+      ? `✅ Suppression activée pour les messages mentionnant : ${rolesDisplay}.`
+      : "✅ Suppression désactivée."
   );
 
   return;
@@ -2507,27 +2551,48 @@ client.on(Events.MessageCreate, async (message) => {
 
   const settings = getGuildRoleMessageDeleteSettingsStmt.get(
     message.guild.id
-  ) as { enabled: number; role_id: string } | undefined;
+  ) as {
+    enabled: number;
+    role_id1: string | null;
+    role_id2: string | null;
+    role_id3: string | null;
+    role_id4: string | null;
+    role_id5: string | null;
+  } | undefined;
 
   if (!settings || settings.enabled !== 1) return;
 
-  // Déterminer si on surveille @everyone/@here ou un rôle classique
-  const isEveryoneOrHere =
-    settings.role_id === message.guild.id || // @everyone a le même ID que le guild
-    settings.role_id === "everyone";
+  const roleIds = [
+    settings.role_id1,
+    settings.role_id2,
+    settings.role_id3,
+    settings.role_id4,
+    settings.role_id5,
+  ].filter(Boolean) as string[];
 
-  const mentionsTarget = isEveryoneOrHere
-    ? message.mentions.everyone // true si @everyone ou @here présent dans le message
-    : message.mentions.roles.has(settings.role_id);
+  if (roleIds.length === 0) return;
+
+  const mentionsTarget = roleIds.some((roleId) => {
+    const isEveryoneOrHere =
+      roleId === message.guild!.id ||
+      roleId === "everyone";
+
+    return isEveryoneOrHere
+      ? message.mentions.everyone
+      : message.mentions.roles.has(roleId);
+  });
 
   console.log("[role-block] mentions.everyone:", message.mentions.everyone);
   console.log("[role-block] mentions.roles:", [...message.mentions.roles.keys()]);
+  console.log("[role-block] roles surveillés:", roleIds);
   console.log("[role-block] mentionsTarget:", mentionsTarget);
 
   if (!mentionsTarget) return;
 
   if (!message.deletable) {
-    console.log("[role-block] Message non supprimable — vérifie la permission Gérer les messages.");
+    console.log(
+      "[role-block] Message non supprimable — vérifie la permission Gérer les messages."
+    );
     return;
   }
 

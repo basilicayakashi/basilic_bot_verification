@@ -175,7 +175,11 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS guild_role_message_delete_settings (
     guild_id TEXT PRIMARY KEY,
     enabled INTEGER NOT NULL,
-    role_id TEXT NOT NULL,
+    role_id1 TEXT NULL,
+    role_id2 TEXT NULL,
+    role_id3 TEXT NULL,
+    role_id4 TEXT NULL,
+    role_id5 TEXT NULL,
     updated_by TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
@@ -421,12 +425,16 @@ export const getGuildRoleMessageDeleteSettingsStmt = db.prepare(`
 
 export const upsertGuildRoleMessageDeleteSettingsStmt = db.prepare(`
   INSERT INTO guild_role_message_delete_settings (
-    guild_id, enabled, role_id, updated_by, updated_at
+    guild_id, enabled, role_id1, role_id2, role_id3, role_id4, role_id5, updated_by, updated_at
   )
-  VALUES (?, ?, ?, ?, ?)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   ON CONFLICT(guild_id) DO UPDATE SET
     enabled = excluded.enabled,
-    role_id = excluded.role_id,
+    role_id1 = excluded.role_id1,
+    role_id2 = excluded.role_id2,
+    role_id3 = excluded.role_id3,
+    role_id4 = excluded.role_id4,
+    role_id5 = excluded.role_id5,
     updated_by = excluded.updated_by,
     updated_at = excluded.updated_at
 `);

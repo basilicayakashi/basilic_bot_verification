@@ -321,8 +321,8 @@ ManualVerificationProcessed: (
   freeGamesManualPublishSettingsDeleted : "Configuración de publicación eliminada",
   freeGamesManualPublishSettingsSaved : "Configuración de publicación guardada",
   none: "Ninguno",
-  SuppressionAutomatiqueMessageMentionRoleActivee: (role_id : string) => `✅ Eliminación activada para los mensajes que mencionan a <@&${role_id}>`,
-  SuppressionAutomatiqueMessageMentionRoleDesctivee: (role_id : string) => `✅ Eliminación desactivada para <@&${role_id}>`,
+  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Eliminación activada para los mensajes que mencionan: ${rolesDisplay}`,
+  SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Eliminación desactivada`,
 };
 
 const es_out = {

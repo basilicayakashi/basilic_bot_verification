@@ -343,6 +343,7 @@ ManualVerificationProcessed: (
       **Activé :** ${enabled ? "oui" : "non"}
       **Rôles surveillés :** ${rolesDisplay}
       `,
+  unknownServer: "Serveur inconnu",
   by: "Par",
   reason: "Raison",
 

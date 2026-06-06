@@ -1475,8 +1475,8 @@ if (interaction.isButton()) {
               `• ${guildDisplay}`,
               `  ${entry.blacklisted_at}`,
               `  ${msgIn.by} : ${moderatorDisplay}`,
-              `  ${msgIn.reason} : ${entry.reason ?? msgIn.noReasonProvided}`,
-
+              `  ${msgIn.reason} : ${entry.reason ?? msgIn.noReasonProvided}
+              `,
             ].join("\n");
           })
         );

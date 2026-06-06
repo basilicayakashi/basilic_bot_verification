@@ -343,6 +343,9 @@ ManualVerificationProcessed: (
       **Activé :** ${enabled ? "oui" : "non"}
       **Rôles surveillés :** ${rolesDisplay}
       `,
+  by: "Par",
+  reason: "Raison",
+
 };
 
 const fr_out = {

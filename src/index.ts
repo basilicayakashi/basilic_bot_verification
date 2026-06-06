@@ -1465,13 +1465,19 @@ if (interaction.isButton()) {
 
             const guildDisplay = guild
               ? `${guild.name} (${entry.guild_id})`
-              : `Serveur inconnu (${entry.guild_id})`;
+              : `${msgIn.unknownServer} (${entry.guild_id})`;
 
             const moderatorDisplay = moderator
               ? `@${moderator.username}`
               : entry.blacklisted_by ?? msgIn.noReasonProvided;
 
-            return `• ${guildDisplay} — ${entry.blacklisted_at} par ${moderatorDisplay} — ${entry.reason ?? msgIn.noReasonProvided}`;
+            return [
+              `• ${guildDisplay}`,
+              `  ${entry.blacklisted_at}`,
+              `  ${msgIn.by} : ${moderatorDisplay}`,
+              `  ${msgIn.reason} : ${entry.reason ?? msgIn.noReasonProvided}`,
+
+            ].join("\n");
           })
         );
 

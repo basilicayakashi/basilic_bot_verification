@@ -339,6 +339,10 @@ ManualVerificationProcessed: (
       **Aktiviert   :** ${enabled ? "ja" : "nein"}
       **Überwachte Rollen :** ${rolesDisplay}
       `,
+  unknownServer: "Unbekannter Server",
+  by: "Von",
+  reason: "Grund",
+
 };
 
 const de_out = {

@@ -338,6 +338,10 @@ ManualVerificationProcessed: (
       **Activado   :** ${enabled ? "sí" : "no"}
       **Roles supervisados :** ${rolesDisplay}
       `,
+  unknownServer: "Servidor desconocido",
+  by: "Por",
+  reason: "Razón",
+
 };
 
 const es_out = {

@@ -346,6 +346,10 @@ ManualVerificationProcessed: (
       **Aktywowany :** ${enabled ? "tak" : "nie"}
       **Monitorowane role :** ${rolesDisplay}
       `,
+  unknownServer: "Nieznany serwer",
+  by: "Przez",
+  reason: "Powód",
+
 };
 
 const pl_out = {

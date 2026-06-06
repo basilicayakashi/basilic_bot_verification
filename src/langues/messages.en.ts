@@ -338,6 +338,10 @@ ManualVerificationProcessed: (
       **Activated  :** ${enabled ? "yes" : "no"}
       **Monitored roles :** ${rolesDisplay}
       `,
+  unknownServer: "Unknown server",
+  by: "By",
+  reason: "Reason",
+
 };
 
 const en_out = {

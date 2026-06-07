@@ -12,7 +12,9 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 
-import { deletePendingVerificationSubmissionStmt } from "../database/sql.js";
+import { deletePendingVerificationSubmissionStmt,
+        getBlacklistedUsersEverywhereStmt,
+ } from "../database/sql.js";
 
 export type VerificationFlowDeps = {
   client: any;
@@ -23,6 +25,7 @@ export type VerificationFlowDeps = {
   getBlacklistedUserStmt: any;
   getGuildVerificationSettingsStmt: any;
   getGuildVerificationQuestionsStmt: any;
+  getBlacklistedUsersEverywhereStmt: any;
 
   buildDisabledDecisionButtonsRow: (
     finalAction: "approved" | "rejected" | "blacklisted",
@@ -718,22 +721,51 @@ export async function handleVerificationModals({
     
 	  content += `\n${msgServer.verificationWaiting(guildSettings.staff_role_id)}`;
 
+    // ── MESSAGE 1 : réponses de vérification ──────────────────────────
 	  await (verificationChannel as TextChannel).send({
 		content,
 		components: [deps.buildDecisionButtonsRow(member.id, msgServer)],
 	  });
     
-    /*
-    await (verificationChannel as TextChannel).send({
-      content,
-      components: [deps.buildDecisionButtonsRow(member.id, msgServer)],
-    });
+    // ── MESSAGE 2 : statut blacklist ──────────────────────────────────
+    const blacklistedEverywhere = deps.getBlacklistedUsersEverywhereStmt.all(member.id);
+
+    let statusContent: string;
+
+    if (blacklistedEverywhere.length === 0) {
+      statusContent = msgServer.checkMemberNotBlacklisted; // ex: "✅ Pas de blacklist connue pour cet utilisateur."
+    } else {
+      const lines = await Promise.all(
+        blacklistedEverywhere.map(async (entry: any) => {
+          const guild = await deps.client.guilds.fetch(entry.guild_id).catch(() => null);
+          const moderator = entry.blacklisted_by
+            ? await deps.client.users.fetch(entry.blacklisted_by).catch(() => null)
+            : null;
+
+          const guildDisplay = guild
+            ? `${guild.name} (${entry.guild_id})`
+            : `${msgServer.unknownServer} (${entry.guild_id})`;
+
+          const moderatorDisplay = moderator
+            ? `@${moderator.username}`
+            : entry.blacklisted_by ?? msgServer.noReasonProvided;
+
+          return [
+            `• ${guildDisplay}`,
+            `  📅 ${entry.blacklisted_at}`,
+            `  👮 ${msgServer.by} : ${moderatorDisplay}`,
+            `  📝 ${msgServer.reason} : ${entry.reason ?? msgServer.noReasonProvided}`,
+          ].join("\n");
+        })
+      );
+
+      statusContent = msgServer.checkMemberBlacklistedOn(lines.join("\n\n"));
+      // ex: "⛔ Cet utilisateur est blacklisté sur :\n\n{lines}"
+    }
 
     await (verificationChannel as TextChannel).send({
-      content: msgServer.verificationWaiting(guildSettings.staff_role_id),
-      allowedMentions: { roles: [guildSettings.staff_role_id] },
+      content: statusContent,
     });
-    */
 
 	  await interaction.reply({
 		content: msgIn.verificationRequestSent,

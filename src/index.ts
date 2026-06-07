@@ -1291,6 +1291,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 	  isUsedOnAServer,
 	  isAdministrator,
 	  formatAccountAge,
+    getBlacklistedUsersEverywhereStmt,
 	};
   
     const msgIn = getMessagesUser(interaction);

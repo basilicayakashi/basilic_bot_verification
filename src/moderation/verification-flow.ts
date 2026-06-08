@@ -751,9 +751,11 @@ export async function handleVerificationModals({
             ? `@${moderator.username}`
             : entry.blacklisted_by ?? msgServer.noReasonProvided;
 
+          const timestamp = Math.floor(new Date(entry.blacklisted_at).getTime() / 1000);
+
           return [
             `• ${guildDisplay}`,
-            `  📅 ${entry.blacklisted_at}`,
+            `  📅 <t:${timestamp}:f>`,
             `  👮 ${msgServer.by} : ${moderatorDisplay}`,
             `  📝 ${msgServer.reason} : ${entry.reason ?? msgServer.noReasonProvided}`,
           ].join("\n");

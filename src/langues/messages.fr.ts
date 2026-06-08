@@ -432,6 +432,8 @@ const fr_server = {
   spamFalsePositiveConfirmed: "✅ Faux positif confirmé.",
   spamUserBanned: "🔨 Utilisateur banni.",
   checkMemberBlacklistedOn: (lines: string) => `⛔ Utilisateur blacklisté sur :\n\n${lines}`,
+  by: "Par",
+  reason: "Raison",
 };
 
 const fr_internal = {

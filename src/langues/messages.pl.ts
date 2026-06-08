@@ -346,7 +346,6 @@ ${roleMsgDeleteText}
   unknownServer: "Nieznany serwer",
   by: "Przez",
   reason: "Powód",
-
 };
 
 const pl_out = {
@@ -429,6 +428,8 @@ const pl_server = {
   spamFalsePositiveConfirmed: "✅ Fałszywy alarm potwierdzony.",
   spamUserBanned: "🔨 Użytkownik zbanowany.",
   checkMemberBlacklistedOn: (lines: string) => `⛔ Użytkownik na czarnej liście na:\n\n${lines}`,
+  by: "Przez",
+  reason: "Powód",
 };
 
 const pl_internal = {

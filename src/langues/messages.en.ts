@@ -338,7 +338,6 @@ ${roleMsgDeleteText}
   unknownServer: "Unknown server",
   by: "By",
   reason: "Reason",
-
 };
 
 const en_out = {
@@ -427,6 +426,8 @@ const en_server = {
   spamFalsePositiveConfirmed: "✅ False positive confirmed.",
   spamUserBanned: "🔨 User banned.",
   checkMemberBlacklistedOn: (lines: string) => `⛔ User blacklisted on:\n\n${lines}`,
+  by: "By",
+  reason: "Reason",
 };
 
 const en_internal = {

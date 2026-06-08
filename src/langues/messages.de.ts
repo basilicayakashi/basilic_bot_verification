@@ -427,6 +427,8 @@ const de_server = {
   spamFalsePositiveConfirmed: "✅ Fehlalarm bestätigt.",
   spamUserBanned: "🔨 Benutzer gebannt.",
   checkMemberBlacklistedOn: (lines: string) => `⛔ Benutzer auf folgenden Servern gesperrt:\n\n${lines}`,
+  by: "Von",
+  reason: "Grund",
 };
 
 const de_internal = {

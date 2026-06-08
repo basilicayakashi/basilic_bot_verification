@@ -481,7 +481,7 @@ export type GuildVerificationSettingsRow = {
   staff_role_id: string;
   created_by: string;
   updated_at: string;
-  verification_timeout_hours : number;
+  verification_timeout_hours: number;
 };
 
 export type GuildSpamSettingsRow = {
@@ -513,7 +513,7 @@ export type GuildFreeGamesSettingsRow = {
 };
 
 export type GuildRoleMessageDeleteSettingsRow = {
-  guild_id: string; 
+  guild_id: string;
   enabled: number;
   role_id1: string | null;
   role_id2: string | null;

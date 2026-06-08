@@ -19,7 +19,7 @@ import {
   BaseInteraction,
   CacheType,
   Locale,
-  ChatInputCommandInteraction ,
+  ChatInputCommandInteraction,
   EmbedBuilder,
 } from "discord.js";
 
@@ -78,10 +78,10 @@ import type {
   GuildWelcomeMessageRow,
 } from "./database/sql.js";
 
-import { handleVerificationButtons, handleVerificationModals} from "./moderation/verification-flow.js";
+import { handleVerificationButtons, handleVerificationModals } from "./moderation/verification-flow.js";
 
 //les messages envoyés à la personne qui fait appel au bot
-import { getMessagesUser, getMessagesOut, getMessagesServer, getMessagesInternal} from "./langues/index.js";
+import { getMessagesUser, getMessagesOut, getMessagesServer, getMessagesInternal } from "./langues/index.js";
 
 // =========================
 // CONFIG
@@ -102,7 +102,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
-	GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
   partials: [Partials.GuildMember],
@@ -165,28 +165,28 @@ export const commands = [
         .setRequired(true)
     )
     .addIntegerOption((option) =>
-    option
-      .setName("verification_timeout_hours")
-      .setDescription("Time limit in hours to submit verification responses")
-      .setDescriptionLocalizations({
+      option
+        .setName("verification_timeout_hours")
+        .setDescription("Time limit in hours to submit verification responses")
+        .setDescriptionLocalizations({
           [Locale.French]: "Délai en heures pour soumettre les réponses de vérification",
           [Locale.SpanishES]: "Tiempo en horas para enviar las respuestas de verificación",
           [Locale.German]: "Zeitlimit in Stunden zum Einreichen der Verifizierungsantworten",
           [Locale.Polish]: "Czas w godzinach na przesłanie odpowiedzi weryfikacyjnych",
         })
-      .setRequired(false)
-      .setMinValue(0)
-  ),
+        .setRequired(false)
+        .setMinValue(0)
+    ),
 
   new SlashCommandBuilder()
     .setName("check-member")
     .setDescription("Check a user's verification, blacklist status, and shared servers")
     .setDescriptionLocalizations({
-          [Locale.French]: "Vérification, liste noire et serveurs communs d'un utilisateur",
-          [Locale.SpanishES]: "Verificación, lista negra y servidores compartidos de un usuario",
-          [Locale.German]: "Verifizierung, Sperrliste und gemeinsame Server eines Nutzers",
-          [Locale.Polish]: "Weryfikacja, czarna lista i wspólne serwery użytkownika",
-        })
+      [Locale.French]: "Vérification, liste noire et serveurs communs d'un utilisateur",
+      [Locale.SpanishES]: "Verificación, lista negra y servidores compartidos de un usuario",
+      [Locale.German]: "Verifizierung, Sperrliste und gemeinsame Server eines Nutzers",
+      [Locale.Polish]: "Weryfikacja, czarna lista i wspólne serwery użytkownika",
+    })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((option) =>
       option
@@ -202,71 +202,71 @@ export const commands = [
     ),
 
   new SlashCommandBuilder()
-  .setName("blacklist-member")
-  .setDescription("Blacklist a user on this server")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Mettre un utilisateur sur liste noire sur ce serveur",
-    [Locale.SpanishES]: "Poner un usuario en la lista negra en este servidor",
-    [Locale.German]: "Einen Benutzer auf diesem Server auf die schwarze Liste setzen",
-    [Locale.Polish]: "Dodać użytkownika do czarnej listy na tym serwerze",
-  })
-  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-  .addStringOption((option) =>
-    option
-      .setName("user_id")
-      .setDescription("The user ID to look up")
-      .setDescriptionLocalizations({
-        [Locale.French]: "ID de l'utilisateur à rechercher",
-        [Locale.SpanishES]: "ID del usuario que se debe buscar",
-        [Locale.German]: "Die Benutzer-ID, nach der gesucht werden soll",
-        [Locale.Polish]: "ID użytkownika",
-      })
-      .setRequired(true)
-  )
-  .addStringOption((option) =>
-    option
-      .setName("reason")
-      .setDescription("Add a reason (optional)")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Ajouter une raison (optionnel)",
-        [Locale.SpanishES]: "Agregar una razón (opcional)",
-        [Locale.German]: "Grund hinzufügen (optional)",
-        [Locale.Polish]: "Dodaj powód (opcjonalnie)",
-      })
-      .setRequired(false)
-  ),
+    .setName("blacklist-member")
+    .setDescription("Blacklist a user on this server")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Mettre un utilisateur sur liste noire sur ce serveur",
+      [Locale.SpanishES]: "Poner un usuario en la lista negra en este servidor",
+      [Locale.German]: "Einen Benutzer auf diesem Server auf die schwarze Liste setzen",
+      [Locale.Polish]: "Dodać użytkownika do czarnej listy na tym serwerze",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addStringOption((option) =>
+      option
+        .setName("user_id")
+        .setDescription("The user ID to look up")
+        .setDescriptionLocalizations({
+          [Locale.French]: "ID de l'utilisateur à rechercher",
+          [Locale.SpanishES]: "ID del usuario que se debe buscar",
+          [Locale.German]: "Die Benutzer-ID, nach der gesucht werden soll",
+          [Locale.Polish]: "ID użytkownika",
+        })
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("reason")
+        .setDescription("Add a reason (optional)")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Ajouter une raison (optionnel)",
+          [Locale.SpanishES]: "Agregar una razón (opcional)",
+          [Locale.German]: "Grund hinzufügen (optional)",
+          [Locale.Polish]: "Dodaj powód (opcjonalnie)",
+        })
+        .setRequired(false)
+    ),
 
   new SlashCommandBuilder()
-  .setName("verify-member")
-  .setDescription("Manually verify a member")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Vérifier manuellement un membre",
-    [Locale.SpanishES]: "Verificar manualmente a un miembro",
-    [Locale.German]: "Ein Mitglied manuell verifizieren",
-    [Locale.Polish]: "Ręcznie zweryfikuj członka",
-  })
-  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-  .addStringOption((option) =>
-    option
-      .setName("user_id")
-      .setDescription("Discord ID of the member to verify")
-      .setDescriptionLocalizations({
-        [Locale.French]: "ID Discord du membre à vérifier",
-        [Locale.SpanishES]: "ID de Discord del miembro a verificar",
-        [Locale.German]: "Discord-ID des zu verifizierenden Mitglieds",
-        [Locale.Polish]: "ID Discord członka do zweryfikowania",
-      })
-      .setRequired(true)
-  ),
+    .setName("verify-member")
+    .setDescription("Manually verify a member")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Vérifier manuellement un membre",
+      [Locale.SpanishES]: "Verificar manualmente a un miembro",
+      [Locale.German]: "Ein Mitglied manuell verifizieren",
+      [Locale.Polish]: "Ręcznie zweryfikuj członka",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addStringOption((option) =>
+      option
+        .setName("user_id")
+        .setDescription("Discord ID of the member to verify")
+        .setDescriptionLocalizations({
+          [Locale.French]: "ID Discord du membre à vérifier",
+          [Locale.SpanishES]: "ID de Discord del miembro a verificar",
+          [Locale.German]: "Discord-ID des zu verifizierenden Mitglieds",
+          [Locale.Polish]: "ID Discord członka do zweryfikowania",
+        })
+        .setRequired(true)
+    ),
   new SlashCommandBuilder()
     .setName("add-verification-question")
     .setDescription("Add a verification question for this server")
     .setDescriptionLocalizations({
-          [Locale.French]: "Ajouter une question de vérification pour ce serveur",
-          [Locale.SpanishES]: "Agregar una pregunta de verificación para este servidor",
-          [Locale.German]: "Eine Verifikationsfrage für diesen Server hinzufügen",
-          [Locale.Polish]: "Dodaj pytanie weryfikacyjne dla tego serwera",
-        })
+      [Locale.French]: "Ajouter une question de vérification pour ce serveur",
+      [Locale.SpanishES]: "Agregar una pregunta de verificación para este servidor",
+      [Locale.German]: "Eine Verifikationsfrage für diesen Server hinzufügen",
+      [Locale.Polish]: "Dodaj pytanie weryfikacyjne dla tego serwera",
+    })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((option) =>
       option
@@ -340,11 +340,11 @@ export const commands = [
     .setName("edit-verification-question")
     .setDescription("Edit a verification question by its index")
     .setDescriptionLocalizations({
-          [Locale.French]: "Modifier une question de vérification par son index",
-          [Locale.SpanishES]: "Editar una pregunta de verificación por su índice",
-          [Locale.German]: "Eine Verifizierungsfrage anhand ihres Index bearbeiten",
-          [Locale.Polish]: "Edytuj pytanie weryfikacyjne według indeksu",
-        })
+      [Locale.French]: "Modifier une question de vérification par son index",
+      [Locale.SpanishES]: "Editar una pregunta de verificación por su índice",
+      [Locale.German]: "Eine Verifizierungsfrage anhand ihres Index bearbeiten",
+      [Locale.Polish]: "Edytuj pytanie weryfikacyjne według indeksu",
+    })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addIntegerOption((option) =>
       option
@@ -381,37 +381,37 @@ export const commands = [
           [Locale.German]: "Neuer Fragetyp",
           [Locale.Polish]: "Nowy typ",
         })
-    .setRequired(false)
+        .setRequired(false)
         .addChoices(
           {
-          name: "Short text",
-          value: "text_short",
-          name_localizations: {
-            [Locale.French]: "Texte court",
-            [Locale.SpanishES]: "Texto corto",
-            [Locale.German]: "Kurzer Text",
-            [Locale.Polish]: "Krótki tekst",
-          },
-          },
-          {
-          name: "Paragraph",
-          value: "text_paragraph",
-          name_localizations: {
-            [Locale.French]: "Paragraphe",
-            [Locale.SpanishES]: "Párrafo",
-            [Locale.German]: "Absatz",
-            [Locale.Polish]: "Paragraf",
-          },
+            name: "Short text",
+            value: "text_short",
+            name_localizations: {
+              [Locale.French]: "Texte court",
+              [Locale.SpanishES]: "Texto corto",
+              [Locale.German]: "Kurzer Text",
+              [Locale.Polish]: "Krótki tekst",
+            },
           },
           {
-          name: "Image upload",
-          value: "file_image",
-          name_localizations: {
-            [Locale.French]: "Téléversement d'image",
-            [Locale.SpanishES]: "Subida de imagen",
-            [Locale.German]: "Bild hochladen",
-            [Locale.Polish]: "Obraz",
+            name: "Paragraph",
+            value: "text_paragraph",
+            name_localizations: {
+              [Locale.French]: "Paragraphe",
+              [Locale.SpanishES]: "Párrafo",
+              [Locale.German]: "Absatz",
+              [Locale.Polish]: "Paragraf",
+            },
           },
+          {
+            name: "Image upload",
+            value: "file_image",
+            name_localizations: {
+              [Locale.French]: "Téléversement d'image",
+              [Locale.SpanishES]: "Subida de imagen",
+              [Locale.German]: "Bild hochladen",
+              [Locale.Polish]: "Obraz",
+            },
           }
         )
     )
@@ -432,11 +432,11 @@ export const commands = [
     .setName("delete-verification-question")
     .setDescription("Delete a verification question by its index")
     .setDescriptionLocalizations({
-          [Locale.French]: "Supprimer une question de vérification par son index",
-          [Locale.SpanishES]: "Eliminar una pregunta de verificación por su índice",
-          [Locale.German]: "Eine Verifizierungsfrage anhand ihres Index löschen",
-          [Locale.Polish]: "Usuwa pytanie weryfikacyjne według jego indeksu",
-        })
+      [Locale.French]: "Supprimer une question de vérification par son index",
+      [Locale.SpanishES]: "Eliminar una pregunta de verificación por su índice",
+      [Locale.German]: "Eine Verifizierungsfrage anhand ihres Index löschen",
+      [Locale.Polish]: "Usuwa pytanie weryfikacyjne według jego indeksu",
+    })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addIntegerOption((option) =>
       option
@@ -451,230 +451,230 @@ export const commands = [
         .setRequired(true)
         .setMinValue(1)
     ),
-    
+
   new SlashCommandBuilder()
     .setName("bot-help")
     .setDescription("Show the bot setup guide and useful commands")
     .setDescriptionLocalizations({
-          [Locale.French]: "Afficher le guide de configuration du bot et les commandes utiles",
-          [Locale.SpanishES]: "Mostrar la guía de configuración del bot y comandos útiles",
-          [Locale.German]: "Die Bot-Setup-Anleitung und nützliche Befehle anzeigen",
-          [Locale.Polish]: "Pokaż przewodnik konfiguracji bota i przydatne polecenia",
-        })
+      [Locale.French]: "Afficher le guide de configuration du bot et les commandes utiles",
+      [Locale.SpanishES]: "Mostrar la guía de configuración del bot y comandos útiles",
+      [Locale.German]: "Die Bot-Setup-Anleitung und nützliche Befehle anzeigen",
+      [Locale.Polish]: "Pokaż przewodnik konfiguracji bota i przydatne polecenia",
+    })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-    
-    new SlashCommandBuilder()
-      .setName("unblacklist-member")
-      .setDescription("Remove a user from the blacklist for this server")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Supprimer un utilisateur de la liste noire pour ce serveur",
-        [Locale.SpanishES]: "Eliminar un usuario de la lista negra para este servidor",
-        [Locale.German]: "Einen Benutzer aus der schwarzen Liste für diesen Server entfernen",
-        [Locale.Polish]: "Usuń użytkownika z listy zablokowanych dla tego serwera",
-      })
-      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-      .addStringOption((option) =>
-        option
-          .setName("user_id")
-          .setDescription("The user ID to look up")
-          .setDescriptionLocalizations({
-            [Locale.French]: "L'ID de l'utilisateur à rechercher",
-            [Locale.SpanishES]: "El ID del usuario a buscar",
-            [Locale.German]: "Die Benutzer-ID, die gesucht werden soll",
-            [Locale.Polish]: "ID użytkownika do wyszukania",
-          })
-          .setRequired(true)
-      ),
-      
-      new SlashCommandBuilder()
-      .setName("setup-spam-detection")
-      .setDescription("Configure spam alert detection for this server")
-      .setDescriptionLocalizations({
-            [Locale.French]: "Configurer la détection d'alertes de spam pour ce serveur",
-            [Locale.SpanishES]: "Configurar la detección de alertas de spam para este servidor",
-            [Locale.German]: "Spam-Alarmdetektion für diesen Server konfigurieren",
-            [Locale.Polish]: "Skonfiguruj wykrywanie alertów spamu dla tego serwera",
-          })
-      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-      .addBooleanOption((option) =>
-        option
-          .setName("enabled")
-          .setDescription("Enable or disable spam detection")
-          .setDescriptionLocalizations({
-                [Locale.French]: "Activer ou désactiver la détection de spam",
-                [Locale.SpanishES]: "Habilitar o deshabilitar la detección de spam",
-                [Locale.German]: "Spam-Erkennung aktivieren oder deaktivieren",
-                [Locale.Polish]: "Włącz lub wyłącz wykrywanie spamu",
-              })
-          .setRequired(true)
-      )
-      .addChannelOption((option) =>
-        option
-          .setName("alert_channel")
-          .setDescription("Channel where moderation alerts will be sent")
-          .setDescriptionLocalizations({
-                [Locale.French]: "Canal où les alertes de modération seront envoyées",
-                [Locale.SpanishES]: "Canal donde se enviarán las alertas de moderación",
-                [Locale.German]: "Kanal, in dem Moderationswarnungen gesendet werden",
-                [Locale.Polish]: "Kanał, gdzie będą wysyłane alerty moderacyjne",
-              })
-          .addChannelTypes(ChannelType.GuildText)
-          .setRequired(false)
-      )
-      .addRoleOption((option) =>
-        option
-          .setName("staff_role")
-          .setDescription("Staff role to mention in spam alerts")
-          .setDescriptionLocalizations({
-                [Locale.French]: "Rôle du personnel à mentionner dans les alertes de spam",
-                [Locale.SpanishES]: "Rol del personal a mencionar en las alertas de spam",
-                [Locale.German]: "Mitarbeiter-Rolle, die in Spam-Warnungen erwähnt wird",
-                [Locale.Polish]: "Rola personelu do wspomnienia w alertach spamu",
-              })
-          .setRequired(false)
-      )
-    .addIntegerOption((option) =>
-    option
-      .setName("number")
-      .setDescription("Number of messages required to trigger an alert")
-          .setDescriptionLocalizations({
-                [Locale.French]: "Nombre de messages requis pour déclencher une alerte",
-                [Locale.SpanishES]: "Número de mensajes requeridos para activar una alerta",
-                [Locale.German]: "Anzahl der Nachrichten, die erforderlich sind, um eine Warnung auslösen",
-                [Locale.Polish]: "Liczba wiadomości wymaganych do wyzwolenia alarmu",
-              })
-      .setRequired(false)
-      .setMinValue(2)
-  )
-  .addIntegerOption((option) =>
-    option
-      .setName("duration")
-      .setDescription("Duration in seconds of the detection window")
-      .setDescriptionLocalizations({
-                [Locale.French]: "Durée en secondes de la fenêtre de détection",
-                [Locale.SpanishES]: "Duración en segundos de la ventana de detección",
-                [Locale.German]: "Dauer in Sekunden des Erkennungsfensters",
-                [Locale.Polish]: "Czas trwania w sekundach okna wykrywania",
-              })
-      .setRequired(false)
-      .setMinValue(5)
-  ),
-new SlashCommandBuilder()
-  .setName("view-settings")
-  .setDescription("Display the current settings for this server")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Affiche les paramètres actuels de ce serveur",
-    [Locale.SpanishES]: "Muestra los parámetros actuales de este servidor",
-    [Locale.German]: "Zeigt die aktuellen Einstellungen dieses Servers an",
-    [Locale.Polish]: "Wyświetl bieżące ustawienia bota dla tego serwera",
-  })
-  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
- new SlashCommandBuilder()
-  .setName("list-members-by-role-count")
-  .setDescription("List members having exactly N roles")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Lister les membres ayant exactement N rôles",
-    [Locale.SpanishES]: "Listar miembros con exactamente N roles",
-    [Locale.German]: "Mitglieder mit genau N Rollen auflisten",
-    [Locale.Polish]: "Wyświetl członków posiadających dokładnie N ról",
-  })
-  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-  .addIntegerOption((option) =>
-    option
-      .setName("number")
-      .setDescription("Exact number of roles")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Nombre exact de rôles",
-        [Locale.SpanishES]: "Número exacto de roles",
-        [Locale.German]: "Exakte Anzahl von Rollen",
-        [Locale.Polish]: "Dokładna liczba ról",
-      })
-      .setRequired(true)
-      .setMinValue(1)
-  ),
-new SlashCommandBuilder()
-  .setName("freegames-publish")
-  .setDescription("Publish notifications for new free games (if enabled)")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Publier les notifications de jeux gratuits (si activé)",
-    [Locale.SpanishES]: "Publicar notificaciones de juegos gratuitos (si activado)",
-    [Locale.German]: "Benachrichtigungen für kostenlose Spiele veröffentlichen",
-    [Locale.Polish]: "Publikuj powiadomienia o darmowych grach (jeśli włączone)",
-  })
-  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-  .addChannelOption((option) =>
-    option
-      .setName("channel")
-      .setDescription("Channel to publish notifications (leave empty to skip)")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Salon pour publier les notifications (vide = ignorer)",
-        [Locale.SpanishES]: "Canal para publicar notificaciones (vacío = omitir)",
-        [Locale.German]: "Kanal für Benachrichtigungen (leer lassen = überspringen)",
-        [Locale.Polish]: "Kanał do publikowania powiadomień (puste = pomiń)",
-      })
-      .addChannelTypes(ChannelType.GuildText)
-      .setRequired(false)
-  )
-  .addBooleanOption((option) =>
-    option
-      .setName("from_steam")
-      .setDescription("Publish Steam free games notifications")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Publier les notifications de jeux gratuits Steam",
-        [Locale.SpanishES]: "Publicar notificaciones de juegos gratuitos de Steam",
-        [Locale.German]: "Steam-Benachrichtigungen für kostenlose Spiele veröffentlichen",
-        [Locale.Polish]: "Publikuj powiadomienia o darmowych grach Steam",
-      })
-      .setRequired(false)
-  )
-  .addBooleanOption((option) =>
-    option
-      .setName("from_epic_games")
-      .setDescription("Publish Epic Games free games notifications")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Publier les notifications de jeux gratuits Epic Games",
-        [Locale.SpanishES]: "Publicar notificaciones de juegos gratuitos de Epic Games",
-        [Locale.German]: "Epic Games-Benachrichtigungen für kostenlose Spiele veröffentlichen",
-        [Locale.Polish]: "Publikuj powiadomienia o darmowych grach Epic Games",
-      })
-      .setRequired(false)
-  ),
+
   new SlashCommandBuilder()
-  .setName("donation")
-  .setDescription("Support the bot development")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Soutenir le développement du bot",
-    [Locale.SpanishES]: "Apoyar el desarrollo del bot",
-    [Locale.German]: "Die Entwicklung des Bots unterstützen",
-    [Locale.Polish]: "Wesprzyj rozwój bota",
-  }),
-new SlashCommandBuilder()
-  .setName("role-used-msg-delete")
-  .setDescription("Delete new messages mentioning a configured role")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Supprimer les nouveaux messages mentionnant un rôle configuré",
-    [Locale.SpanishES]: "Eliminar los nuevos mensajes que mencionan un rol configurado",
-    [Locale.German]: "Neue Nachrichten löschen, die einen konfigurierten Rollen erwähnen",
-    [Locale.Polish]: "Usuń nowe wiadomości wspominające skonfigurowaną rolę",
-  })
-  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-  .addBooleanOption((option) =>
-    option
-      .setName("enabled")
-      .setDescription("Enable or disable message deletion")
-      .setDescriptionLocalizations({
-        [Locale.French]: "Activer ou désactiver la suppression des messages",
-        [Locale.SpanishES]: "Habilitar o deshabilitar la eliminación de mensajes",
-        [Locale.German]: "Löschen von Nachrichten aktivieren oder deaktivieren",
-        [Locale.Polish]: "Włącz lub wyłącz usuwanie wiadomości",
-      })
-      .setRequired(true)
-  )
- .addRoleOption((option) =>
-  option
-    .setName("role_1")
-    .setDescription("First role that will trigger message deletion")
-    .setRequired(false)
+    .setName("unblacklist-member")
+    .setDescription("Remove a user from the blacklist for this server")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Supprimer un utilisateur de la liste noire pour ce serveur",
+      [Locale.SpanishES]: "Eliminar un usuario de la lista negra para este servidor",
+      [Locale.German]: "Einen Benutzer aus der schwarzen Liste für diesen Server entfernen",
+      [Locale.Polish]: "Usuń użytkownika z listy zablokowanych dla tego serwera",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addStringOption((option) =>
+      option
+        .setName("user_id")
+        .setDescription("The user ID to look up")
+        .setDescriptionLocalizations({
+          [Locale.French]: "L'ID de l'utilisateur à rechercher",
+          [Locale.SpanishES]: "El ID del usuario a buscar",
+          [Locale.German]: "Die Benutzer-ID, die gesucht werden soll",
+          [Locale.Polish]: "ID użytkownika do wyszukania",
+        })
+        .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName("setup-spam-detection")
+    .setDescription("Configure spam alert detection for this server")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Configurer la détection d'alertes de spam pour ce serveur",
+      [Locale.SpanishES]: "Configurar la detección de alertas de spam para este servidor",
+      [Locale.German]: "Spam-Alarmdetektion für diesen Server konfigurieren",
+      [Locale.Polish]: "Skonfiguruj wykrywanie alertów spamu dla tego serwera",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addBooleanOption((option) =>
+      option
+        .setName("enabled")
+        .setDescription("Enable or disable spam detection")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Activer ou désactiver la détection de spam",
+          [Locale.SpanishES]: "Habilitar o deshabilitar la detección de spam",
+          [Locale.German]: "Spam-Erkennung aktivieren oder deaktivieren",
+          [Locale.Polish]: "Włącz lub wyłącz wykrywanie spamu",
+        })
+        .setRequired(true)
+    )
+    .addChannelOption((option) =>
+      option
+        .setName("alert_channel")
+        .setDescription("Channel where moderation alerts will be sent")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Canal où les alertes de modération seront envoyées",
+          [Locale.SpanishES]: "Canal donde se enviarán las alertas de moderación",
+          [Locale.German]: "Kanal, in dem Moderationswarnungen gesendet werden",
+          [Locale.Polish]: "Kanał, gdzie będą wysyłane alerty moderacyjne",
+        })
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(false)
+    )
+    .addRoleOption((option) =>
+      option
+        .setName("staff_role")
+        .setDescription("Staff role to mention in spam alerts")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Rôle du personnel à mentionner dans les alertes de spam",
+          [Locale.SpanishES]: "Rol del personal a mencionar en las alertas de spam",
+          [Locale.German]: "Mitarbeiter-Rolle, die in Spam-Warnungen erwähnt wird",
+          [Locale.Polish]: "Rola personelu do wspomnienia w alertach spamu",
+        })
+        .setRequired(false)
+    )
+    .addIntegerOption((option) =>
+      option
+        .setName("number")
+        .setDescription("Number of messages required to trigger an alert")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Nombre de messages requis pour déclencher une alerte",
+          [Locale.SpanishES]: "Número de mensajes requeridos para activar una alerta",
+          [Locale.German]: "Anzahl der Nachrichten, die erforderlich sind, um eine Warnung auslösen",
+          [Locale.Polish]: "Liczba wiadomości wymaganych do wyzwolenia alarmu",
+        })
+        .setRequired(false)
+        .setMinValue(2)
+    )
+    .addIntegerOption((option) =>
+      option
+        .setName("duration")
+        .setDescription("Duration in seconds of the detection window")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Durée en secondes de la fenêtre de détection",
+          [Locale.SpanishES]: "Duración en segundos de la ventana de detección",
+          [Locale.German]: "Dauer in Sekunden des Erkennungsfensters",
+          [Locale.Polish]: "Czas trwania w sekundach okna wykrywania",
+        })
+        .setRequired(false)
+        .setMinValue(5)
+    ),
+  new SlashCommandBuilder()
+    .setName("view-settings")
+    .setDescription("Display the current settings for this server")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Affiche les paramètres actuels de ce serveur",
+      [Locale.SpanishES]: "Muestra los parámetros actuales de este servidor",
+      [Locale.German]: "Zeigt die aktuellen Einstellungen dieses Servers an",
+      [Locale.Polish]: "Wyświetl bieżące ustawienia bota dla tego serwera",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  new SlashCommandBuilder()
+    .setName("list-members-by-role-count")
+    .setDescription("List members having exactly N roles")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Lister les membres ayant exactement N rôles",
+      [Locale.SpanishES]: "Listar miembros con exactamente N roles",
+      [Locale.German]: "Mitglieder mit genau N Rollen auflisten",
+      [Locale.Polish]: "Wyświetl członków posiadających dokładnie N ról",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addIntegerOption((option) =>
+      option
+        .setName("number")
+        .setDescription("Exact number of roles")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Nombre exact de rôles",
+          [Locale.SpanishES]: "Número exacto de roles",
+          [Locale.German]: "Exakte Anzahl von Rollen",
+          [Locale.Polish]: "Dokładna liczba ról",
+        })
+        .setRequired(true)
+        .setMinValue(1)
+    ),
+  new SlashCommandBuilder()
+    .setName("freegames-publish")
+    .setDescription("Publish notifications for new free games (if enabled)")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Publier les notifications de jeux gratuits (si activé)",
+      [Locale.SpanishES]: "Publicar notificaciones de juegos gratuitos (si activado)",
+      [Locale.German]: "Benachrichtigungen für kostenlose Spiele veröffentlichen",
+      [Locale.Polish]: "Publikuj powiadomienia o darmowych grach (jeśli włączone)",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("Channel to publish notifications (leave empty to skip)")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Salon pour publier les notifications (vide = ignorer)",
+          [Locale.SpanishES]: "Canal para publicar notificaciones (vacío = omitir)",
+          [Locale.German]: "Kanal für Benachrichtigungen (leer lassen = überspringen)",
+          [Locale.Polish]: "Kanał do publikowania powiadomień (puste = pomiń)",
+        })
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(false)
+    )
+    .addBooleanOption((option) =>
+      option
+        .setName("from_steam")
+        .setDescription("Publish Steam free games notifications")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Publier les notifications de jeux gratuits Steam",
+          [Locale.SpanishES]: "Publicar notificaciones de juegos gratuitos de Steam",
+          [Locale.German]: "Steam-Benachrichtigungen für kostenlose Spiele veröffentlichen",
+          [Locale.Polish]: "Publikuj powiadomienia o darmowych grach Steam",
+        })
+        .setRequired(false)
+    )
+    .addBooleanOption((option) =>
+      option
+        .setName("from_epic_games")
+        .setDescription("Publish Epic Games free games notifications")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Publier les notifications de jeux gratuits Epic Games",
+          [Locale.SpanishES]: "Publicar notificaciones de juegos gratuitos de Epic Games",
+          [Locale.German]: "Epic Games-Benachrichtigungen für kostenlose Spiele veröffentlichen",
+          [Locale.Polish]: "Publikuj powiadomienia o darmowych grach Epic Games",
+        })
+        .setRequired(false)
+    ),
+  new SlashCommandBuilder()
+    .setName("donation")
+    .setDescription("Support the bot development")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Soutenir le développement du bot",
+      [Locale.SpanishES]: "Apoyar el desarrollo del bot",
+      [Locale.German]: "Die Entwicklung des Bots unterstützen",
+      [Locale.Polish]: "Wesprzyj rozwój bota",
+    }),
+  new SlashCommandBuilder()
+    .setName("role-used-msg-delete")
+    .setDescription("Delete new messages mentioning a configured role")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Supprimer les nouveaux messages mentionnant un rôle configuré",
+      [Locale.SpanishES]: "Eliminar los nuevos mensajes que mencionan un rol configurado",
+      [Locale.German]: "Neue Nachrichten löschen, die einen konfigurierten Rollen erwähnen",
+      [Locale.Polish]: "Usuń nowe wiadomości wspominające skonfigurowaną rolę",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addBooleanOption((option) =>
+      option
+        .setName("enabled")
+        .setDescription("Enable or disable message deletion")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Activer ou désactiver la suppression des messages",
+          [Locale.SpanishES]: "Habilitar o deshabilitar la eliminación de mensajes",
+          [Locale.German]: "Löschen von Nachrichten aktivieren oder deaktivieren",
+          [Locale.Polish]: "Włącz lub wyłącz usuwanie wiadomości",
+        })
+        .setRequired(true)
+    )
+    .addRoleOption((option) =>
+      option
+        .setName("role_1")
+        .setDescription("First role that will trigger message deletion")
+        .setRequired(false)
     )
     .addRoleOption((option) =>
       option
@@ -863,7 +863,7 @@ function formatAccountAge(createdAt: Date, msgServer: any): string {
   return msgServer.years(years);
 }
 
-function buildDecisionButtonsRow(userId: string, msgServer : any) {
+function buildDecisionButtonsRow(userId: string, msgServer: any) {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(`staff_validate_${userId}`)
@@ -879,11 +879,11 @@ function buildDecisionButtonsRow(userId: string, msgServer : any) {
       .setCustomId(`staff_blacklist_${userId}`)
       .setLabel(msgServer.blacklistButton)
       .setStyle(ButtonStyle.Secondary),
-	  
-	new ButtonBuilder()
-	  .setCustomId(`staff_discuss_${userId}`)
-	  .setLabel(msgServer.discussMemberButton)
-	  .setStyle(ButtonStyle.Primary),
+
+    new ButtonBuilder()
+      .setCustomId(`staff_discuss_${userId}`)
+      .setLabel(msgServer.discussMemberButton)
+      .setStyle(ButtonStyle.Primary),
   );
 }
 
@@ -907,12 +907,12 @@ function buildDisabledDecisionButtonsRow(finalAction: "approved" | "rejected" | 
       .setLabel(msgServer.blacklistedDoneButton)
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(true),
-	  
-	new ButtonBuilder()
-	  .setCustomId("staff_discuss_done")
-	  .setLabel(msgServer.discussMemberButton)
-	  .setStyle(ButtonStyle.Primary)
-	  .setDisabled(true)
+
+    new ButtonBuilder()
+      .setCustomId("staff_discuss_done")
+      .setLabel(msgServer.discussMemberButton)
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true)
   );
 }
 
@@ -951,7 +951,7 @@ function isAuthorizedServer(interaction: any): boolean {
 }
 
 //si c'est moi
-function isBasilic(interaction: any): boolean{
+function isBasilic(interaction: any): boolean {
   /*
   const BASILIC_IDS: string[] = [
     "260716512711540736", // compte principal
@@ -1243,12 +1243,12 @@ client.once(Events.ClientReady, async (readyClient) => {
 
     const rest = new REST({ version: "10" }).setToken(TOKEN);
 
-  await rest.put(
-    isProduction
-      ? Routes.applicationCommands(CLIENT_ID)
-      : Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
-    { body: commands }
-  );
+    await rest.put(
+      isProduction
+        ? Routes.applicationCommands(CLIENT_ID)
+        : Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
+      { body: commands }
+    );
 
     console.log("✅ Commandes slash enregistrées");
   } catch (error) {
@@ -1278,118 +1278,118 @@ client.once(Events.ClientReady, async (readyClient) => {
 // =========================
 client.on(Events.InteractionCreate, async (interaction) => {
   try {
-	const verificationDeps = {
-	  client,
-	  getVerifiedUserStmt,
-	  insertVerifiedUserStmt,
-	  getBlacklistedUserStmt,
-	  getGuildVerificationSettingsStmt,
-	  getGuildVerificationQuestionsStmt,
-	  buildDecisionButtonsRow,
-	  buildDisabledDecisionButtonsRow,
-	  blacklistMemberInGuild,
-	  isUsedOnAServer,
-	  isAdministrator,
-	  formatAccountAge,
-    getBlacklistedUsersEverywhereStmt,
-	};
-  
+    const verificationDeps = {
+      client,
+      getVerifiedUserStmt,
+      insertVerifiedUserStmt,
+      getBlacklistedUserStmt,
+      getGuildVerificationSettingsStmt,
+      getGuildVerificationQuestionsStmt,
+      buildDecisionButtonsRow,
+      buildDisabledDecisionButtonsRow,
+      blacklistMemberInGuild,
+      isUsedOnAServer,
+      isAdministrator,
+      formatAccountAge,
+      getBlacklistedUsersEverywhereStmt,
+    };
+
     const msgIn = getMessagesUser(interaction);
     const msgOut = getMessagesOut(interaction.locale);
     const msgServer = isUsedOnAServer(interaction)
-        ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
-        : getMessagesServer("en");
+      ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
+      : getMessagesServer("en");
     const internalLocale = isUsedOnAServer(interaction)
-        ? interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en"
-        : interaction.locale ?? "en";
+      ? interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en"
+      : interaction.locale ?? "en";
 
     const msgInternal = getMessagesInternal(internalLocale);
-	
-	const handledButtons = await handleVerificationButtons({
-	  interaction,
-	  deps: verificationDeps,
-	  msgIn,
-	  msgOut,
-	  msgServer,
-	  msgInternal
-	});
-	if (handledButtons) return;
 
-  // =======================
-// BOUTONS SPAM
-// =======================
-if (interaction.isButton()) {
-
-  // ===== FAUX SPAM =====
-  if (interaction.customId.startsWith("spam:false_positive:")) {
-
-    if (!interaction.inGuild()) return;
-
-    const [, action, guildId, userId] = interaction.customId.split(":");
-
-    spamAlertService.clearActiveAlert(guildId, userId);
-
-    await interaction.update({
-      content: interaction.message.content + "\n\n"+msgServer.spamFalsePositiveConfirmed,
-      components: []
+    const handledButtons = await handleVerificationButtons({
+      interaction,
+      deps: verificationDeps,
+      msgIn,
+      msgOut,
+      msgServer,
+      msgInternal
     });
+    if (handledButtons) return;
 
-    return;
-  }
+    // =======================
+    // BOUTONS SPAM
+    // =======================
+    if (interaction.isButton()) {
 
-  // ===== BAN =====
-  if (interaction.customId.startsWith("spam:ban:")) {
-      const [, action, guildId, userId] = interaction.customId.split(":");
+      // ===== FAUX SPAM =====
+      if (interaction.customId.startsWith("spam:false_positive:")) {
 
-      const member = await interaction.guild!.members.fetch(userId).catch(() => null);
+        if (!interaction.inGuild()) return;
 
-      if (member?.bannable) {
-        await member.ban({
-          reason: msgInternal.spamBanReason(interaction.user.tag)
+        const [, action, guildId, userId] = interaction.customId.split(":");
+
+        spamAlertService.clearActiveAlert(guildId, userId);
+
+        await interaction.update({
+          content: interaction.message.content + "\n\n" + msgServer.spamFalsePositiveConfirmed,
+          components: []
         });
+
+        return;
       }
 
-      spamAlertService.clearActiveAlert(guildId, userId);
+      // ===== BAN =====
+      if (interaction.customId.startsWith("spam:ban:")) {
+        const [, action, guildId, userId] = interaction.customId.split(":");
 
-      await interaction.update({
-        content: interaction.message.content + "\n\n" + msgServer.spamUserBanned,
-        components: []
-      });
+        const member = await interaction.guild!.members.fetch(userId).catch(() => null);
 
-      return;
+        if (member?.bannable) {
+          await member.ban({
+            reason: msgInternal.spamBanReason(interaction.user.tag)
+          });
+        }
+
+        spamAlertService.clearActiveAlert(guildId, userId);
+
+        await interaction.update({
+          content: interaction.message.content + "\n\n" + msgServer.spamUserBanned,
+          components: []
+        });
+
+        return;
+      }
     }
-}
 
-	const handledModals = await handleVerificationModals({
-	  interaction,
-	  deps: verificationDeps,
-	  msgIn,
-	  msgOut,
-	  msgServer,
-	  msgInternal,
-	});
-	if (handledModals) return;
-	
+    const handledModals = await handleVerificationModals({
+      interaction,
+      deps: verificationDeps,
+      msgIn,
+      msgOut,
+      msgServer,
+      msgInternal,
+    });
+    if (handledModals) return;
+
     // =========================================
     // 1) COMMANDES SLASH
     // =========================================
     if (interaction.isChatInputCommand()) {
-        
-      //on veut que les commandes soient utilisées sur un serveur, pas en MP
-        if (!isUsedOnAServer(interaction)) {
-          await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
-          return;
-        }
 
-        //sur toutes les commandes autres que "allow-setup-verification"
-        if (
-          interaction.commandName !== "allow-setup-verification" &&
-          !isBasilic(interaction) &&
-          !isAuthorizedServer(interaction)
-        ) {
-          await replyEphemeral(interaction, msgIn.NotAuthorizedServer);
-          return;
-        }
+      //on veut que les commandes soient utilisées sur un serveur, pas en MP
+      if (!isUsedOnAServer(interaction)) {
+        await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
+        return;
+      }
+
+      //sur toutes les commandes autres que "allow-setup-verification"
+      if (
+        interaction.commandName !== "allow-setup-verification" &&
+        !isBasilic(interaction) &&
+        !isAuthorizedServer(interaction)
+      ) {
+        await replyEphemeral(interaction, msgIn.NotAuthorizedServer);
+        return;
+      }
 
       if (interaction.commandName === "setup-verification") {
         if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
@@ -1450,7 +1450,7 @@ if (interaction.isButton()) {
         if (!context) return;
 
         const targetUserId = interaction.options.getString("user_id", true);
-       
+
         const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
           targetUserId
         ) as BlacklistedUserRow[];
@@ -1687,7 +1687,7 @@ if (interaction.isButton()) {
         const newLabel = newLabelRaw?.trim();
         const newType = interaction.options.getString("type");
         const newRequired = interaction.options.getBoolean("required");
-		
+
         if (newLabel && newLabel.length > 45) {
           await replyEphemeral(interaction, "Can't exceed 45 characters");
           return;
@@ -1777,131 +1777,130 @@ if (interaction.isButton()) {
 
         return;
       }
-		  
-	if (interaction.commandName === "unblacklist-member") {
-		const context = await requireStaffOnConfiguredGuild(interaction, msgIn);
-		if (!context) return;
 
-		const targetUserId = interaction.options.getString("user_id", true);
+      if (interaction.commandName === "unblacklist-member") {
+        const context = await requireStaffOnConfiguredGuild(interaction, msgIn);
+        if (!context) return;
 
-		const blacklistedRecord = getBlacklistedUserStmt.get(
-		  interaction.guild!.id,
-		  targetUserId
-		) as BlacklistedUserRow | undefined;
+        const targetUserId = interaction.options.getString("user_id", true);
 
-		if (!blacklistedRecord) {
-		  await replyEphemeral(interaction, msgIn.userNotBlacklisted(targetUserId));
-		  return;
-		}
+        const blacklistedRecord = getBlacklistedUserStmt.get(
+          interaction.guild!.id,
+          targetUserId
+        ) as BlacklistedUserRow | undefined;
 
-		deleteBlacklistedUserStmt.run(interaction.guild!.id, targetUserId);
+        if (!blacklistedRecord) {
+          await replyEphemeral(interaction, msgIn.userNotBlacklisted(targetUserId));
+          return;
+        }
 
-		await replyEphemeral(interaction, msgIn.userRemovedFromBlacklist(targetUserId));
-		return;
-	  }
-	
-	if (interaction.commandName === "setup-spam-detection") {
-	  const member = await interaction.guild!.members.fetch(interaction.user.id);
+        deleteBlacklistedUserStmt.run(interaction.guild!.id, targetUserId);
 
-	  if (!isAdministrator(member, interaction)) {
-		await interaction.reply({
-		  content: msgIn.onlyStaffCanUseCommand,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
+        await replyEphemeral(interaction, msgIn.userRemovedFromBlacklist(targetUserId));
+        return;
+      }
 
-	  const enabled = interaction.options.getBoolean("enabled", true);
-	  const alertChannel = interaction.options.getChannel("alert_channel");
-	  const staffRole = interaction.options.getRole("staff_role");
-    const messageThreshold = interaction.options.getInteger("number", false) ?? 6;
-    const windowSeconds = interaction.options.getInteger("duration", false) ?? 20;
+      if (interaction.commandName === "setup-spam-detection") {
+        const member = await interaction.guild!.members.fetch(interaction.user.id);
 
-	  const existingSpamSettings = getGuildSpamSettingsStmt.get(interaction.guild!.id) as
-		| GuildSpamSettingsRow
-		| undefined;
+        if (!isAdministrator(member, interaction)) {
+          await interaction.reply({
+            content: msgIn.onlyStaffCanUseCommand,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
 
-	  const alertChannelId =
-		alertChannel?.id ?? existingSpamSettings?.alert_channel_id ?? null;
+        const enabled = interaction.options.getBoolean("enabled", true);
+        const alertChannel = interaction.options.getChannel("alert_channel");
+        const staffRole = interaction.options.getRole("staff_role");
+        const messageThreshold = interaction.options.getInteger("number", false) ?? 6;
+        const windowSeconds = interaction.options.getInteger("duration", false) ?? 20;
 
-	  const staffRoleId =
-		staffRole?.id ?? existingSpamSettings?.staff_role_id ?? null;
+        const existingSpamSettings = getGuildSpamSettingsStmt.get(interaction.guild!.id) as
+          | GuildSpamSettingsRow
+          | undefined;
 
-	  if (enabled && !alertChannelId) {
-		await interaction.reply({
-		  content: "You must provide an alert channel when enabling spam detection.",
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
+        const alertChannelId =
+          alertChannel?.id ?? existingSpamSettings?.alert_channel_id ?? null;
 
-    upsertGuildSpamSettingsStmt.run(
-      interaction.guild!.id,
-      enabled ? 1 : 0,
-      alertChannel?.id ?? null,
-      staffRole?.id ?? null,
-      messageThreshold,
-      windowSeconds,
-      interaction.user.id,
-      new Date().toISOString()
-    );
+        const staffRoleId =
+          staffRole?.id ?? existingSpamSettings?.staff_role_id ?? null;
 
-	  await interaction.reply({
-		content: enabled
-		  ? `✅ Spam detection enabled.\nAlert channel: <#${alertChannelId}>${
-			  staffRoleId ? `\nStaff role: <@&${staffRoleId}>` : ""
-			}`
-		  : "✅ Spam detection disabled.",
-		flags: MessageFlags.Ephemeral,
-	  });
+        if (enabled && !alertChannelId) {
+          await interaction.reply({
+            content: "You must provide an alert channel when enabling spam detection.",
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
 
-	  return;
-	}
+        upsertGuildSpamSettingsStmt.run(
+          interaction.guild!.id,
+          enabled ? 1 : 0,
+          alertChannel?.id ?? null,
+          staffRole?.id ?? null,
+          messageThreshold,
+          windowSeconds,
+          interaction.user.id,
+          new Date().toISOString()
+        );
 
-  if (interaction.commandName === "view-settings") {
-    const settings = getGuildVerificationSettingsStmt.get(
-      interaction.guild!.id
-    ) as GuildVerificationSettingsRow | undefined;
+        await interaction.reply({
+          content: enabled
+            ? `✅ Spam detection enabled.\nAlert channel: <#${alertChannelId}>${staffRoleId ? `\nStaff role: <@&${staffRoleId}>` : ""
+            }`
+            : "✅ Spam detection disabled.",
+          flags: MessageFlags.Ephemeral,
+        });
 
-    if (!settings) {
-      await interaction.reply({
-        content: msgIn.verificationNotConfigured,
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
+        return;
+      }
 
-    const verifiedRole = interaction.guild!.roles.cache.get(settings.verified_role_id);
-    const staffRole = interaction.guild!.roles.cache.get(settings.staff_role_id);
-    const SettingsMsgDeletedFromRoles = getGuildRoleMessageDeleteSettingsStmt.get(interaction.guild!.id) as GuildRoleMessageDeleteSettingsRow | undefined;
+      if (interaction.commandName === "view-settings") {
+        const settings = getGuildVerificationSettingsStmt.get(
+          interaction.guild!.id
+        ) as GuildVerificationSettingsRow | undefined;
 
-    const verifiedRoleDisplay = verifiedRole
-      ? `<@&${settings.verified_role_id}>`
-      : msgIn.RoleIntrouvable(settings.verified_role_id);
+        if (!settings) {
+          await interaction.reply({
+            content: msgIn.verificationNotConfigured,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
 
-    const staffRoleDisplay = staffRole
-      ? `<@&${settings.staff_role_id}>`
-      : msgIn.RoleIntrouvable(settings.staff_role_id);
+        const verifiedRole = interaction.guild!.roles.cache.get(settings.verified_role_id);
+        const staffRole = interaction.guild!.roles.cache.get(settings.staff_role_id);
+        const SettingsMsgDeletedFromRoles = getGuildRoleMessageDeleteSettingsStmt.get(interaction.guild!.id) as GuildRoleMessageDeleteSettingsRow | undefined;
 
-    const freeGamesSettings =
-      getFreeGamesSettingsStmt.get(
-        interaction.guild.id
-      ) as any | undefined;
+        const verifiedRoleDisplay = verifiedRole
+          ? `<@&${settings.verified_role_id}>`
+          : msgIn.RoleIntrouvable(settings.verified_role_id);
 
-    const freeGamesChannel =
-      freeGamesSettings?.channel_id
-        ? `<#${freeGamesSettings.channel_id}>`
-        : "—";
+        const staffRoleDisplay = staffRole
+          ? `<@&${settings.staff_role_id}>`
+          : msgIn.RoleIntrouvable(settings.staff_role_id);
 
-    const questions =
-      getGuildVerificationQuestionsStmt.all(
-        interaction.guild.id
-      ) as GuildVerificationQuestionRow[];
+        const freeGamesSettings =
+          getFreeGamesSettingsStmt.get(
+            interaction.guild.id
+          ) as any | undefined;
 
-    const questionsText =
-        questions.length === 0
-          ? msgIn.noVerificationQuestions
-          :   `## ${msgIn.verificationQuestionsTitle}\n\n` +
+        const freeGamesChannel =
+          freeGamesSettings?.channel_id
+            ? `<#${freeGamesSettings.channel_id}>`
+            : "—";
+
+        const questions =
+          getGuildVerificationQuestionsStmt.all(
+            interaction.guild.id
+          ) as GuildVerificationQuestionRow[];
+
+        const questionsText =
+          questions.length === 0
+            ? msgIn.noVerificationQuestions
+            : `## ${msgIn.verificationQuestionsTitle}\n\n` +
             questions
               .map(
                 (q, index) =>
@@ -1910,453 +1909,453 @@ if (interaction.isButton()) {
               )
               .join("\n\n");
 
-    let roleMsgDeleteText = "";
+        let roleMsgDeleteText = "";
 
-    if (SettingsMsgDeletedFromRoles) {
-      const enabled = SettingsMsgDeletedFromRoles.enabled === 1;
+        if (SettingsMsgDeletedFromRoles) {
+          const enabled = SettingsMsgDeletedFromRoles.enabled === 1;
 
-      const roleIds = [
-        SettingsMsgDeletedFromRoles.role_id1,
-        SettingsMsgDeletedFromRoles.role_id2,
-        SettingsMsgDeletedFromRoles.role_id3,
-        SettingsMsgDeletedFromRoles.role_id4,
-        SettingsMsgDeletedFromRoles.role_id5,
-      ].filter((id): id is string => id !== null);
+          const roleIds = [
+            SettingsMsgDeletedFromRoles.role_id1,
+            SettingsMsgDeletedFromRoles.role_id2,
+            SettingsMsgDeletedFromRoles.role_id3,
+            SettingsMsgDeletedFromRoles.role_id4,
+            SettingsMsgDeletedFromRoles.role_id5,
+          ].filter((id): id is string => id !== null);
 
-      const roleDisplays = roleIds.map((id) => {
-        // @everyone a le même ID que le guild
-        if (id === interaction.guild!.id) return "`@everyone`";
-        const role = interaction.guild!.roles.cache.get(id);
+          const roleDisplays = roleIds.map((id) => {
+            // @everyone a le même ID que le guild
+            if (id === interaction.guild!.id) return "`@everyone`";
+            const role = interaction.guild!.roles.cache.get(id);
 
-        return role ? `<@&${id}>` : msgIn.RoleIntrouvable(id);
-      });
-
-      const rolesLine =
-        roleDisplays.length > 0
-          ? roleDisplays.join(", ")
-          : msgIn.AucunRole;
-
-      roleMsgDeleteText =  msgIn.AffichageParametrageSuppressionMessageRolesUtilises(enabled, rolesLine);         
-      }
-
-    await interaction.reply({
-      content: msgIn.ViewSettings(questionsText, 
-          verifiedRoleDisplay,
-          staffRoleDisplay,
-          settings.verification_timeout_hours,
-          freeGamesSettings?.enabled === 1,
-          freeGamesChannel,
-          freeGamesSettings?.include_steam === 1,
-          freeGamesSettings?.include_epicgames === 1,
-          roleMsgDeleteText),
-            flags: MessageFlags.Ephemeral,
+            return role ? `<@&${id}>` : msgIn.RoleIntrouvable(id);
           });
 
-    return;
-  }
-  
-	if (interaction.commandName === "set-welcome-message") {
-	  const member = await interaction.guild.members.fetch(interaction.user.id);
-
-	  if (!isAdministrator(member, interaction)) {
-		await interaction.reply({
-		  content: msgIn.onlyStaffCanUseCommand,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
-
-	  const locale = interaction.options.getString("language", true);
-	  const dmMessage = interaction.options.getString("message", true).trim();
-
-	  upsertGuildWelcomeMessageStmt.run(
-		interaction.guild.id,
-		locale,
-		dmMessage.replaceAll("{n}", "\n").replaceAll("{N}", "\n"),
-		new Date().toISOString()
-	  );
-
-	  await interaction.reply({
-		content: `✅ Welcome message saved for \`${locale}\`.`,
-		flags: MessageFlags.Ephemeral,
-	  });
-
-	  return;
-	}
-	
-	if (interaction.commandName === "delete-welcome-message") {
-	  const member = await interaction.guild.members.fetch(interaction.user.id);
-
-	  if (!isAdministrator(member, interaction)) {
-		await interaction.reply({
-		  content: msgIn.onlyStaffCanUseCommand,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
-
-	  const locale = interaction.options.getString("language", true);
-
-	  const existingMessage = getGuildWelcomeMessageStmt.get(
-		interaction.guild.id,
-		locale
-	  ) as GuildWelcomeMessageRow | undefined;
-
-	  if (!existingMessage) {
-		await interaction.reply({
-		  content: `No welcome message exists for \`${locale}\` on this server.`,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
-
-	  deleteGuildWelcomeMessageStmt.run(interaction.guild.id, locale);
-
-	  await interaction.reply({
-		content: `✅ Welcome message deleted for \`${locale}\`.`,
-		flags: MessageFlags.Ephemeral,
-	  });
-
-	  return;
-	}
-	
-	if (interaction.commandName === "view-welcome-messages") {
-	  const member = await interaction.guild.members.fetch(interaction.user.id);
-
-	  if (!isAdministrator(member, interaction)) {
-		await interaction.reply({
-		  content: msgIn.onlyStaffCanUseCommand,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
-
-	  const welcomeMessages = getGuildWelcomeMessagesAllStmt.all(
-		interaction.guild.id
-	  ) as GuildWelcomeMessageRow[];
-
-	  if (welcomeMessages.length === 0) {
-		await interaction.reply({
-		  content: "No welcome messages are configured for this server.",
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
-
-	  const content =
-		"**Configured welcome messages:**\n\n" +
-		welcomeMessages
-		  .map((row) => `- \`${row.locale}\` → ${row.dm_message}`)
-		  .join("\n");
-
-	  const chunks = splitMessage(content);
-
-	  await interaction.reply({
-		content: chunks[0],
-		flags: MessageFlags.Ephemeral,
-	  });
-
-	  for (let i = 1; i < chunks.length; i++) {
-		await interaction.followUp({
-		  content: chunks[i],
-		  flags: MessageFlags.Ephemeral,
-		});
-	  }
-
-	  return;
-	}
-	
-	if (interaction.commandName === "test-welcome-message") {
-	  const member = await interaction.guild.members.fetch(interaction.user.id);
-
-	  if (!isAdministrator(member, interaction)) {
-		await interaction.reply({
-		  content: msgIn.onlyStaffCanUseCommand,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
-
-	  const locale = interaction.options.getString("language", true);
-
-	  const localizedWelcome = getGuildWelcomeMessageStmt.get(
-		interaction.guild.id,
-		locale
-	  ) as GuildWelcomeMessageRow | undefined;
-
-	  const fallbackWelcome =
-		locale === "en"
-		  ? undefined
-		  : (getGuildWelcomeMessageStmt.get(
-			  interaction.guild.id,
-			  "en"
-			) as GuildWelcomeMessageRow | undefined);
-
-	  const welcomeMessage = localizedWelcome ?? fallbackWelcome;
-
-	  if (!welcomeMessage) {
-		await interaction.reply({
-		  content: `No welcome message exists for \`${locale}\`, and no English fallback is configured either.`,
-		  flags: MessageFlags.Ephemeral,
-		});
-		return;
-	  }
-
-	  await interaction.reply({
-		content:
-		  `**Preview for \`${locale}\`:**\n\n` +
-		  welcomeMessage.dm_message,
-		flags: MessageFlags.Ephemeral,
-	  });
-
-	  return;
-	}
-
-  if (interaction.commandName === "list-members-by-role-count") {
-    const commandInteraction = interaction as ChatInputCommandInteraction;
-
-    if (!isUsedOnAServer(commandInteraction)) {
-      await commandInteraction.reply({
-        content: msgIn.commandMustBeUsedInServer,
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-
-    const roleCount = commandInteraction.options.getInteger(
-      "number",
-      true
-    );
-
-    await commandInteraction.deferReply({
-      flags: MessageFlags.Ephemeral,
-    });
-
-    await interaction.guild!.members.fetch();
-
-    const matchingMembers = interaction.guild!.members.cache.filter(
-      (member) => !member.user.bot &&
-        member.roles.cache.size -1 === roleCount
-    );
-
-    if (matchingMembers.size === 0) {
-      await commandInteraction.editReply(
-        msgIn.NoMembersFoundWithRoleCount(roleCount)
-      );
-      return;
-    }
-
-    const locale = interaction.locale ?? "fr";
-
-    const lines = matchingMembers.map((member) => {
-      const joinedDate = member.joinedAt
-        ? member.joinedAt.toLocaleString(locale)
-        : "??????";
-
-      return `- ${member.user.tag} (${member.id}) — ${joinedDate}`;
-    });
-
-    const chunks = splitMessage(
-      `${msgIn.MembersWithRoleCountTitle(roleCount)}\n\n${lines.join("\n")}`
-    );
-
-    await commandInteraction.editReply(chunks[0]);
-
-    for (let i = 1; i < chunks.length; i++) {
-      await commandInteraction.followUp({
-        content: chunks[i],
-        flags: MessageFlags.Ephemeral,
-      });
-    }
-
-    return;
-  }
-
-  if (interaction.commandName === "freegames-publish") {
-    if (!isUsedOnAServer(interaction)) {
-      await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
-      return;
-    }
-
-    const channel = interaction.options.getChannel("channel");
-    const fromSteam = interaction.options.getBoolean("from_steam") ?? true;
-    const fromEpicGames = interaction.options.getBoolean("from_epic_games") ?? true;
-
-    if (!channel) {
-      upsertFreeGamesSettingsStmt.run(
-        interaction.guild.id,
-        "",    // channel_id vide
-        0,     // enabled = false
-        fromSteam ? 1 : 0,
-        fromEpicGames ? 1 : 0,
-        0,     // itchio
-        0      // gog
-      );
-      await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsDeleted);
-      return;
-    }
-
-    upsertFreeGamesSettingsStmt.run(
-      interaction.guild.id,
-      channel.id,
-      1,     // enabled = true
-      fromSteam ? 1 : 0,
-      fromEpicGames ? 1 : 0,
-      0,     // itchio
-      0      // gog
-    );
-
-    await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsSaved);
-
-    try {
-      await publishFreeGamesForAllGuilds();
-    } catch (error) {
-      console.error("❌ Erreur dnas la commande freegames-publish :", error);
-    }
-
-    return;
-  }
-
-  if (interaction.commandName === "donation") {
-
-    const v_paypal = "https://www.paypal.com/paypalme/Basilic64";
-    const v_kofi = "https://ko-fi.com/basilic64";
-
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setLabel("PayPal")
-        .setStyle(ButtonStyle.Link)
-        .setURL(v_paypal),
-
-      new ButtonBuilder()
-        .setLabel("Ko-fi")
-        .setStyle(ButtonStyle.Link)
-        .setURL(v_kofi)
-    );
-
-    await interaction.reply({
-      content: "**Support the bot**\n\nThank you for supporting the project ❤️",
-      components: [row],
-      flags: MessageFlags.Ephemeral,
-    });
-
-    return;
-  }
-
-if (interaction.commandName === "role-used-msg-delete") {
-  const member = await interaction.guild!.members.fetch(interaction.user.id);
-
-  if (!isAdministrator(member, interaction)) {
-    await replyEphemeral(interaction, msgIn.onlyStaffCanUseCommand);
-    return;
-  }
-
-  const enabled = interaction.options.getBoolean("enabled", true);
-
-  const roles = [
-    interaction.options.getRole("role_1"),
-    interaction.options.getRole("role_2"),
-    interaction.options.getRole("role_3"),
-    interaction.options.getRole("role_4"),
-    interaction.options.getRole("role_5"),
-  ].filter((role): role is NonNullable<typeof role> => role !== null);
-
-  if (enabled && roles.length === 0) {
-    await replyEphemeral(
-      interaction,
-      msgIn.FournirAuMoinsUnRole
-    );
-    return;
-  }
-
-  const roleIds = roles.map((role) => role.id);
-
-  upsertGuildRoleMessageDeleteSettingsStmt.run(
-    interaction.guild!.id,
-    enabled ? 1 : 0,
-    roleIds[0] ?? null,
-    roleIds[1] ?? null,
-    roleIds[2] ?? null,
-    roleIds[3] ?? null,
-    roleIds[4] ?? null,
-    interaction.user.id,
-    new Date().toISOString()
-  );
-
-  const rolesDisplay =
-    roleIds.length > 0
-      ? roleIds.map((roleId) => `<@&${roleId}>`).join(", ")
-      : msgIn.AucunRole;
-
-  await replyEphemeral(
-    interaction,
-    enabled
-      ? msgIn.SuppressionAutomatiqueMessageMentionRoleActivee(rolesDisplay)
-      : msgIn.SuppressionAutomatiqueMessageMentionRoleDesctivee
-  );
-
-  return;
-}
+          const rolesLine =
+            roleDisplays.length > 0
+              ? roleDisplays.join(", ")
+              : msgIn.AucunRole;
+
+          roleMsgDeleteText = msgIn.AffichageParametrageSuppressionMessageRolesUtilises(enabled, rolesLine);
+        }
+
+        await interaction.reply({
+          content: msgIn.ViewSettings(questionsText,
+            verifiedRoleDisplay,
+            staffRoleDisplay,
+            settings.verification_timeout_hours,
+            freeGamesSettings?.enabled === 1,
+            freeGamesChannel,
+            freeGamesSettings?.include_steam === 1,
+            freeGamesSettings?.include_epicgames === 1,
+            roleMsgDeleteText),
+          flags: MessageFlags.Ephemeral,
+        });
+
+        return;
+      }
+
+      if (interaction.commandName === "set-welcome-message") {
+        const member = await interaction.guild.members.fetch(interaction.user.id);
+
+        if (!isAdministrator(member, interaction)) {
+          await interaction.reply({
+            content: msgIn.onlyStaffCanUseCommand,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const locale = interaction.options.getString("language", true);
+        const dmMessage = interaction.options.getString("message", true).trim();
+
+        upsertGuildWelcomeMessageStmt.run(
+          interaction.guild.id,
+          locale,
+          dmMessage.replaceAll("{n}", "\n").replaceAll("{N}", "\n"),
+          new Date().toISOString()
+        );
+
+        await interaction.reply({
+          content: `✅ Welcome message saved for \`${locale}\`.`,
+          flags: MessageFlags.Ephemeral,
+        });
+
+        return;
+      }
+
+      if (interaction.commandName === "delete-welcome-message") {
+        const member = await interaction.guild.members.fetch(interaction.user.id);
+
+        if (!isAdministrator(member, interaction)) {
+          await interaction.reply({
+            content: msgIn.onlyStaffCanUseCommand,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const locale = interaction.options.getString("language", true);
+
+        const existingMessage = getGuildWelcomeMessageStmt.get(
+          interaction.guild.id,
+          locale
+        ) as GuildWelcomeMessageRow | undefined;
+
+        if (!existingMessage) {
+          await interaction.reply({
+            content: `No welcome message exists for \`${locale}\` on this server.`,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        deleteGuildWelcomeMessageStmt.run(interaction.guild.id, locale);
+
+        await interaction.reply({
+          content: `✅ Welcome message deleted for \`${locale}\`.`,
+          flags: MessageFlags.Ephemeral,
+        });
+
+        return;
+      }
+
+      if (interaction.commandName === "view-welcome-messages") {
+        const member = await interaction.guild.members.fetch(interaction.user.id);
+
+        if (!isAdministrator(member, interaction)) {
+          await interaction.reply({
+            content: msgIn.onlyStaffCanUseCommand,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const welcomeMessages = getGuildWelcomeMessagesAllStmt.all(
+          interaction.guild.id
+        ) as GuildWelcomeMessageRow[];
+
+        if (welcomeMessages.length === 0) {
+          await interaction.reply({
+            content: "No welcome messages are configured for this server.",
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const content =
+          "**Configured welcome messages:**\n\n" +
+          welcomeMessages
+            .map((row) => `- \`${row.locale}\` → ${row.dm_message}`)
+            .join("\n");
+
+        const chunks = splitMessage(content);
+
+        await interaction.reply({
+          content: chunks[0],
+          flags: MessageFlags.Ephemeral,
+        });
+
+        for (let i = 1; i < chunks.length; i++) {
+          await interaction.followUp({
+            content: chunks[i],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        return;
+      }
+
+      if (interaction.commandName === "test-welcome-message") {
+        const member = await interaction.guild.members.fetch(interaction.user.id);
+
+        if (!isAdministrator(member, interaction)) {
+          await interaction.reply({
+            content: msgIn.onlyStaffCanUseCommand,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const locale = interaction.options.getString("language", true);
+
+        const localizedWelcome = getGuildWelcomeMessageStmt.get(
+          interaction.guild.id,
+          locale
+        ) as GuildWelcomeMessageRow | undefined;
+
+        const fallbackWelcome =
+          locale === "en"
+            ? undefined
+            : (getGuildWelcomeMessageStmt.get(
+              interaction.guild.id,
+              "en"
+            ) as GuildWelcomeMessageRow | undefined);
+
+        const welcomeMessage = localizedWelcome ?? fallbackWelcome;
+
+        if (!welcomeMessage) {
+          await interaction.reply({
+            content: `No welcome message exists for \`${locale}\`, and no English fallback is configured either.`,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        await interaction.reply({
+          content:
+            `**Preview for \`${locale}\`:**\n\n` +
+            welcomeMessage.dm_message,
+          flags: MessageFlags.Ephemeral,
+        });
+
+        return;
+      }
+
+      if (interaction.commandName === "list-members-by-role-count") {
+        const commandInteraction = interaction as ChatInputCommandInteraction;
+
+        if (!isUsedOnAServer(commandInteraction)) {
+          await commandInteraction.reply({
+            content: msgIn.commandMustBeUsedInServer,
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        const roleCount = commandInteraction.options.getInteger(
+          "number",
+          true
+        );
+
+        await commandInteraction.deferReply({
+          flags: MessageFlags.Ephemeral,
+        });
+
+        await interaction.guild!.members.fetch();
+
+        const matchingMembers = interaction.guild!.members.cache.filter(
+          (member) => !member.user.bot &&
+            member.roles.cache.size - 1 === roleCount
+        );
+
+        if (matchingMembers.size === 0) {
+          await commandInteraction.editReply(
+            msgIn.NoMembersFoundWithRoleCount(roleCount)
+          );
+          return;
+        }
+
+        const locale = interaction.locale ?? "fr";
+
+        const lines = matchingMembers.map((member) => {
+          const joinedDate = member.joinedAt
+            ? member.joinedAt.toLocaleString(locale)
+            : "??????";
+
+          return `- ${member.user.tag} (${member.id}) — ${joinedDate}`;
+        });
+
+        const chunks = splitMessage(
+          `${msgIn.MembersWithRoleCountTitle(roleCount)}\n\n${lines.join("\n")}`
+        );
+
+        await commandInteraction.editReply(chunks[0]);
+
+        for (let i = 1; i < chunks.length; i++) {
+          await commandInteraction.followUp({
+            content: chunks[i],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        return;
+      }
+
+      if (interaction.commandName === "freegames-publish") {
+        if (!isUsedOnAServer(interaction)) {
+          await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
+          return;
+        }
+
+        const channel = interaction.options.getChannel("channel");
+        const fromSteam = interaction.options.getBoolean("from_steam") ?? true;
+        const fromEpicGames = interaction.options.getBoolean("from_epic_games") ?? true;
+
+        if (!channel) {
+          upsertFreeGamesSettingsStmt.run(
+            interaction.guild.id,
+            "",    // channel_id vide
+            0,     // enabled = false
+            fromSteam ? 1 : 0,
+            fromEpicGames ? 1 : 0,
+            0,     // itchio
+            0      // gog
+          );
+          await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsDeleted);
+          return;
+        }
+
+        upsertFreeGamesSettingsStmt.run(
+          interaction.guild.id,
+          channel.id,
+          1,     // enabled = true
+          fromSteam ? 1 : 0,
+          fromEpicGames ? 1 : 0,
+          0,     // itchio
+          0      // gog
+        );
+
+        await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsSaved);
+
+        try {
+          await publishFreeGamesForAllGuilds();
+        } catch (error) {
+          console.error("❌ Erreur dnas la commande freegames-publish :", error);
+        }
+
+        return;
+      }
+
+      if (interaction.commandName === "donation") {
+
+        const v_paypal = "https://www.paypal.com/paypalme/Basilic64";
+        const v_kofi = "https://ko-fi.com/basilic64";
+
+        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setLabel("PayPal")
+            .setStyle(ButtonStyle.Link)
+            .setURL(v_paypal),
+
+          new ButtonBuilder()
+            .setLabel("Ko-fi")
+            .setStyle(ButtonStyle.Link)
+            .setURL(v_kofi)
+        );
+
+        await interaction.reply({
+          content: "**Support the bot**\n\nThank you for supporting the project ❤️",
+          components: [row],
+          flags: MessageFlags.Ephemeral,
+        });
+
+        return;
+      }
+
+      if (interaction.commandName === "role-used-msg-delete") {
+        const member = await interaction.guild!.members.fetch(interaction.user.id);
+
+        if (!isAdministrator(member, interaction)) {
+          await replyEphemeral(interaction, msgIn.onlyStaffCanUseCommand);
+          return;
+        }
+
+        const enabled = interaction.options.getBoolean("enabled", true);
+
+        const roles = [
+          interaction.options.getRole("role_1"),
+          interaction.options.getRole("role_2"),
+          interaction.options.getRole("role_3"),
+          interaction.options.getRole("role_4"),
+          interaction.options.getRole("role_5"),
+        ].filter((role): role is NonNullable<typeof role> => role !== null);
+
+        if (enabled && roles.length === 0) {
+          await replyEphemeral(
+            interaction,
+            msgIn.FournirAuMoinsUnRole
+          );
+          return;
+        }
+
+        const roleIds = roles.map((role) => role.id);
+
+        upsertGuildRoleMessageDeleteSettingsStmt.run(
+          interaction.guild!.id,
+          enabled ? 1 : 0,
+          roleIds[0] ?? null,
+          roleIds[1] ?? null,
+          roleIds[2] ?? null,
+          roleIds[3] ?? null,
+          roleIds[4] ?? null,
+          interaction.user.id,
+          new Date().toISOString()
+        );
+
+        const rolesDisplay =
+          roleIds.length > 0
+            ? roleIds.map((roleId) => `<@&${roleId}>`).join(", ")
+            : msgIn.AucunRole;
+
+        await replyEphemeral(
+          interaction,
+          enabled
+            ? msgIn.SuppressionAutomatiqueMessageMentionRoleActivee(rolesDisplay)
+            : msgIn.SuppressionAutomatiqueMessageMentionRoleDesctivee
+        );
+
+        return;
+      }
 
     }
 
     // =========================================
     // 3) SOUMISSION DU MODAL
     // =========================================  
-      if (interaction.isModalSubmit()) {
-        if (!isUsedOnAServer(interaction)) {
-          await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
-          return;
+    if (interaction.isModalSubmit()) {
+      if (!isUsedOnAServer(interaction)) {
+        await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
+        return;
+      }
+
+      const member = await interaction.guild.members.fetch(interaction.user.id);
+
+      const questions = getGuildVerificationQuestionsStmt.all(
+        interaction.guild.id
+      ) as GuildVerificationQuestionRow[];
+
+      if (questions.length === 0) {
+        await interaction.reply({
+          content: msgIn.noVerificationQuestions,
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      const accountAgeText = formatAccountAge(member.user.createdAt, msgServer);
+      const createdTimestamp = Math.floor(member.user.createdAt.getTime() / 1000);
+
+      const guildSettings = getGuildVerificationSettingsStmt.get(interaction.guild.id) as
+        | {
+          guild_id: string;
+          verified_role_id: string;
+          panel_channel_id: string;
+          staff_category_id: string;
+          staff_role_id: string;
+          created_by: string;
+          updated_at: string;
         }
+        | undefined;
 
-        const member = await interaction.guild.members.fetch(interaction.user.id);
+      if (!guildSettings) {
+        await interaction.reply({
+          content: msgIn.verificationNotConfigured,
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
 
-        const questions = getGuildVerificationQuestionsStmt.all(
-          interaction.guild.id
-        ) as GuildVerificationQuestionRow[];
+      const staffCategory = await interaction.guild.channels
+        .fetch(guildSettings.staff_category_id)
+        .catch(() => null);
 
-        if (questions.length === 0) {
-          await interaction.reply({
-            content: msgIn.noVerificationQuestions,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        const accountAgeText = formatAccountAge(member.user.createdAt, msgServer);
-        const createdTimestamp = Math.floor(member.user.createdAt.getTime() / 1000);
-
-        const guildSettings = getGuildVerificationSettingsStmt.get(interaction.guild.id) as
-          | {
-              guild_id: string;
-              verified_role_id: string;
-              panel_channel_id: string;
-              staff_category_id: string;
-              staff_role_id: string;
-              created_by: string;
-              updated_at: string;
-            }
-          | undefined;
-
-        if (!guildSettings) {
-          await interaction.reply({
-            content: msgIn.verificationNotConfigured,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        const staffCategory = await interaction.guild.channels
-          .fetch(guildSettings.staff_category_id)
-          .catch(() => null);
-
-        if (!staffCategory || staffCategory.type !== ChannelType.GuildCategory) {
-          await interaction.reply({
-            content: msgIn.configuredStaffCategoryNotFound,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
+      if (!staffCategory || staffCategory.type !== ChannelType.GuildCategory) {
+        await interaction.reply({
+          content: msgIn.configuredStaffCategoryNotFound,
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
 
       const verificationChannel = await interaction.guild.channels.create({
         name: `verification-${member.user.username}`
@@ -2366,40 +2365,40 @@ if (interaction.commandName === "role-used-msg-delete") {
         type: ChannelType.GuildText,
         parent: staffCategory.id,
         permissionOverwrites: [
-            {
-              id: interaction.guild.roles.everyone.id,
-              deny: [
-                PermissionFlagsBits.ViewChannel,
-              ],
-            },
-            {
-              id: guildSettings.staff_role_id,
-              allow: [
-                PermissionFlagsBits.ViewChannel,
-                PermissionFlagsBits.SendMessages,
-                PermissionFlagsBits.ReadMessageHistory,
-                PermissionFlagsBits.MentionEveryone,
-              ],
-            },
-            {
-              id: client.user!.id,
-              allow: [
-                PermissionFlagsBits.ViewChannel,
-                PermissionFlagsBits.SendMessages,
-                PermissionFlagsBits.ReadMessageHistory,
-                PermissionFlagsBits.ManageChannels,
-                PermissionFlagsBits.MentionEveryone,
-              ],
-            },
-          ],
-        });
+          {
+            id: interaction.guild.roles.everyone.id,
+            deny: [
+              PermissionFlagsBits.ViewChannel,
+            ],
+          },
+          {
+            id: guildSettings.staff_role_id,
+            allow: [
+              PermissionFlagsBits.ViewChannel,
+              PermissionFlagsBits.SendMessages,
+              PermissionFlagsBits.ReadMessageHistory,
+              PermissionFlagsBits.MentionEveryone,
+            ],
+          },
+          {
+            id: client.user!.id,
+            allow: [
+              PermissionFlagsBits.ViewChannel,
+              PermissionFlagsBits.SendMessages,
+              PermissionFlagsBits.ReadMessageHistory,
+              PermissionFlagsBits.ManageChannels,
+              PermissionFlagsBits.MentionEveryone,
+            ],
+          },
+        ],
+      });
 
-    let content =
-      `${msgServer.newVerificationRequest}\n\n` +
-      `**${msgServer.memberLabel}:** <@${member.id}>\n` +
-      `**${msgServer.tagLabel}:** ${member.user.tag}\n` +
-      `**${msgServer.accountCreatedOnLabel}:** <t:${createdTimestamp}:F>\n` +
-      `**${msgServer.accountAgeLabel}:** ${accountAgeText}\n\n`;
+      let content =
+        `${msgServer.newVerificationRequest}\n\n` +
+        `**${msgServer.memberLabel}:** <@${member.id}>\n` +
+        `**${msgServer.tagLabel}:** ${member.user.tag}\n` +
+        `**${msgServer.accountCreatedOnLabel}:** <t:${createdTimestamp}:F>\n` +
+        `**${msgServer.accountAgeLabel}:** ${accountAgeText}\n\n`;
 
       for (const question of questions) {
         if (
@@ -2490,7 +2489,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
       try {
         await member.send(msgOut.MsgBlacklisted(member.guild.name));
-      } catch {}
+      } catch { }
 
       if (member.kickable) {
         await member.kick(msgInternal.kickReasonAuto);
@@ -2498,8 +2497,8 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
       return; // ⚠️ STOP ici
     }
-	
-	// =========================
+
+    // =========================
     // 2️⃣ WELCOME DM
     // =========================
     const targetLocale = normalizeSupportedLocale(member.guild.preferredLocale);
@@ -2513,9 +2512,9 @@ client.on(Events.GuildMemberAdd, async (member) => {
       targetLocale === "en"
         ? undefined
         : (getGuildWelcomeMessageStmt.get(
-            member.guild.id,
-            "en"
-          ) as GuildWelcomeMessageRow | undefined);
+          member.guild.id,
+          "en"
+        ) as GuildWelcomeMessageRow | undefined);
 
     const welcomeMessage = localizedWelcome ?? fallbackWelcome;
 
@@ -2545,7 +2544,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     const joinedAt = new Date();
     const expiresAt = new Date(
       joinedAt.getTime() +
-        guildSettings.verification_timeout_hours * 60 * 60 * 1000
+      guildSettings.verification_timeout_hours * 60 * 60 * 1000
     );
 
     insertPendingVerificationSubmissionStmt.run(

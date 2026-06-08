@@ -734,7 +734,7 @@ export async function handleVerificationModals({
     let statusContent: string;
 
     if (blacklistedEverywhere.length === 0) {
-      statusContent = msgServer.checkMemberNotBlacklisted; // ex: "✅ Pas de blacklist connue pour cet utilisateur."
+      statusContent = "";
     } else {
       const lines = await Promise.all(
         blacklistedEverywhere.map(async (entry: any) => {

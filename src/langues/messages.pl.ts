@@ -243,14 +243,14 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
   userNotKickable: (name: string, id: string) => `❌ ${name} (${id}) — nie można wyrzucić`,
   userKicked: (name: string, id: string) => `✅ ${name} (${id}) — wyrzucony`,
   unexpectedError: (id: string) => `❌ ${id} — błąd`,
-  
-	BlacklistedUserFound: (
-	  userId: string,
-	  username: string,
-	  blacklistedAt: string,
-	  blacklistedBy: string,
-	  reason: string
-	) => `⚠️ Użytkownik znaleziony na czarnej liście
+
+  BlacklistedUserFound: (
+    userId: string,
+    username: string,
+    blacklistedAt: string,
+    blacklistedBy: string,
+    reason: string
+  ) => `⚠️ Użytkownik znaleziony na czarnej liście
 
 	ID użytkownika: ${userId}
 	Nazwa użytkownika: ${username}
@@ -258,33 +258,32 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
 	Dodany przez: ${blacklistedBy}
 	Powód: ${reason}`,
 
-	noReasonProvided: "Nie podano powodu",
-	
+  noReasonProvided: "Nie podano powodu",
+
   blacklistReasonDescription: "Dodaj powód (opcjonalne)",
   blacklistMemberDescription: "Dodać użytkownika do czarnej listy na tym serwerze",
-	unblacklistMemberDescription: "Usuń użytkownika z czarnej listy i odbanuj go",
-	userNotBlacklisted: (userId: string) => `ℹ️ ${userId} — użytkownik nie jest na czarnej liście`,
-	userRemovedFromBlacklist: (userId: string) => `✅ ${userId} — usunięty z czarnej listy i odbanowany`,
-	blacklistReasonSaved: "Powód zapisany pomyślnie",
-	refusalReasonSaved: "Powód zapisany pomyślnie",
-	setupSpamDetectionDescription: "Skonfiguruj wykrywanie alertów spamowych dla tego serwera",
-	spamDetectionEnabledOptionDescription: "Włącz lub wyłącz wykrywanie spamu",
-	spamAlertChannelDescription: "Kanał, na który będą wysyłane alerty moderacyjne",
-	spamStaffRoleDescription: "Rola administracji oznaczana w alertach spamowych",
-	spamAlertChannelRequired: "Musisz podać kanał alertów, aby włączyć wykrywanie spamu.",
-	spamDetectionEnabled: (channelId: string, staffRoleId: string | null) => `✅ Wykrywanie spamu włączone.\nKanał alertów: <#${channelId}>${
-		staffRoleId ? `\nRola administracji: <@&${staffRoleId}>` : ""
-	  }`,
-	spamDetectionDisabled: "✅ Wykrywanie spamu wyłączone.",
-	memberPresentOnServers: (servers: string) => `📡 Użytkownik znajduje się na następujących serwerach:\n${servers}`,
-	memberBlacklistedOnServers: (servers: string) => `⚠️ Użytkownik znajduje się na czarnej liście na następujących serwerach:\n${servers}`,
-	blacklistMemberSavedButKickFailed: (userId: string, username: string) => `⚠️ ${username} (${userId}) został dodany do blacklisty, ale nie udało się go wyrzucić z serwera.`,
+  unblacklistMemberDescription: "Usuń użytkownika z czarnej listy i odbanuj go",
+  userNotBlacklisted: (userId: string) => `ℹ️ ${userId} — użytkownik nie jest na czarnej liście`,
+  userRemovedFromBlacklist: (userId: string) => `✅ ${userId} — usunięty z czarnej listy i odbanowany`,
+  blacklistReasonSaved: "Powód zapisany pomyślnie",
+  refusalReasonSaved: "Powód zapisany pomyślnie",
+  setupSpamDetectionDescription: "Skonfiguruj wykrywanie alertów spamowych dla tego serwera",
+  spamDetectionEnabledOptionDescription: "Włącz lub wyłącz wykrywanie spamu",
+  spamAlertChannelDescription: "Kanał, na który będą wysyłane alerty moderacyjne",
+  spamStaffRoleDescription: "Rola administracji oznaczana w alertach spamowych",
+  spamAlertChannelRequired: "Musisz podać kanał alertów, aby włączyć wykrywanie spamu.",
+  spamDetectionEnabled: (channelId: string, staffRoleId: string | null) => `✅ Wykrywanie spamu włączone.\nKanał alertów: <#${channelId}>${staffRoleId ? `\nRola administracji: <@&${staffRoleId}>` : ""
+    }`,
+  spamDetectionDisabled: "✅ Wykrywanie spamu wyłączone.",
+  memberPresentOnServers: (servers: string) => `📡 Użytkownik znajduje się na następujących serwerach:\n${servers}`,
+  memberBlacklistedOnServers: (servers: string) => `⚠️ Użytkownik znajduje się na czarnej liście na następujących serwerach:\n${servers}`,
+  blacklistMemberSavedButKickFailed: (userId: string, username: string) => `⚠️ ${username} (${userId}) został dodany do blacklisty, ale nie udało się go wyrzucić z serwera.`,
   blacklistMemberSuccess: (userId: string, username: string) => `✅ ${username} (${userId}) został dodany do czarnej listy i wyrzucony z serwera.`,
-  spamInfoNombre : "Liczba wiadomości, po której przekroczeniu uruchamiane jest powiadomienie",
-  spamInfoDuree : "Czas trwania okna wykrywania w sekundach",
-  DelaiDescriptionCommande : "Czas w godzinach na przesłanie odpowiedzi weryfikacyjnych",
+  spamInfoNombre: "Liczba wiadomości, po której przekroczeniu uruchamiane jest powiadomienie",
+  spamInfoDuree: "Czas trwania okna wykrywania w sekundach",
+  DelaiDescriptionCommande: "Czas w godzinach na przesłanie odpowiedzi weryfikacyjnych",
   ViewSettings: (
-    questionsText : string,
+    questionsText: string,
     verifiedRoleDisplay: string,
     staffRoleDisplay: string,
     verificationTimeoutHours: number,
@@ -311,37 +310,35 @@ ${roleMsgDeleteText}
 2) Kanał publikacji: ${freeGamesChannel}
 3) Steam: ${includeSteam ? "tak" : "nie"}
 4) Epic Games: ${includeEpicGames ? "tak" : "nie"}`,
-NotAuthorizedServer: "Serwer nie został autoryzowany, nie można używać żadnej komendy",
-ManualVerificationProcessed: (
-  targetUserId: string,
-  existingVerification: boolean,
-  targetMember: boolean,
-  roleAdded: boolean
-) =>
-  `✅ Ręczna weryfikacja została przetworzona dla \`${targetUserId}\`.\n` +
-  `- Usunięcie oczekującej weryfikacji: zakończone\n` +
-  `- Wpis w verified_users: ${
-    existingVerification ? "już istniał" : "dodany"
-  }\n` +
-  `- Zweryfikowana rola: ${
-    targetMember
+  NotAuthorizedServer: "Serwer nie został autoryzowany, nie można używać żadnej komendy",
+  ManualVerificationProcessed: (
+    targetUserId: string,
+    existingVerification: boolean,
+    targetMember: boolean,
+    roleAdded: boolean
+  ) =>
+    `✅ Ręczna weryfikacja została przetworzona dla \`${targetUserId}\`.\n` +
+    `- Usunięcie oczekującej weryfikacji: zakończone\n` +
+    `- Wpis w verified_users: ${existingVerification ? "już istniał" : "dodany"
+    }\n` +
+    `- Zweryfikowana rola: ${targetMember
       ? roleAdded
         ? "dodana"
         : "już obecna"
       : "nie dodano, członek nie jest obecny na serwerze"
-  }`,
+    }`,
 
   NoMembersFoundWithRoleCount: (count: number) => `Nie znaleziono członków posiadających dokładnie ${count} rol(i).`,
   MembersWithRoleCountTitle: (count: number) => `**Członkowie posiadający dokładnie ${count} rol(i)**`,
-  freeGamesManualPublishSettingsDeleted : "Ustawienia publikacji zostały usunięte",
-  freeGamesManualPublishSettingsSaved : "Ustawienia publikacji zostały zapisane",
+  freeGamesManualPublishSettingsDeleted: "Ustawienia publikacji zostały usunięte",
+  freeGamesManualPublishSettingsSaved: "Ustawienia publikacji zostały zapisane",
   none: "Brak",
-  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Usuwanie wiadomości zawierających wzmiankę o następujących rolach zostało włączone: ${rolesDisplay}`,
+  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string) => `✅ Usuwanie wiadomości zawierających wzmiankę o następujących rolach zostało włączone: ${rolesDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Usuwanie wiadomości zostało wyłączone`,
   FournirAuMoinsUnRole: "Musisz podać co najmniej jedną rolę, jeśli usunięcie jest włączone.",
-  AucunRole : "Brak roli",
+  AucunRole: "Brak roli",
   RoleIntrouvable: (roleDisplay: string) => `Rola nie została znaleziona (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled : boolean, rolesDisplay: string) => `## 🚫 Usuwanie wiadomości według roli
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string) => `## 🚫 Usuwanie wiadomości według roli
       
       **Aktywowany :** ${enabled ? "tak" : "nie"}
       **Monitorowane role :** ${rolesDisplay}
@@ -392,13 +389,13 @@ const pl_server = {
   months: (n: number) => `${n} miesięcy`,
   oneYear: "1 rok",
   years: (n: number) => `${n} lat`,
-  
-	rejectModalTitle: "Odrzuć wniosek o weryfikację",
-	rejectReasonLabel: "Powód odrzucenia",
-	rejectReasonPlaceholder: "Opcjonalnie: wyjaśnij, dlaczego wniosek został odrzucony",
-	reasonLabel: "Powód",
-	noReasonProvided: "Nie podano powodu",
-	
+
+  rejectModalTitle: "Odrzuć wniosek o weryfikację",
+  rejectReasonLabel: "Powód odrzucenia",
+  rejectReasonPlaceholder: "Opcjonalnie: wyjaśnij, dlaczego wniosek został odrzucony",
+  reasonLabel: "Powód",
+  noReasonProvided: "Nie podano powodu",
+
   blacklistModalTitle: "Dodaj użytkownika do czarnej listy",
   blacklistReasonLabel: "Powód dodania do czarnej listy",
   blacklistReasonPlaceholder: "Wyjaśnij, dlaczego ten użytkownik trafia na czarną listę",
@@ -431,6 +428,7 @@ const pl_server = {
   verificationTimeoutSet: (hours: number) => `Czas weryfikacji ustawiony na ${hours} godz.`,
   spamFalsePositiveConfirmed: "✅ Fałszywy alarm potwierdzony.",
   spamUserBanned: "🔨 Użytkownik zbanowany.",
+  checkMemberBlacklistedOn: (lines: string) => `⛔ Użytkownik na czarnej liście na:\n\n${lines}`,
 };
 
 const pl_internal = {

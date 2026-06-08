@@ -148,49 +148,49 @@ Este comando proporciona una vista centralizada de toda la configuración espec�
 
 La mayoría de los comandos de configuración requieren permisos de **Administrador**.
 `,
-    commandMustBeUsedInServer: "Este comando debe usarse dentro de un servidor.",
-    actionMustBeUsedInServer: "Esta acción debe usarse dentro de un servidor.",
-    commandMustBeUsedInTextChannel: "Este comando debe usarse en un canal de texto",
-    onlyStaffCanUseCommand: "Solo los miembros del staff pueden usar este comando.",
-    onlyStaffCanUseButtons: "Solo los miembros del staff pueden usar estos botones.",
-    verificationNotConfigured: "La verificación no está configurada para este servidor.",
-    verificationSettingsSaved: "Los ajustes de verificación se han guardado para este servidor.",
-    verificationSettingsSavedAndPanelPosted:
-      "Los ajustes de verificación se han guardado y el panel se ha publicado correctamente.",
-    verificationRequestSent:
-      "Tu solicitud de verificación ha sido enviada al equipo de staff.",
-    configuredStaffCategoryNotFound:
-      "No se pudo encontrar la categoría de staff configurada.",
-    configuredPanelChannelInvalid:
-      "El canal actual no es un canal de texto válido para el panel de verificación.",
-    notAllowedConfigureVerification:
-      "No tienes permiso para configurar la verificación en este servidor.",
-    notAllowedManageQuestions:
-      "No tienes permiso para gestionar las preguntas de verificación en este servidor.",
-    noVerificationQuestions:
-      "No hay preguntas de verificación configuradas para este servidor.",
-    tooManyVerificationQuestions:
-      "Hay demasiadas preguntas de verificación configuradas para este servidor. Los modales de Discord admiten un máximo de 5 componentes.",
-    blacklistedCannotAccess:
-      "Estás en la lista negra y no puedes acceder a este servidor.",
-    alreadyVerifiedRoleRestored:
-      "Ya habías sido verificado anteriormente. El rol de verificado se ha restaurado automáticamente.",
-    targetMemberNoLongerInServer:
-      "El miembro afectado ya no está en el servidor.",
-    imageRequired: "Se requiere una imagen.",
-    errorOccurred: "Ha ocurrido un error.",
-    noQuestionFound: (index: number) => `No se encontró ninguna pregunta en el índice ${index}.`,
-    questionUpdatedSuccessfully: (index: number) => `La pregunta ${index} se actualizó correctamente.`,
-    questionDeletedSuccessfully: (index: number) => `La pregunta ${index} se eliminó correctamente.`,
-    alreadyBeenVerifiedBefore : "Ya has sido verificado anteriormente. El rol @verified ha sido restaurado automáticamente.",
-    userUnknownToTheBot : (targetUserId: string) => `El usuario ${targetUserId} es desconocido para el bot.`,
-    NoAuthorizedServerFoundInSetupVerificationPermissions : "No se encontraron servidores autorizados en setup_verification_permissions.",
-    CommandReservedByBasilic : "Este comando solo puede ser utilizado por \@basilicayakashifr",
-    YouCannotConfigureMoreThanFiveQuestions : "No puedes configurar más de 5 preguntas de verificación porque los modales de Discord están limitados a 5 componentes.",
-    QuestionAddedAtIndex : (index: number) => `Pregunta añadida en el índice ${index}.`,
-    YouAreNotAllowedToViewVerificationQuestionsOnThisServer : "No tienes permiso para ver las preguntas de verificación en este servidor.",
-    YouAreNotAllowedtoEditVerificationQuestionsOnThisServer : "No tienes permiso para editar las preguntas de verificación en este servidor",
-    VerifiedUserFound: (user_id:string, username : string, verified_at : string, verified_by : string) => `
+  commandMustBeUsedInServer: "Este comando debe usarse dentro de un servidor.",
+  actionMustBeUsedInServer: "Esta acción debe usarse dentro de un servidor.",
+  commandMustBeUsedInTextChannel: "Este comando debe usarse en un canal de texto",
+  onlyStaffCanUseCommand: "Solo los miembros del staff pueden usar este comando.",
+  onlyStaffCanUseButtons: "Solo los miembros del staff pueden usar estos botones.",
+  verificationNotConfigured: "La verificación no está configurada para este servidor.",
+  verificationSettingsSaved: "Los ajustes de verificación se han guardado para este servidor.",
+  verificationSettingsSavedAndPanelPosted:
+    "Los ajustes de verificación se han guardado y el panel se ha publicado correctamente.",
+  verificationRequestSent:
+    "Tu solicitud de verificación ha sido enviada al equipo de staff.",
+  configuredStaffCategoryNotFound:
+    "No se pudo encontrar la categoría de staff configurada.",
+  configuredPanelChannelInvalid:
+    "El canal actual no es un canal de texto válido para el panel de verificación.",
+  notAllowedConfigureVerification:
+    "No tienes permiso para configurar la verificación en este servidor.",
+  notAllowedManageQuestions:
+    "No tienes permiso para gestionar las preguntas de verificación en este servidor.",
+  noVerificationQuestions:
+    "No hay preguntas de verificación configuradas para este servidor.",
+  tooManyVerificationQuestions:
+    "Hay demasiadas preguntas de verificación configuradas para este servidor. Los modales de Discord admiten un máximo de 5 componentes.",
+  blacklistedCannotAccess:
+    "Estás en la lista negra y no puedes acceder a este servidor.",
+  alreadyVerifiedRoleRestored:
+    "Ya habías sido verificado anteriormente. El rol de verificado se ha restaurado automáticamente.",
+  targetMemberNoLongerInServer:
+    "El miembro afectado ya no está en el servidor.",
+  imageRequired: "Se requiere una imagen.",
+  errorOccurred: "Ha ocurrido un error.",
+  noQuestionFound: (index: number) => `No se encontró ninguna pregunta en el índice ${index}.`,
+  questionUpdatedSuccessfully: (index: number) => `La pregunta ${index} se actualizó correctamente.`,
+  questionDeletedSuccessfully: (index: number) => `La pregunta ${index} se eliminó correctamente.`,
+  alreadyBeenVerifiedBefore: "Ya has sido verificado anteriormente. El rol @verified ha sido restaurado automáticamente.",
+  userUnknownToTheBot: (targetUserId: string) => `El usuario ${targetUserId} es desconocido para el bot.`,
+  NoAuthorizedServerFoundInSetupVerificationPermissions: "No se encontraron servidores autorizados en setup_verification_permissions.",
+  CommandReservedByBasilic: "Este comando solo puede ser utilizado por \@basilicayakashifr",
+  YouCannotConfigureMoreThanFiveQuestions: "No puedes configurar más de 5 preguntas de verificación porque los modales de Discord están limitados a 5 componentes.",
+  QuestionAddedAtIndex: (index: number) => `Pregunta añadida en el índice ${index}.`,
+  YouAreNotAllowedToViewVerificationQuestionsOnThisServer: "No tienes permiso para ver las preguntas de verificación en este servidor.",
+  YouAreNotAllowedtoEditVerificationQuestionsOnThisServer: "No tienes permiso para editar las preguntas de verificación en este servidor",
+  VerifiedUserFound: (user_id: string, username: string, verified_at: string, verified_by: string) => `
             **Usuario verificado encontrado**
 
             **ID de usuario:** ${user_id}
@@ -198,51 +198,51 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
             **Verificado el** ${verified_at}
             **Verificado por:** ${verified_by}
             `,
-    globalKickHeader: (userId: string) =>`**Resultados del kick global para** \`${userId}\``,
-    permissionAdded: (guildId: string) => `Permiso añadido.\n\n**ID del servidor:** ${guildId}`,
-    verificationQuestionsTitle: "**Preguntas de verificación para este servidor**",
-    typeLabel: "Tipo",
-    requiredLabel: "Requerido",
-    yes: "sí",
-    no: "no",
-	setupVerificationDescription: "Configurar la verificación para este servidor",
-	checkVerifiedDescription: "Comprobar la verificación, el estado de lista negra y los servidores compartidos de un usuario",
-	globalKickDescription: "Expulsar a un usuario de todos los servidores autorizados para el bot",
-	allowSetupVerificationDescription: "Permitir a un usuario configurar la verificación para un servidor específico",
-	addVerificationQuestionDescription: "Añadir una pregunta de verificación para este servidor",
-	listVerificationQuestionsDescription: "Listar las preguntas de verificación para este servidor",
-	editVerificationQuestionDescription: "Editar una pregunta de verificación por su índice",
-	deleteVerificationQuestionDescription: "Eliminar una pregunta de verificación por su índice",
-	botHelpDescription: "Mostrar la guía de configuración del bot y los comandos útiles",
-	verifiedRoleIdDescription: "Rol que se asignará tras la aprobación",
-	staffCategoryIdDescription: "ID de la categoría donde se crearán los canales del staff",
-	staffRoleIdDescription: "Rol del staff a notificar",
-	userIdLookupDescription: "ID del usuario que se debe buscar",
-	userIdKickDescription: "ID de Discord del usuario que se debe expulsar",
-	guildIdDescription: "ID del servidor de Discord donde se permite el comando",
-	questionLabelDescription: "Etiqueta de la pregunta mostrada al usuario",
-	questionTypeDescription: "Tipo de pregunta",
-	questionRequiredDescription: "Indica si la pregunta es obligatoria",
-	questionIndexDescription: "Índice de la pregunta mostrado por /view-settings",
-	newQuestionLabelDescription: "Nueva etiqueta de la pregunta",
-	newQuestionTypeDescription: "Nuevo tipo de pregunta",
-	newQuestionRequiredDescription: "Indica si la pregunta es obligatoria",
-	choiceShortText: "Texto corto",
-	choiceParagraph: "Párrafo",
-	choiceImageUpload: "Subida de imagen",
+  globalKickHeader: (userId: string) => `**Resultados del kick global para** \`${userId}\``,
+  permissionAdded: (guildId: string) => `Permiso añadido.\n\n**ID del servidor:** ${guildId}`,
+  verificationQuestionsTitle: "**Preguntas de verificación para este servidor**",
+  typeLabel: "Tipo",
+  requiredLabel: "Requerido",
+  yes: "sí",
+  no: "no",
+  setupVerificationDescription: "Configurar la verificación para este servidor",
+  checkVerifiedDescription: "Comprobar la verificación, el estado de lista negra y los servidores compartidos de un usuario",
+  globalKickDescription: "Expulsar a un usuario de todos los servidores autorizados para el bot",
+  allowSetupVerificationDescription: "Permitir a un usuario configurar la verificación para un servidor específico",
+  addVerificationQuestionDescription: "Añadir una pregunta de verificación para este servidor",
+  listVerificationQuestionsDescription: "Listar las preguntas de verificación para este servidor",
+  editVerificationQuestionDescription: "Editar una pregunta de verificación por su índice",
+  deleteVerificationQuestionDescription: "Eliminar una pregunta de verificación por su índice",
+  botHelpDescription: "Mostrar la guía de configuración del bot y los comandos útiles",
+  verifiedRoleIdDescription: "Rol que se asignará tras la aprobación",
+  staffCategoryIdDescription: "ID de la categoría donde se crearán los canales del staff",
+  staffRoleIdDescription: "Rol del staff a notificar",
+  userIdLookupDescription: "ID del usuario que se debe buscar",
+  userIdKickDescription: "ID de Discord del usuario que se debe expulsar",
+  guildIdDescription: "ID del servidor de Discord donde se permite el comando",
+  questionLabelDescription: "Etiqueta de la pregunta mostrada al usuario",
+  questionTypeDescription: "Tipo de pregunta",
+  questionRequiredDescription: "Indica si la pregunta es obligatoria",
+  questionIndexDescription: "Índice de la pregunta mostrado por /view-settings",
+  newQuestionLabelDescription: "Nueva etiqueta de la pregunta",
+  newQuestionTypeDescription: "Nuevo tipo de pregunta",
+  newQuestionRequiredDescription: "Indica si la pregunta es obligatoria",
+  choiceShortText: "Texto corto",
+  choiceParagraph: "Párrafo",
+  choiceImageUpload: "Subida de imagen",
   guildNotFound: (guildId: string) => `❌ ${guildId} — servidor no encontrado o el bot no está presente`,
   userNotPresent: (name: string, id: string) => `ℹ️ ${name} (${id}) — usuario no presente`,
   userNotKickable: (name: string, id: string) => `❌ ${name} (${id}) — el usuario no puede ser expulsado`,
   userKicked: (name: string, id: string) => `✅ ${name} (${id}) — expulsado`,
   unexpectedError: (guildId: string) => `❌ ${guildId} — error inesperado`,
-  
-	BlacklistedUserFound: (
-	  userId: string,
-	  username: string,
-	  blacklistedAt: string,
-	  blacklistedBy: string,
-	  reason: string
-	) => `⚠️ Usuario en lista negra encontrado
+
+  BlacklistedUserFound: (
+    userId: string,
+    username: string,
+    blacklistedAt: string,
+    blacklistedBy: string,
+    reason: string
+  ) => `⚠️ Usuario en lista negra encontrado
 
 	ID de usuario: ${userId}
 	Nombre de usuario: ${username}
@@ -250,33 +250,32 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
 	Incluido por: ${blacklistedBy}
 	Razón: ${reason}`,
 
-	noReasonProvided: "Sin razón proporcionada",
-	
+  noReasonProvided: "Sin razón proporcionada",
+
   blacklistReasonDescription: "Añadir una razón (opcional)",
   blacklistMemberDescription: "Poner un usuario en la lista negra en este servidor",
-	unblacklistMemberDescription: "Eliminar a un usuario de la lista negra y desbanearlo",
-	userNotBlacklisted: (userId: string) => `ℹ️ ${userId} — el usuario no está en la lista negra`,
-	userRemovedFromBlacklist: (userId: string) => `✅ ${userId} — eliminado de la lista negra y desbaneado`,
-	blacklistReasonSaved: "Motivo de la lista negra guardado correctamente",
-	refusalReasonSaved: "Motivo guardado correctamente",
-	setupSpamDetectionDescription: "Configurar la detección de alertas de spam para este servidor",
-	spamDetectionEnabledOptionDescription: "Activar o desactivar la detección de spam",
-	spamAlertChannelDescription: "Canal donde se enviarán las alertas de moderación",
-	spamStaffRoleDescription: "Rol del staff que se mencionará en las alertas de spam",
-	spamAlertChannelRequired: "Debes proporcionar un canal de alertas para activar la detección de spam.",
-	spamDetectionEnabled: (channelId: string, staffRoleId: string | null) => `✅ Detección de spam activada.\nCanal de alertas: <#${channelId}>${
-		staffRoleId ? `\nRol del staff: <@&${staffRoleId}>` : ""
-	  }`,
-	spamDetectionDisabled: "✅ Detección de spam desactivada.",
-	memberPresentOnServers: (servers: string) => `📡 Miembro presente en los siguientes servidores:\n${servers}`,
-	memberBlacklistedOnServers: (servers: string) => `⚠️ El usuario está en la lista negra en los siguientes servidores:\n${servers}`,
-	blacklistMemberSavedButKickFailed: (userId: string, username: string) => `⚠️ ${username} (${userId}) fue añadido a la lista negra, pero no pudo ser expulsado del servidor.`,
+  unblacklistMemberDescription: "Eliminar a un usuario de la lista negra y desbanearlo",
+  userNotBlacklisted: (userId: string) => `ℹ️ ${userId} — el usuario no está en la lista negra`,
+  userRemovedFromBlacklist: (userId: string) => `✅ ${userId} — eliminado de la lista negra y desbaneado`,
+  blacklistReasonSaved: "Motivo de la lista negra guardado correctamente",
+  refusalReasonSaved: "Motivo guardado correctamente",
+  setupSpamDetectionDescription: "Configurar la detección de alertas de spam para este servidor",
+  spamDetectionEnabledOptionDescription: "Activar o desactivar la detección de spam",
+  spamAlertChannelDescription: "Canal donde se enviarán las alertas de moderación",
+  spamStaffRoleDescription: "Rol del staff que se mencionará en las alertas de spam",
+  spamAlertChannelRequired: "Debes proporcionar un canal de alertas para activar la detección de spam.",
+  spamDetectionEnabled: (channelId: string, staffRoleId: string | null) => `✅ Detección de spam activada.\nCanal de alertas: <#${channelId}>${staffRoleId ? `\nRol del staff: <@&${staffRoleId}>` : ""
+    }`,
+  spamDetectionDisabled: "✅ Detección de spam desactivada.",
+  memberPresentOnServers: (servers: string) => `📡 Miembro presente en los siguientes servidores:\n${servers}`,
+  memberBlacklistedOnServers: (servers: string) => `⚠️ El usuario está en la lista negra en los siguientes servidores:\n${servers}`,
+  blacklistMemberSavedButKickFailed: (userId: string, username: string) => `⚠️ ${username} (${userId}) fue añadido a la lista negra, pero no pudo ser expulsado del servidor.`,
   blacklistMemberSuccess: (userId: string, username: string) => `✅ ${username} (${userId}) fue añadido a la lista negra y expulsado del servidor.`,
-  spamInfoNombre : "Número de mensajes a partir del cual se activa una alerta",
-  spamInfoDuree : "Duración en segundos de la ventana de detección",
-  DelaiDescriptionCommande : "Tiempo en horas para enviar las respuestas de verificación",
+  spamInfoNombre: "Número de mensajes a partir del cual se activa una alerta",
+  spamInfoDuree: "Duración en segundos de la ventana de detección",
+  DelaiDescriptionCommande: "Tiempo en horas para enviar las respuestas de verificación",
   ViewSettings: (
-    questionsText : string,
+    questionsText: string,
     verifiedRoleDisplay: string,
     staffRoleDisplay: string,
     verificationTimeoutHours: number,
@@ -303,37 +302,35 @@ ${roleMsgDeleteText}
 2) Canal de publicación: ${freeGamesChannel}
 3) Steam: ${includeSteam ? "sí" : "no"}
 4) Epic Games: ${includeEpicGames ? "sí" : "no"}`,
-NotAuthorizedServer: "El servidor no ha sido autorizado, es imposible usar ningún comando",
-ManualVerificationProcessed: (
-  targetUserId: string,
-  existingVerification: boolean,
-  targetMember: boolean,
-  roleAdded: boolean
-) =>
-  `✅ Verificación manual procesada para \`${targetUserId}\`.\n` +
-  `- Eliminación de verificación pendiente: completada\n` +
-  `- Entrada en verified_users: ${
-    existingVerification ? "ya existente" : "añadida"
-  }\n` +
-  `- Rol verificado: ${
-    targetMember
+  NotAuthorizedServer: "El servidor no ha sido autorizado, es imposible usar ningún comando",
+  ManualVerificationProcessed: (
+    targetUserId: string,
+    existingVerification: boolean,
+    targetMember: boolean,
+    roleAdded: boolean
+  ) =>
+    `✅ Verificación manual procesada para \`${targetUserId}\`.\n` +
+    `- Eliminación de verificación pendiente: completada\n` +
+    `- Entrada en verified_users: ${existingVerification ? "ya existente" : "añadida"
+    }\n` +
+    `- Rol verificado: ${targetMember
       ? roleAdded
         ? "añadido"
         : "ya presente"
       : "no añadido, miembro ausente del servidor"
-  }`,
+    }`,
 
   NoMembersFoundWithRoleCount: (count: number) => `No se encontraron miembros con exactamente ${count} rol(es).`,
   MembersWithRoleCountTitle: (count: number) => `**Miembros con exactamente ${count} rol(es)**`,
-  freeGamesManualPublishSettingsDeleted : "Configuración de publicación eliminada",
-  freeGamesManualPublishSettingsSaved : "Configuración de publicación guardada",
+  freeGamesManualPublishSettingsDeleted: "Configuración de publicación eliminada",
+  freeGamesManualPublishSettingsSaved: "Configuración de publicación guardada",
   none: "Ninguno",
-  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay : string) => `✅ Eliminación activada para los mensajes que mencionan: ${rolesDisplay}`,
+  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string) => `✅ Eliminación activada para los mensajes que mencionan: ${rolesDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Eliminación desactivada`,
   FournirAuMoinsUnRole: "Debe proporcionar al menos un rol para mencionar y habilitar la eliminación automática.",
-  AucunRole : "No rol",
+  AucunRole: "No rol",
   RoleIntrouvable: (roleDisplay: string) => `Rol no encontrado (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled : boolean, rolesDisplay: string) => `## 🚫 Eliminación de mensajes por rol
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string) => `## 🚫 Eliminación de mensajes por rol
       
       **Activado   :** ${enabled ? "sí" : "no"}
       **Roles supervisados :** ${rolesDisplay}
@@ -341,15 +338,14 @@ ManualVerificationProcessed: (
   unknownServer: "Servidor desconocido",
   by: "Por",
   reason: "Razón",
-
 };
 
 const es_out = {
-  YourVerifiedStatusRestored: (guild_name : string) => `Hola, tu estado verificado en **${guild_name}** ha sido restaurado automáticamente.`,
-  YourVerifiedStatusAccepted : (guild_name : string) => `Hola, tu verificación en **${guild_name}** ha sido aceptada. El rol @verified te ha sido asignado.`,
-  YourVerifiedStatusDenied : (guild_name : string) => `Hola, tu solicitud de verificación en **${guild_name}** ha sido rechazada.`,
-  YourVerifiedStatusDeniedAndBlackedListed : (guild_name : string) => `Hola, tu solicitud de verificación en **${guild_name}** ha sido rechazada y tu cuenta ha sido incluida en la lista negra.`,
-  MsgBlacklisted : (guild_name : string) => `Hola, estás en la lista negra y no puedes unirte a **${guild_name}**.`,
+  YourVerifiedStatusRestored: (guild_name: string) => `Hola, tu estado verificado en **${guild_name}** ha sido restaurado automáticamente.`,
+  YourVerifiedStatusAccepted: (guild_name: string) => `Hola, tu verificación en **${guild_name}** ha sido aceptada. El rol @verified te ha sido asignado.`,
+  YourVerifiedStatusDenied: (guild_name: string) => `Hola, tu solicitud de verificación en **${guild_name}** ha sido rechazada.`,
+  YourVerifiedStatusDeniedAndBlackedListed: (guild_name: string) => `Hola, tu solicitud de verificación en **${guild_name}** ha sido rechazada y tu cuenta ha sido incluida en la lista negra.`,
+  MsgBlacklisted: (guild_name: string) => `Hola, estás en la lista negra y no puedes unirte a **${guild_name}**.`,
   YourVerifiedStatusDeniedAndBlackedListedWithReason: (guildName: string, reason: string) => `❌ Tu solicitud de verificación para ${guildName} fue rechazada y has sido incluido en la lista negra.\nMotivo: ${reason}`,
   YourVerifiedStatusDeniedWithReason: (guildName: string, reason: string) => `❌ Tu solicitud de verificación para ${guildName} fue rechazada.\nMotivo: ${reason}`,
   verificationTimeoutDM: (guildName: string) => `Has sido expulsado de **${guildName}** porque no completaste la verificación a tiempo.`,
@@ -381,8 +377,8 @@ const es_server = {
   verificationWaiting: (staffRoleId: string) => `<@&${staffRoleId}> hay una solicitud de verificación en espera.`,
   verificationAcceptedBy: (staffId: string, targetId: string) => `✅ Verificación aceptada por <@${staffId}> para <@${targetId}>.`,
   verificationDeniedBy: (staffId: string, targetId: string) => `❌ Verificación rechazada por <@${staffId}> para <@${targetId}>.`,
-  userBlacklistedBy: (staffId: string, targetId: string) =>`⛔ El usuario <@${targetId}> ha sido puesto en la lista negra por <@${staffId}>.`,
-  
+  userBlacklistedBy: (staffId: string, targetId: string) => `⛔ El usuario <@${targetId}> ha sido puesto en la lista negra por <@${staffId}>.`,
+
   lessThanOneDay: "menos de un día",
   oneDay: "1 día",
   days: (n: number) => `${n} días`,
@@ -390,13 +386,13 @@ const es_server = {
   months: (n: number) => `${n} meses`,
   oneYear: "1 año",
   years: (n: number) => `${n} años`,
-  
-	rejectModalTitle: "Rechazar solicitud de verificación",
-	rejectReasonLabel: "Motivo del rechazo",
-	rejectReasonPlaceholder: "Opcional: explica por qué se rechaza la solicitud",
-	reasonLabel: "Motivo",
-	noReasonProvided: "No se proporcionó motivo",
-	
+
+  rejectModalTitle: "Rechazar solicitud de verificación",
+  rejectReasonLabel: "Motivo del rechazo",
+  rejectReasonPlaceholder: "Opcional: explica por qué se rechaza la solicitud",
+  reasonLabel: "Motivo",
+  noReasonProvided: "No se proporcionó motivo",
+
   blacklistModalTitle: "Poner al miembro en la lista negra",
   blacklistReasonLabel: "Motivo de la lista negra",
   blacklistReasonPlaceholder: "Explica por qué este miembro está en la lista negra",
@@ -418,7 +414,7 @@ const es_server = {
   spamUnknown: "desconocido",
   spamModerationFallback: "Moderación",
   spamAlertMessage: "actividad sospechosa detectada, se recomienda revisión manual.",
-  discussMemberButton: "Hablar con el miembro", 
+  discussMemberButton: "Hablar con el miembro",
   discussionChannelIntro: (targetId: string) => `Este canal privado permite al staff comunicarse con <@${targetId}> sobre su solicitud de verificación.`,
   discussionChannelAlreadyExists: (channelId: string) => `Ya existe un canal de discusión: <#${channelId}>`,
   discussionChannelCreated: (channelId: string) => `Canal de discusión creado: <#${channelId}>`,
@@ -429,17 +425,18 @@ const es_server = {
   verificationTimeoutSet: (hours: number) => `Tiempo de verificación configurado a ${hours} hora(s).`,
   spamFalsePositiveConfirmed: "✅ Falso positivo confirmado.",
   spamUserBanned: "🔨 Usuario baneado.",
+  checkMemberBlacklistedOn: (lines: string) => `⛔ Usuario en lista negra en:\n\n${lines}`,
 };
 
 const es_internal = {
-  kickReasonBlacklistedStart : "Usuario en lista negra intentó iniciar la verificación",
+  kickReasonBlacklistedStart: "Usuario en lista negra intentó iniciar la verificación",
   kickReasonAuto: "Usuario en lista negra expulsado automáticamente al entrar",
   kickReasonDenied: "Verificación rechazada por el staff",
   kickReasonBlacklisted: "User blacklisted by staff during verification",
-  memberAlreadyVerifiedPreviously:"Miembro ya verificado anteriormente",
-  blacklistedDuringVerification:"Puesto en lista negra durante la verificación",
-  verifiedBy: (staffTag: string) =>`Verificado por ${staffTag}`,
-  globalKickRequestedBy: (staffTag: string) =>`Expulsión global solicitada por ${staffTag}`,
+  memberAlreadyVerifiedPreviously: "Miembro ya verificado anteriormente",
+  blacklistedDuringVerification: "Puesto en lista negra durante la verificación",
+  verifiedBy: (staffTag: string) => `Verificado por ${staffTag}`,
+  globalKickRequestedBy: (staffTag: string) => `Expulsión global solicitada por ${staffTag}`,
   kickReasonBlacklistedWithReason: (reason: string) => `Incluido en la lista negra durante la verificación: ${reason}`,
   kickReasonDeniedWithReason: (reason: string) => `Verificación rechazada: ${reason}`,
   spamDuplicateText: (n: number) => `Texto idéntico enviado ${n} veces`,
@@ -450,4 +447,4 @@ const es_internal = {
   spamBanReason: (moderatorTag: string) => `Spam confirmado por ${moderatorTag}`,
 };
 
-export default {es_in, es_out, es_server, es_internal};
+export default { es_in, es_out, es_server, es_internal };

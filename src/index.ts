@@ -1472,9 +1472,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
               ? `@${moderator.username}`
               : entry.blacklisted_by ?? msgIn.noReasonProvided;
 
+            const timestamp = Math.floor(new Date(entry.blacklisted_at).getTime() / 1000);
+
             return [
               `• ${guildDisplay}`,
-              `  ${entry.blacklisted_at}`,
+              `  <t:${timestamp}:f>`,
               `  ${msgIn.by} : ${moderatorDisplay}`,
               `  ${msgIn.reason} : ${entry.reason ?? msgIn.noReasonProvided}
               `,

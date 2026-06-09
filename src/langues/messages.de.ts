@@ -339,6 +339,7 @@ ${roleMsgDeleteText}
   unknownServer: "Unbekannter Server",
   by: "Von",
   reason: "Grund",
+  verificationAlreadyInProgress: "⏳ Deine Verifizierung wird bereits vom Staff bearbeitet.",
 };
 
 const de_out = {

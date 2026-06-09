@@ -343,7 +343,7 @@ ${roleMsgDeleteText}
   unknownServer: "Serveur inconnu",
   by: "Par",
   reason: "Raison",
-
+  verificationAlreadyInProgress: "⏳ Ta vérification est déjà en cours de traitement par le staff.",
 };
 
 const fr_out = {

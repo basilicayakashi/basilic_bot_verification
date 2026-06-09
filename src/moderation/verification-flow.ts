@@ -17,6 +17,8 @@ import {
   getBlacklistedUsersEverywhereStmt,
 } from "../database/sql.js";
 
+const pendingVerifications = new Set<string>();
+
 export type VerificationFlowDeps = {
   client: any;
 
@@ -123,6 +125,29 @@ export async function handleVerificationButtons({
         flags: MessageFlags.Ephemeral,
       });
       return true;
+    }
+
+    const staffCategory = await interaction.guild.channels
+      .fetch(guildSettings.staff_category_id)
+      .catch(() => null);
+
+    if (staffCategory) {
+      const existingChannel = interaction.guild.channels.cache.find(
+        (ch : any) =>
+          ch.parentId === guildSettings.staff_category_id &&
+          ch.name === `verification-${member.user.username}`
+            .toLowerCase()
+            .replace(/[^a-z0-9-]/g, "")
+            .slice(0, 90)
+      );
+
+      if (existingChannel) {
+        await interaction.reply({
+          content: msgIn.verificationAlreadyInProgress,
+          flags: MessageFlags.Ephemeral,
+        });
+        return true;
+      }
     }
 
     const questions = deps.getGuildVerificationQuestionsStmt.all(
@@ -609,173 +634,181 @@ export async function handleVerificationModals({
   if (interaction.customId === "verification_modal") {
     const member = await interaction.guild.members.fetch(interaction.user.id);
 
-    deletePendingVerificationSubmissionStmt.run(
-      interaction.guild.id,
-      member.id
-    );
+    if (pendingVerifications.has(member.id)) return true;
+    pendingVerifications.add(member.id);
 
-    const questions = deps.getGuildVerificationQuestionsStmt.all(
-      interaction.guild.id
-    );
-
-    if (questions.length === 0) {
-      await interaction.reply({
-        content: msgIn.noVerificationQuestions,
-        flags: MessageFlags.Ephemeral,
-      });
-      return true;
-    }
-
-    const accountAgeText = deps.formatAccountAge(member.user.createdAt, msgServer);
-    const createdTimestamp = Math.floor(member.user.createdAt.getTime() / 1000);
-
-    const guildSettings = deps.getGuildVerificationSettingsStmt.get(
-      interaction.guild.id
-    );
-
-    if (!guildSettings) {
-      await interaction.reply({
-        content: msgIn.verificationNotConfigured,
-        flags: MessageFlags.Ephemeral,
-      });
-      return true;
-    }
-
-    const staffCategory = await interaction.guild.channels
-      .fetch(guildSettings.staff_category_id)
-      .catch(() => null);
-
-    if (!staffCategory || staffCategory.type !== ChannelType.GuildCategory) {
-      await interaction.reply({
-        content: msgIn.configuredStaffCategoryNotFound,
-        flags: MessageFlags.Ephemeral,
-      });
-      return true;
-    }
-
-    const verificationChannel = await interaction.guild.channels.create({
-      name: `verification-${member.user.username}`
-        .toLowerCase()
-        .replace(/[^a-z0-9-]/g, "")
-        .slice(0, 90),
-      type: ChannelType.GuildText,
-      parent: staffCategory.id,
-      permissionOverwrites: [
-        {
-          id: interaction.guild.roles.everyone.id,
-          deny: [PermissionFlagsBits.ViewChannel],
-        },
-        {
-          id: guildSettings.staff_role_id,
-          allow: [
-            PermissionFlagsBits.ViewChannel,
-            PermissionFlagsBits.SendMessages,
-            PermissionFlagsBits.ReadMessageHistory,
-          ],
-        },
-        {
-          id: deps.client.user!.id,
-          allow: [
-            PermissionFlagsBits.ViewChannel,
-            PermissionFlagsBits.SendMessages,
-            PermissionFlagsBits.ReadMessageHistory,
-            PermissionFlagsBits.ManageChannels,
-            PermissionFlagsBits.MentionEveryone,
-          ],
-        },
-      ],
-    });
-
-    let content =
-      `${msgServer.newVerificationRequest}\n\n` +
-      `**${msgServer.memberLabel}:** <@${member.id}>\n` +
-      `**${msgServer.tagLabel}:** ${member.user.tag}\n` +
-      `**${msgServer.accountCreatedOnLabel}:** <t:${createdTimestamp}:F>\n` +
-      `**${msgServer.accountAgeLabel}:** ${accountAgeText}\n\n`;
-
-    for (const question of questions) {
-      if (
-        question.question_type === "text_short" ||
-        question.question_type === "text_paragraph"
-      ) {
-        const answer = interaction.fields.getTextInputValue(question.question_key).trim();
-        content += `**${question.question_label}:** ${answer}\n`;
-        continue;
-      }
-
-      if (question.question_type === "file_image") {
-        const files = interaction.fields.getUploadedFiles(
-          question.question_key,
-          question.required === 1
-        );
-
-        const file = files?.first();
-
-        if (file) {
-          content += `**${question.question_label}:** ${file.url}\n`;
-        } else {
-          content += `**${question.question_label}:** ${msgServer.noFileProvided}\n`;
-        }
-      }
-    }
-
-
-    content += `\n${msgServer.verificationWaiting(guildSettings.staff_role_id)}`;
-
-    // ── MESSAGE 1 : réponses de vérification ──────────────────────────
-    await (verificationChannel as TextChannel).send({
-      content,
-      components: [deps.buildDecisionButtonsRow(member.id, msgServer)],
-    });
-
-    // ── MESSAGE 2 : statut blacklist ──────────────────────────────────
-    const blacklistedEverywhere = deps.getBlacklistedUsersEverywhereStmt.all(member.id);
-
-    let statusContent: string;
-
-    if (blacklistedEverywhere.length === 0) {
-      statusContent = "";
-    } else {
-      const lines = await Promise.all(
-        blacklistedEverywhere.map(async (entry: any) => {
-          const guild = await deps.client.guilds.fetch(entry.guild_id).catch(() => null);
-          const moderator = entry.blacklisted_by
-            ? await deps.client.users.fetch(entry.blacklisted_by).catch(() => null)
-            : null;
-
-          const guildDisplay = guild
-            ? `${guild.name} (${entry.guild_id})`
-            : `${msgServer.unknownServer} (${entry.guild_id})`;
-
-          const moderatorDisplay = moderator
-            ? `@${moderator.username}`
-            : entry.blacklisted_by ?? msgServer.noReasonProvided;
-
-          const timestamp = Math.floor(new Date(entry.blacklisted_at).getTime() / 1000);
-
-          return [
-            `• ${guildDisplay}`,
-            `  📅 <t:${timestamp}:f>`,
-            `  👮 ${msgServer.by} : ${moderatorDisplay}`,
-            `  📝 ${msgServer.reason} : ${entry.reason ?? msgServer.noReasonProvided}`,
-          ].join("\n");
-        })
+    try {
+      deletePendingVerificationSubmissionStmt.run(
+        interaction.guild.id,
+        member.id
       );
 
-      statusContent = msgServer.checkMemberBlacklistedOn(lines.join("\n\n"));
-      // ex: "⛔ Cet utilisateur est blacklisté sur :\n\n{lines}"
+      const questions = deps.getGuildVerificationQuestionsStmt.all(
+        interaction.guild.id
+      );
+
+      if (questions.length === 0) {
+        await interaction.reply({
+          content: msgIn.noVerificationQuestions,
+          flags: MessageFlags.Ephemeral,
+        });
+        return true;
+      }
+
+      const accountAgeText = deps.formatAccountAge(member.user.createdAt, msgServer);
+      const createdTimestamp = Math.floor(member.user.createdAt.getTime() / 1000);
+
+      const guildSettings = deps.getGuildVerificationSettingsStmt.get(
+        interaction.guild.id
+      );
+
+      if (!guildSettings) {
+        await interaction.reply({
+          content: msgIn.verificationNotConfigured,
+          flags: MessageFlags.Ephemeral,
+        });
+        return true;
+      }
+
+      const staffCategory = await interaction.guild.channels
+        .fetch(guildSettings.staff_category_id)
+        .catch(() => null);
+
+      if (!staffCategory || staffCategory.type !== ChannelType.GuildCategory) {
+        await interaction.reply({
+          content: msgIn.configuredStaffCategoryNotFound,
+          flags: MessageFlags.Ephemeral,
+        });
+        return true;
+      }
+
+      const verificationChannel = await interaction.guild.channels.create({
+        name: `verification-${member.user.username}`
+          .toLowerCase()
+          .replace(/[^a-z0-9-]/g, "")
+          .slice(0, 90),
+        type: ChannelType.GuildText,
+        parent: staffCategory.id,
+        permissionOverwrites: [
+          {
+            id: interaction.guild.roles.everyone.id,
+            deny: [PermissionFlagsBits.ViewChannel],
+          },
+          {
+            id: guildSettings.staff_role_id,
+            allow: [
+              PermissionFlagsBits.ViewChannel,
+              PermissionFlagsBits.SendMessages,
+              PermissionFlagsBits.ReadMessageHistory,
+            ],
+          },
+          {
+            id: deps.client.user!.id,
+            allow: [
+              PermissionFlagsBits.ViewChannel,
+              PermissionFlagsBits.SendMessages,
+              PermissionFlagsBits.ReadMessageHistory,
+              PermissionFlagsBits.ManageChannels,
+              PermissionFlagsBits.MentionEveryone,
+            ],
+          },
+        ],
+      });
+
+      let content =
+        `${msgServer.newVerificationRequest}\n\n` +
+        `**${msgServer.memberLabel}:** <@${member.id}>\n` +
+        `**${msgServer.tagLabel}:** ${member.user.tag}\n` +
+        `**${msgServer.accountCreatedOnLabel}:** <t:${createdTimestamp}:F>\n` +
+        `**${msgServer.accountAgeLabel}:** ${accountAgeText}\n\n`;
+
+      for (const question of questions) {
+        if (
+          question.question_type === "text_short" ||
+          question.question_type === "text_paragraph"
+        ) {
+          const answer = interaction.fields.getTextInputValue(question.question_key).trim();
+          content += `**${question.question_label}:** ${answer}\n`;
+          continue;
+        }
+
+        if (question.question_type === "file_image") {
+          const files = interaction.fields.getUploadedFiles(
+            question.question_key,
+            question.required === 1
+          );
+
+          const file = files?.first();
+
+          if (file) {
+            content += `**${question.question_label}:** ${file.url}\n`;
+          } else {
+            content += `**${question.question_label}:** ${msgServer.noFileProvided}\n`;
+          }
+        }
+      }
+
+
+      content += `\n${msgServer.verificationWaiting(guildSettings.staff_role_id)}`;
+
+      // ── MESSAGE 1 : réponses de vérification ──────────────────────────
+      await (verificationChannel as TextChannel).send({
+        content,
+        components: [deps.buildDecisionButtonsRow(member.id, msgServer)],
+      });
+
+      // ── MESSAGE 2 : statut blacklist ──────────────────────────────────
+      const blacklistedEverywhere = deps.getBlacklistedUsersEverywhereStmt.all(member.id);
+
+      let statusContent: string;
+
+      if (blacklistedEverywhere.length === 0) {
+        statusContent = "";
+      } else {
+        const lines = await Promise.all(
+          blacklistedEverywhere.map(async (entry: any) => {
+            const guild = await deps.client.guilds.fetch(entry.guild_id).catch(() => null);
+            const moderator = entry.blacklisted_by
+              ? await deps.client.users.fetch(entry.blacklisted_by).catch(() => null)
+              : null;
+
+            const guildDisplay = guild
+              ? `${guild.name} (${entry.guild_id})`
+              : `${msgServer.unknownServer} (${entry.guild_id})`;
+
+            const moderatorDisplay = moderator
+              ? `@${moderator.username}`
+              : entry.blacklisted_by ?? msgServer.noReasonProvided;
+
+            const timestamp = Math.floor(new Date(entry.blacklisted_at).getTime() / 1000);
+
+            return [
+              `• ${guildDisplay}`,
+              `  📅 <t:${timestamp}:f>`,
+              `  👮 ${msgServer.by} : ${moderatorDisplay}`,
+              `  📝 ${msgServer.reason} : ${entry.reason ?? msgServer.noReasonProvided}`,
+            ].join("\n");
+          })
+        );
+
+        statusContent = msgServer.checkMemberBlacklistedOn(lines.join("\n\n"));
+        // ex: "⛔ Cet utilisateur est blacklisté sur :\n\n{lines}"
+      }
+
+      await (verificationChannel as TextChannel).send({
+        content: statusContent,
+      });
+
+      await interaction.reply({
+        content: msgIn.verificationRequestSent,
+        flags: MessageFlags.Ephemeral,
+      });
+
+      return true;
     }
-
-    await (verificationChannel as TextChannel).send({
-      content: statusContent,
-    });
-
-    await interaction.reply({
-      content: msgIn.verificationRequestSent,
-      flags: MessageFlags.Ephemeral,
-    });
-
-    return true;
+    finally {
+      pendingVerifications.delete(member.id);
+    }
   }
 
   return false;

@@ -430,6 +430,7 @@ const pl_server = {
   checkMemberBlacklistedOn: (lines: string) => `⛔ Użytkownik na czarnej liście na:\n\n${lines}`,
   by: "Przez",
   reason: "Powód",
+  verificationAlreadyInProgress: "⏳ Twoja weryfikacja jest już przetwarzana przez staff.",
 };
 
 const pl_internal = {

@@ -338,6 +338,7 @@ ${roleMsgDeleteText}
   unknownServer: "Unknown server",
   by: "By",
   reason: "Reason",
+  verificationAlreadyInProgress: "⏳ Your verification is already being processed by the staff.",
 };
 
 const en_out = {

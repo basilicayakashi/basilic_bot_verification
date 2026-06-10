@@ -338,6 +338,7 @@ ${roleMsgDeleteText}
   unknownServer: "Servidor desconocido",
   by: "Por",
   reason: "Razón",
+  verificationAlreadyInProgress: "⏳ Tu verificación ya está siendo procesada por el staff.",
 };
 
 const es_out = {
@@ -428,7 +429,6 @@ const es_server = {
   checkMemberBlacklistedOn: (lines: string) => `⛔ Usuario en lista negra en:\n\n${lines}`,
   by: "Por",
   reason: "Razón",
-  verificationAlreadyInProgress: "⏳ Tu verificación ya está siendo procesada por el staff.",
 };
 
 const es_internal = {

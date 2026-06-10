@@ -1,4 +1,6 @@
-const pl_in = {
+import type { MessagesIn, MessagesOut, MessagesServer, MessagesInternal } from "./messages.types.js";
+
+const pl_in: MessagesIn = {
   helpMessage: `
 # 🤖 Przewodnik konfiguracji bota
 
@@ -347,9 +349,27 @@ ${roleMsgDeleteText}
   by: "Przez",
   reason: "Powód",
   verificationAlreadyInProgress: "⏳ Twoja weryfikacja jest już przetwarzana przez staff.",
+  allowManageQuestionsDescription: "Zezwól użytkownikowi na zarządzanie pytaniami weryfikacyjnymi dla danego serwera",
+  choiceLongText: "Długi tekst",
+  verificationTimeoutHoursDescription: "Limit czasu w godzinach na przesłanie odpowiedzi weryfikacyjnych",
+  spamDetectionDisabledOptionDescription: "Wyłącz wykrywanie spamu",
+  spamAlertRoleDescription: "Rola staff do wspomnienia w alertach spamowych",
+  questionAdded: "Pytanie dodane.",
+  questionDeleted: "Pytanie usunięte.",
+  questionUpdated: "Pytanie zaktualizowane.",
+  noQuestionsToDelete: "Brak pytań do usunięcia.",
+  noQuestionsToEdit: "Brak pytań do edycji.",
+  invalidQuestionIndex: "Nieprawidłowy indeks pytania.",
+  verificationSettingsNotConfigured: "Ustawienia weryfikacji nie są skonfigurowane.",
+  blacklistReasonRequired: "Wymagany jest powód dla czarnej listy.",
+  memberNotFound: "Nie znaleziono członka.",
+  memberAlreadyBlacklisted: "Ten członek jest już na czarnej liście.",
+  memberBlacklistRemoved: "Członek usunięty z czarnej listy.",
+  memberNotBlacklisted: "Ten członek nie jest na czarnej liście.",
+  spamDetectionSaved: "Ustawienia wykrywania spamu zapisane.",
 };
 
-const pl_out = {
+const pl_out: MessagesOut = {
   YourVerifiedStatusRestored: (g: string) => `Twoja weryfikacja na **${g}** została przywrócona.`,
   YourVerifiedStatusAccepted: (g: string) => `Twoja weryfikacja na **${g}** została zaakceptowana.`,
   YourVerifiedStatusDenied: (g: string) => `Twoja weryfikacja na **${g}** została odrzucona.`,
@@ -360,7 +380,7 @@ const pl_out = {
   verificationTimeoutDM: (guildName: string) => `Zostałeś wyrzucony z serwera **${guildName}**, ponieważ nie ukończyłeś weryfikacji na czas.`,
 };
 
-const pl_server = {
+const pl_server: MessagesServer = {
   startVerificationButton: "Rozpocznij weryfikację",
   startVerificationMessage: "Kliknij, aby rozpocząć.",
   approveButton: "Zatwierdź",
@@ -433,7 +453,7 @@ const pl_server = {
   reason: "Powód",
 };
 
-const pl_internal = {
+const pl_internal: MessagesInternal = {
   kickReasonBlacklistedStart: "Zablokowany użytkownik próbował weryfikacji",
   kickReasonAuto: "Auto kick (blacklist)",
   kickReasonDenied: "Odrzucony przez admina",

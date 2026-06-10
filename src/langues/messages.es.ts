@@ -1,4 +1,6 @@
-const es_in = {
+import type { MessagesIn, MessagesOut, MessagesServer, MessagesInternal } from "./messages.types.js";
+
+const es_in: MessagesIn = {
   helpMessage: `
 # 🤖 Guía de configuración del bot
 
@@ -339,9 +341,27 @@ ${roleMsgDeleteText}
   by: "Por",
   reason: "Razón",
   verificationAlreadyInProgress: "⏳ Tu verificación ya está siendo procesada por el staff.",
+  allowManageQuestionsDescription: "Permitir a un usuario gestionar las preguntas de verificación de un servidor",
+  choiceLongText: "Texto largo",
+  verificationTimeoutHoursDescription: "Tiempo límite en horas para enviar las respuestas de verificación",
+  spamDetectionDisabledOptionDescription: "Desactivar la detección de spam",
+  spamAlertRoleDescription: "Rol de staff a mencionar en las alertas de spam",
+  questionAdded: "Pregunta añadida.",
+  questionDeleted: "Pregunta eliminada.",
+  questionUpdated: "Pregunta actualizada.",
+  noQuestionsToDelete: "No hay preguntas para eliminar.",
+  noQuestionsToEdit: "No hay preguntas para editar.",
+  invalidQuestionIndex: "Índice de pregunta inválido.",
+  verificationSettingsNotConfigured: "La configuración de verificación no está configurada.",
+  blacklistReasonRequired: "Se requiere un motivo para la lista negra.",
+  memberNotFound: "Miembro no encontrado.",
+  memberAlreadyBlacklisted: "Este miembro ya está en la lista negra.",
+  memberBlacklistRemoved: "Miembro eliminado de la lista negra.",
+  memberNotBlacklisted: "Este miembro no está en la lista negra.",
+  spamDetectionSaved: "Configuración de detección de spam guardada.",
 };
 
-const es_out = {
+const es_out: MessagesOut = {
   YourVerifiedStatusRestored: (guild_name: string) => `Hola, tu estado verificado en **${guild_name}** ha sido restaurado automáticamente.`,
   YourVerifiedStatusAccepted: (guild_name: string) => `Hola, tu verificación en **${guild_name}** ha sido aceptada. El rol @verified te ha sido asignado.`,
   YourVerifiedStatusDenied: (guild_name: string) => `Hola, tu solicitud de verificación en **${guild_name}** ha sido rechazada.`,
@@ -352,7 +372,7 @@ const es_out = {
   verificationTimeoutDM: (guildName: string) => `Has sido expulsado de **${guildName}** porque no completaste la verificación a tiempo.`,
 };
 
-const es_server = {
+const es_server: MessagesServer = {
   startVerificationButton: "Iniciar verificación",
   startVerificationMessage: "Haz clic en el botón de abajo para comenzar tu verificación.",
 
@@ -431,7 +451,7 @@ const es_server = {
   reason: "Razón",
 };
 
-const es_internal = {
+const es_internal: MessagesInternal = {
   kickReasonBlacklistedStart: "Usuario en lista negra intentó iniciar la verificación",
   kickReasonAuto: "Usuario en lista negra expulsado automáticamente al entrar",
   kickReasonDenied: "Verificación rechazada por el staff",
@@ -442,8 +462,8 @@ const es_internal = {
   globalKickRequestedBy: (staffTag: string) => `Expulsión global solicitada por ${staffTag}`,
   kickReasonBlacklistedWithReason: (reason: string) => `Incluido en la lista negra durante la verificación: ${reason}`,
   kickReasonDeniedWithReason: (reason: string) => `Verificación rechazada: ${reason}`,
-  spamDuplicateText: (n: number) => `Texto idéntico enviado ${n} veces`,
-  spamChannelsTouched: (n: number) => `Canales afectados: ${n}`,
+  //spamDuplicateText: (n: number) => `Texto idéntico enviado ${n} veces`,
+  //spamChannelsTouched: (n: number) => `Canales afectados: ${n}`,
   verificationTimeoutKickReason: "Tiempo de verificación excedido",
   verificationChannelClosed: "Decisión de verificación finalizada",
   blacklistKickReason: (moderatorTag: string, reason?: string) => `Incluido en la lista negra por ${moderatorTag}${reason ? ` | Motivo: ${reason}` : ""}`,

@@ -1,4 +1,6 @@
-const de_in = {
+import type { MessagesIn, MessagesOut, MessagesServer, MessagesInternal } from "./messages.types.js";
+
+const de_in: MessagesIn = {
   helpMessage: `
 # 🤖 Bot-Einrichtungsanleitung
 
@@ -340,9 +342,27 @@ ${roleMsgDeleteText}
   by: "Von",
   reason: "Grund",
   verificationAlreadyInProgress: "⏳ Deine Verifizierung wird bereits vom Staff bearbeitet.",
+  allowManageQuestionsDescription: "Einem Benutzer erlauben, die Verifizierungsfragen für einen bestimmten Server zu verwalten",
+  choiceLongText: "Langer Text",
+  verificationTimeoutHoursDescription: "Zeitlimit in Stunden für die Einreichung der Verifizierungsantworten",
+  spamDetectionDisabledOptionDescription: "Spam-Erkennung deaktivieren",
+  spamAlertRoleDescription: "Staff-Rolle, die in Spam-Warnungen erwähnt werden soll",
+  questionAdded: "Frage hinzugefügt.",
+  questionDeleted: "Frage gelöscht.",
+  questionUpdated: "Frage aktualisiert.",
+  noQuestionsToDelete: "Keine Fragen zum Löschen vorhanden.",
+  noQuestionsToEdit: "Keine Fragen zum Bearbeiten vorhanden.",
+  invalidQuestionIndex: "Ungültiger Frageindex.",
+  verificationSettingsNotConfigured: "Die Verifizierungseinstellungen sind nicht konfiguriert.",
+  blacklistReasonRequired: "Ein Grund für die Blacklist ist erforderlich.",
+  memberNotFound: "Mitglied nicht gefunden.",
+  memberAlreadyBlacklisted: "Dieses Mitglied steht bereits auf der Blacklist.",
+  memberBlacklistRemoved: "Mitglied von der Blacklist entfernt.",
+  memberNotBlacklisted: "Dieses Mitglied steht nicht auf der Blacklist.",
+  spamDetectionSaved: "Spam-Erkennungseinstellungen gespeichert.",
 };
 
-const de_out = {
+const de_out: MessagesOut = {
   YourVerifiedStatusRestored: (guild_name: string) => `Hallo, dein verifizierter Status auf **${guild_name}** wurde automatisch wiederhergestellt.`,
   YourVerifiedStatusAccepted: (guild_name: string) => `Hallo, deine Verifizierung auf **${guild_name}** wurde akzeptiert. Die Rolle @verified wurde dir zugewiesen.`,
   YourVerifiedStatusDenied: (guild_name: string) => `Hallo, deine Verifizierungsanfrage auf **${guild_name}** wurde abgelehnt.`,
@@ -353,7 +373,7 @@ const de_out = {
   verificationTimeoutDM: (guildName: string) => `Du wurdest von **${guildName}** entfernt, da du die Verifizierung nicht rechtzeitig abgeschlossen hast.`,
 };
 
-const de_server = {
+const de_server: MessagesServer = {
   startVerificationButton: "Verifizierung starten",
   startVerificationMessage: "Klicke auf den Button unten, um deine Verifizierung zu starten.",
 
@@ -432,7 +452,7 @@ const de_server = {
   reason: "Grund",
 };
 
-const de_internal = {
+const de_internal: MessagesInternal = {
   kickReasonBlacklistedStart: "Gesperrter Benutzer hat versucht, die Verifizierung zu starten",
   kickReasonAuto: "Gesperrter Benutzer beim Beitritt automatisch gekickt",
   kickReasonDenied: "Verifizierung vom Team abgelehnt",

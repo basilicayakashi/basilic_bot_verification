@@ -1,4 +1,6 @@
-const en_in = {
+import type { MessagesIn, MessagesOut, MessagesServer, MessagesInternal } from "./messages.types.js";
+
+const en_in: MessagesIn = {
   helpMessage: `
 # 🤖 Bot setup guide
 
@@ -339,9 +341,27 @@ ${roleMsgDeleteText}
   by: "By",
   reason: "Reason",
   verificationAlreadyInProgress: "⏳ Your verification is already being processed by the staff.",
+  allowManageQuestionsDescription: "Allow a user to manage verification questions for a specific server",
+  choiceLongText: "Long text",
+  verificationTimeoutHoursDescription: "Time limit in hours to submit verification answers",
+  spamDetectionDisabledOptionDescription: "Disable spam detection",
+  spamAlertRoleDescription: "Staff role to mention in spam alerts",
+  questionAdded: "Question added.",
+  questionDeleted: "Question deleted.",
+  questionUpdated: "Question updated.",
+  noQuestionsToDelete: "No questions to delete.",
+  noQuestionsToEdit: "No questions to edit.",
+  invalidQuestionIndex: "Invalid question index.",
+  verificationSettingsNotConfigured: "Verification settings are not configured.",
+  blacklistReasonRequired: "A blacklist reason is required.",
+  memberNotFound: "Member not found.",
+  memberAlreadyBlacklisted: "This member is already blacklisted.",
+  memberBlacklistRemoved: "Member removed from blacklist.",
+  memberNotBlacklisted: "This member is not blacklisted.",
+  spamDetectionSaved: "Spam detection settings saved.",
 };
 
-const en_out = {
+const en_out: MessagesOut = {
   YourVerifiedStatusRestored: (guild_name: string) => `Hello, your verified status on **${guild_name}** has been automatically restored.`,
   YourVerifiedStatusAccepted: (guild_name: string) => `Hello, your verification on **${guild_name}** has been accepted. The @verified role has been assigned to you.`,
   YourVerifiedStatusDenied: (guild_name: string) => `Hello, your verification request on **${guild_name}** has been denied.`,
@@ -352,7 +372,7 @@ const en_out = {
   verificationTimeoutDM: (guildName: string) => `You have been kicked from **${guildName}** because you did not complete the verification in time.`,
 };
 
-const en_server = {
+const en_server: MessagesServer = {
   startVerificationButton: "Start verification",
   startVerificationMessage: "Click the button below to start your verification.",
 
@@ -431,7 +451,7 @@ const en_server = {
   reason: "Reason",
 };
 
-const en_internal = {
+const en_internal: MessagesInternal = {
   kickReasonBlacklistedStart: "Blacklisted user attempted to start verification",
   kickReasonAuto: "Blacklisted user auto-kicked on join",
   kickReasonDenied: "Verification denied by staff",

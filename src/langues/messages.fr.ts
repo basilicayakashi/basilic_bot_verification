@@ -1,4 +1,6 @@
-const fr_in = {
+import type { MessagesIn, MessagesOut, MessagesServer, MessagesInternal } from "./messages.types.js";
+
+const fr_in: MessagesIn = {
   helpMessage: `
 # 🤖 Guide de configuration du bot
 
@@ -344,9 +346,27 @@ ${roleMsgDeleteText}
   by: "Par",
   reason: "Raison",
   verificationAlreadyInProgress: "⏳ Ta vérification est déjà en cours de traitement par le staff.",
+  allowManageQuestionsDescription: "Permettre à un utilisateur de gérer les questions de vérification pour un serveur donné",
+  choiceLongText: "Texte long",
+  verificationTimeoutHoursDescription: "Délai en heures pour soumettre les réponses de vérification",
+  spamDetectionDisabledOptionDescription: "Désactiver la détection de spam",
+  spamAlertRoleDescription: "Rôle staff à mentionner dans les alertes spam",
+  questionAdded: "Question ajoutée.",
+  questionDeleted: "Question supprimée.",
+  questionUpdated: "Question mise à jour.",
+  noQuestionsToDelete: "Aucune question à supprimer.",
+  noQuestionsToEdit: "Aucune question à modifier.",
+  invalidQuestionIndex: "Index de question invalide.",
+  verificationSettingsNotConfigured: "Les paramètres de vérification ne sont pas configurés.",
+  blacklistReasonRequired: "Une raison de blacklist est requise.",
+  memberNotFound: "Membre introuvable.",
+  memberAlreadyBlacklisted: "Ce membre est déjà blacklisté.",
+  memberBlacklistRemoved: "Membre retiré de la blacklist.",
+  memberNotBlacklisted: "Ce membre n'est pas blacklisté.",
+  spamDetectionSaved: "Paramètres de détection de spam sauvegardés.",
 };
 
-const fr_out = {
+const fr_out: MessagesOut = {
   YourVerifiedStatusRestored: (guild_name: string) => `Bonjour, votre statut vérifié sur **${guild_name}** a été automatiquement restauré.`,
   YourVerifiedStatusAccepted: (guild_name: string) => `Bonjour, votre vérification sur **${guild_name}** a été acceptée. Le rôle @verified vous a été attribué.`,
   YourVerifiedStatusDenied: (guild_name: string) => `Bonjour, votre demande de vérification sur **${guild_name}** a été refusée.`,
@@ -357,7 +377,7 @@ const fr_out = {
   verificationTimeoutDM: (guildName: string) => `Vous avez été expulsé du serveur **${guildName}** car vous n’avez pas complété la vérification à temps.`,
 };
 
-const fr_server = {
+const fr_server: MessagesServer = {
   startVerificationButton: "Commencer la vérification",
   startVerificationMessage: "Cliquez sur le bouton ci-dessous pour commencer votre vérification.",
 
@@ -436,7 +456,7 @@ const fr_server = {
   reason: "Raison",
 };
 
-const fr_internal = {
+const fr_internal: MessagesInternal = {
   kickReasonBlacklistedStart: "Utilisateur blacklisté ayant tenté une vérification",
   kickReasonAuto: "Utilisateur blacklisté expulsé automatiquement à l'arrivée",
   kickReasonDenied: "Vérification refusée par le staff",

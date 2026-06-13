@@ -745,7 +745,11 @@ export const commands = [
         )
     )
     .addStringOption((o) =>
-      o.setName("name").setDescription("Nom de la catégorie").setRequired(true)
+      o
+        .setName("name")
+        .setDescription("Nom de la catégorie")
+        .setRequired(true)
+        .setAutocomplete(true)
     )
     .addStringOption((o) =>
       o
@@ -813,6 +817,10 @@ export const commands = [
         .setDescription("Salon où publier le panel")
         .setRequired(true)
     ),
+  new SlashCommandBuilder()
+    .setName("role-category-list")
+    .setDescription("Lister les catégories de reaction roles et leurs rôles")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -1486,6 +1494,25 @@ client.on(Events.InteractionCreate, async (interaction) => {
     // =========================================
     // 1) COMMANDES SLASH
     // =========================================
+    if (interaction.isAutocomplete()) {
+      const focusedOption = interaction.options.getFocused(true);
+
+      if (focusedOption.name === "categorie") {
+        const guildId = interaction.guildId!;
+        const categories = getReactionRoleCategoriesStmt.all(guildId) as ReactionRoleCategoryRow[];
+
+        const filtered = categories.filter((c) =>
+          c.name.toLowerCase().startsWith(focusedOption.value.toLowerCase())
+        );
+
+        await interaction.respond(
+          filtered.slice(0, 25).map((c) => ({ name: c.name, value: c.name }))
+        );
+      }
+
+      return;
+    }
+
     if (interaction.isChatInputCommand()) {
 
       //on veut que les commandes soient utilisées sur un serveur, pas en MP
@@ -2558,6 +2585,38 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
         await interaction.editReply({ content: `Panel **${categoryName}** publié dans ${channel}.` });
+      }
+
+      if (interaction.commandName === "role-category-list") {
+        const guildId = interaction.guildId!;
+        const categories = getReactionRoleCategoriesStmt.all(guildId) as ReactionRoleCategoryRow[];
+
+        if (categories.length === 0) {
+          await interaction.reply({ content: "Aucune catégorie configurée sur ce serveur.", ephemeral: true });
+          return;
+        }
+
+        const embed = new EmbedBuilder().setTitle("Catégories de reaction roles");
+
+        for (const category of categories) {
+          const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+
+          const rolesText = entries.length > 0
+            ? entries.map((e) => `${e.emoji} <@&${e.role_id}> — ${e.description}`).join("\n")
+            : "*Aucun rôle*";
+
+          const panelText = panel
+            ? `\n📌 Panel publié dans <#${panel.channel_id}>`
+            : "\n*(panel non publié)*";
+
+          embed.addFields({
+            name: `📂 ${category.name}`,
+            value: rolesText + panelText,
+          });
+        }
+
+        await interaction.reply({ embeds: [embed], ephemeral: true });
       }
     }
 

@@ -185,6 +185,38 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS reaction_role_categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    UNIQUE(guild_id, name)
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS reaction_role_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category_id INTEGER NOT NULL,
+    role_id TEXT NOT NULL,
+    description TEXT NOT NULL,
+    emoji TEXT NOT NULL,
+    UNIQUE(category_id, role_id),
+    FOREIGN KEY(category_id) REFERENCES reaction_role_categories(id) ON DELETE CASCADE
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS reaction_role_panels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category_id INTEGER NOT NULL UNIQUE,
+    guild_id TEXT NOT NULL,
+    channel_id TEXT NOT NULL,
+    message_id TEXT NOT NULL,
+    FOREIGN KEY(category_id) REFERENCES reaction_role_categories(id) ON DELETE CASCADE
+  );
+`);
+
 export const getAllFreeGamesStmt = db.prepare(`
   SELECT *
   FROM free_games
@@ -439,6 +471,108 @@ export const upsertGuildRoleMessageDeleteSettingsStmt = db.prepare(`
     updated_at = excluded.updated_at
 `);
 
+export const insertRolePanelStmt = db.prepare(`
+  INSERT INTO role_panels (guild_id, channel_id, title, description, created_by)
+  VALUES (?, ?, ?, ?, ?)
+`);
+
+export const updateRolePanelMessageIdStmt = db.prepare(`
+  UPDATE role_panels SET message_id = ? WHERE id = ?
+`);
+
+export const getRolePanelStmt = db.prepare(`
+  SELECT * FROM role_panels WHERE id = ?
+`);
+
+export const getRolePanelByMessageIdStmt = db.prepare(`
+  SELECT * FROM role_panels WHERE message_id = ?
+`);
+
+export const getRolePanelsByGuildStmt = db.prepare(`
+  SELECT * FROM role_panels WHERE guild_id = ? ORDER BY id DESC
+`);
+
+export const deleteRolePanelStmt = db.prepare(`
+  DELETE FROM role_panels WHERE id = ?
+`);
+
+export const insertRolePanelOptionStmt = db.prepare(`
+  INSERT INTO role_panel_options (panel_id, role_id, label, emoji, button_style, position)
+  VALUES (?, ?, ?, ?, ?, ?)
+`);
+
+export const getRolePanelOptionsStmt = db.prepare(`
+  SELECT * FROM role_panel_options WHERE panel_id = ? ORDER BY position ASC
+`);
+
+export const deleteRolePanelOptionsStmt = db.prepare(`
+  DELETE FROM role_panel_options WHERE panel_id = ?
+`);
+
+export const insertReactionRoleCategoryStmt = db.prepare(`
+  INSERT INTO reaction_role_categories (guild_id, name) VALUES (?, ?)
+`);
+
+export const updateReactionRoleCategoryStmt = db.prepare(`
+  UPDATE reaction_role_categories SET name = ? WHERE guild_id = ? AND name = ?
+`);
+
+export const deleteReactionRoleCategoryStmt = db.prepare(`
+  DELETE FROM reaction_role_categories WHERE guild_id = ? AND name = ?
+`);
+
+export const getReactionRoleCategoryStmt = db.prepare(`
+  SELECT * FROM reaction_role_categories WHERE guild_id = ? AND name = ?
+`);
+
+export const getReactionRoleCategoriesStmt = db.prepare(`
+  SELECT * FROM reaction_role_categories WHERE guild_id = ? ORDER BY name ASC
+`);
+
+// Statements — entrées
+export const insertReactionRoleEntryStmt = db.prepare(`
+  INSERT INTO reaction_role_entries (category_id, role_id, description, emoji)
+  VALUES (?, ?, ?, ?)
+`);
+
+export const updateReactionRoleEntryStmt = db.prepare(`
+  UPDATE reaction_role_entries
+  SET description = COALESCE(?, description),
+      emoji = COALESCE(?, emoji),
+      role_id = COALESCE(?, role_id)
+  WHERE category_id = ? AND role_id = ?
+`);
+
+export const deleteReactionRoleEntryStmt = db.prepare(`
+  DELETE FROM reaction_role_entries WHERE category_id = ? AND role_id = ?
+`);
+
+export const getReactionRoleEntriesStmt = db.prepare(`
+  SELECT * FROM reaction_role_entries WHERE category_id = ? ORDER BY id ASC
+`);
+
+export const getReactionRoleEntryByEmojiStmt = db.prepare(`
+  SELECT * FROM reaction_role_entries WHERE category_id = ? AND emoji = ?
+`);
+
+// Statements — panels
+export const insertReactionRolePanelStmt = db.prepare(`
+  INSERT OR REPLACE INTO reaction_role_panels (category_id, guild_id, channel_id, message_id)
+  VALUES (?, ?, ?, ?)
+`);
+
+export const getReactionRolePanelByCategoryStmt = db.prepare(`
+  SELECT * FROM reaction_role_panels WHERE category_id = ?
+`);
+
+export const getReactionRolePanelByMessageIdStmt = db.prepare(`
+  SELECT * FROM reaction_role_panels WHERE message_id = ?
+`);
+
+export const deleteReactionRolePanelStmt = db.prepare(`
+  DELETE FROM reaction_role_panels WHERE category_id = ?
+`);
+
 export type VerifiedUserRow = {
   user_id: string;
   username: string;
@@ -523,3 +657,46 @@ export type GuildRoleMessageDeleteSettingsRow = {
   updated_by: string;
   updated_at: string;
 }
+
+export type RolePanelRow = {
+  id: number;
+  guild_id: string;
+  channel_id: string;
+  message_id: string | null;
+  title: string;
+  description: string | null;
+  created_by: string;
+  created_at: string;
+};
+
+export type RolePanelOptionRow = {
+  id: number;
+  panel_id: number;
+  role_id: string;
+  label: string;
+  emoji: string | null;
+  button_style: string;
+  position: number;
+};
+
+export type ReactionRoleCategoryRow = {
+  id: number;
+  guild_id: string;
+  name: string;
+};
+
+export type ReactionRoleEntryRow = {
+  id: number;
+  category_id: number;
+  role_id: string;
+  description: string;
+  emoji: string;
+};
+
+export type ReactionRolePanelRow = {
+  id: number;
+  category_id: number;
+  guild_id: string;
+  channel_id: string;
+  message_id: string;
+};

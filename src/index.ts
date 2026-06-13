@@ -65,6 +65,21 @@ import {
   getGuildRoleMessageDeleteSettingsStmt,
   upsertGuildRoleMessageDeleteSettingsStmt,
   GuildRoleMessageDeleteSettingsRow,
+  getReactionRoleEntriesStmt,
+  ReactionRoleEntryRow,
+  getReactionRolePanelByCategoryStmt,
+  insertReactionRolePanelStmt,
+  ReactionRoleCategoryRow,
+  ReactionRolePanelRow,
+  getReactionRoleCategoriesStmt,
+  getReactionRoleCategoryStmt,
+  updateReactionRoleCategoryStmt,
+  insertReactionRoleCategoryStmt,
+  updateReactionRoleEntryStmt,
+  insertReactionRoleEntryStmt,
+  deleteReactionRoleEntryStmt,
+  getReactionRolePanelByMessageIdStmt,
+  deleteReactionRoleCategoryStmt,
 } from "./database/sql.js";
 
 import type {
@@ -77,6 +92,13 @@ import type {
   GuildSpamSettingsRow,
   GuildWelcomeMessageRow,
 } from "./database/sql.js";
+
+import {
+  publishOrUpdatePanel,
+  handleReactionAdd,
+  handleReactionRemove,
+}
+from "./reaction-roles/role-panels.js";
 
 import { handleVerificationButtons, handleVerificationModals } from "./moderation/verification-flow.js";
 
@@ -104,8 +126,14 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessageReactions,
   ],
-  partials: [Partials.GuildMember],
+  partials: [
+    Partials.GuildMember,
+    Partials.Message,
+    Partials.Reaction,
+    Partials.User,
+  ],
 });
 
 const spamAlertService = new SpamAlertService({
@@ -699,6 +727,90 @@ export const commands = [
         .setName("role_5")
         .setDescription("Fifth role that will trigger message deletion")
         .setRequired(false)
+    ),
+  new SlashCommandBuilder()
+    .setName("role-category")
+    .setDescription("Gérer les catégories de reaction roles")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addStringOption((o) =>
+      o
+        .setName("action")
+        .setDescription("Action à effectuer")
+        .setRequired(true)
+        .addChoices(
+          { name: "create", value: "create" },
+          { name: "update", value: "update" },
+          { name: "delete", value: "delete" }
+        )
+    )
+    .addStringOption((o) =>
+      o.setName("name").setDescription("Nom de la catégorie").setRequired(true)
+    )
+    .addStringOption((o) =>
+      o
+        .setName("new_name")
+        .setDescription("Nouveau nom (pour action update)")
+        .setRequired(false)
+    ),
+  new SlashCommandBuilder()
+    .setName("role-manage")
+    .setDescription("Gérer les rôles d'une catégorie de reaction roles")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addStringOption((o) =>
+      o
+        .setName("action")
+        .setDescription("Action à effectuer")
+        .setRequired(true)
+        .addChoices(
+          { name: "add", value: "add" },
+          { name: "update", value: "update" },
+          { name: "delete", value: "delete" }
+        )
+    )
+    .addStringOption((o) =>
+      o
+        .setName("categorie")
+        .setDescription("Nom de la catégorie")
+        .setRequired(true)
+    )
+    .addRoleOption((o) =>
+      o.setName("role").setDescription("Rôle concerné").setRequired(true)
+    )
+    .addStringOption((o) =>
+      o
+        .setName("description")
+        .setDescription("Description affichée aux membres")
+        .setRequired(false)
+    )
+    .addStringOption((o) =>
+      o
+        .setName("emoji")
+        .setDescription("Emoji associé (ex: 🦊 ou <:custom:123456>)")
+        .setRequired(false)
+    )
+    .addRoleOption((o) =>
+      o
+        .setName("new_role")
+        .setDescription("Nouveau rôle (pour action update)")
+        .setRequired(false)
+    ),
+
+  // /role-create
+  new SlashCommandBuilder()
+    .setName("role-create")
+    .setDescription("Publier le panel de reaction roles d'une catégorie")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addStringOption((o) =>
+      o
+        .setName("categorie")
+        .setDescription("Nom de la catégorie")
+        .setRequired(true)
+    )
+    .addChannelOption((o) =>
+      o
+        .setName("channel")
+        .setDescription("Salon où publier le panel")
+        .setRequired(true)
     ),
 ].map((command) => command.toJSON());
 
@@ -2299,6 +2411,135 @@ client.on(Events.InteractionCreate, async (interaction) => {
         return;
       }
 
+      if (interaction.commandName === "role-category") {
+        const action = interaction.options.getString("action", true);
+        const name = interaction.options.getString("name", true);
+        const guildId = interaction.guildId!;
+
+        if (action === "create") {
+          const existing = getReactionRoleCategoryStmt.get(guildId, name);
+          if (existing) {
+            await interaction.reply({ content: `La catégorie **${name}** existe déjà.`, ephemeral: true });
+            return;
+          }
+          insertReactionRoleCategoryStmt.run(guildId, name);
+          await interaction.reply({ content: `Catégorie **${name}** créée.`, ephemeral: true });
+
+        } else if (action === "update") {
+          const newName = interaction.options.getString("new_name");
+          if (!newName) {
+            await interaction.reply({ content: "Paramètre `new_name` requis pour update.", ephemeral: true });
+            return;
+          }
+          const result = updateReactionRoleCategoryStmt.run(newName, guildId, name);
+          if (result.changes === 0) {
+            await interaction.reply({ content: `Catégorie **${name}** introuvable.`, ephemeral: true });
+            return;
+          }
+          await interaction.reply({ content: `Catégorie renommée **${name}** → **${newName}**.`, ephemeral: true });
+
+        } else if (action === "delete") {
+          const category = getReactionRoleCategoryStmt.get(guildId, name) as ReactionRoleCategoryRow | undefined;
+          if (!category) {
+            await interaction.reply({ content: `Catégorie **${name}** introuvable.`, ephemeral: true });
+            return;
+          }
+
+          // Supprimer le message de panel si existant
+          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+          if (panel) {
+            try {
+              const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
+              const message = channel ? await channel.messages.fetch(panel.message_id) : null;
+              if (message) await message.delete();
+            } catch { /* message déjà supprimé */ }
+          }
+
+          // Supprime la catégorie (CASCADE supprime entries + panel en DB)
+          deleteReactionRoleCategoryStmt.run(guildId, name);
+          await interaction.reply({ content: `Catégorie **${name}** et tous ses rôles supprimés.`, ephemeral: true });
+        }
+      }
+
+      if (interaction.commandName === "role-manage") {
+        const action = interaction.options.getString("action", true);
+        const categoryName = interaction.options.getString("categorie", true);
+        const role = interaction.options.getRole("role", true);
+        const guildId = interaction.guildId!;
+
+        const category = getReactionRoleCategoryStmt.get(guildId, categoryName) as ReactionRoleCategoryRow | undefined;
+        if (!category) {
+          await interaction.reply({ content: `Catégorie **${categoryName}** introuvable.`, ephemeral: true });
+          return;
+        }
+
+        if (action === "add") {
+          const description = interaction.options.getString("description");
+          const emoji = interaction.options.getString("emoji");
+          if (!description || !emoji) {
+            await interaction.reply({ content: "`description` et `emoji` sont requis pour add.", ephemeral: true });
+            return;
+          }
+          insertReactionRoleEntryStmt.run(category.id, role.id, description, emoji);
+
+          // Mettre à jour le panel existant si publié
+          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+          if (panel) {
+            const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+            const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
+            if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
+          }
+
+          await interaction.reply({ content: `Rôle ${role} ajouté à **${categoryName}** avec l'emoji ${emoji}.`, ephemeral: true });
+
+        } else if (action === "update") {
+          const description = interaction.options.getString("description");
+          const emoji = interaction.options.getString("emoji");
+          const newRole = interaction.options.getRole("new_role");
+          updateReactionRoleEntryStmt.run(description ?? null, emoji ?? null, newRole?.id ?? null, category.id, role.id);
+
+          // Mettre à jour le panel si publié
+          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+          if (panel) {
+            const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+            const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
+            if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
+          }
+
+          await interaction.reply({ content: `Rôle ${role} mis à jour dans **${categoryName}**.`, ephemeral: true });
+
+        } else if (action === "delete") {
+          deleteReactionRoleEntryStmt.run(category.id, role.id);
+
+          // Mettre à jour le panel si publié
+          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+          if (panel) {
+            const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+            const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
+            if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
+          }
+
+          await interaction.reply({ content: `Rôle ${role} retiré de **${categoryName}**.`, ephemeral: true });
+        }
+      }
+
+      if (interaction.commandName === "role-create") {
+        const categoryName = interaction.options.getString("categorie", true);
+        const channel = interaction.options.getChannel("channel", true) as TextChannel;
+        const guildId = interaction.guildId!;
+
+        const category = getReactionRoleCategoryStmt.get(guildId, categoryName) as ReactionRoleCategoryRow | undefined;
+        if (!category) {
+          await interaction.reply({ content: `Catégorie **${categoryName}** introuvable.`, ephemeral: true });
+          return;
+        }
+
+        const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+        await interaction.deferReply({ ephemeral: true });
+
+        await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
+        await interaction.editReply({ content: `Panel **${categoryName}** publié dans ${channel}.` });
+      }
     }
 
     // =========================================
@@ -2645,6 +2886,40 @@ client.on(Events.MessageCreate, async (message) => {
   } catch (error) {
     console.error("[role-block] Erreur suppression :", error);
   }
+});
+
+client.on(Events.MessageReactionAdd, async (reaction, user) => {
+  if (user.bot) return;
+  if (reaction.partial) await reaction.fetch();
+  if (!reaction.message.guildId) return;
+
+  const panel = getReactionRolePanelByMessageIdStmt.get(reaction.message.id) as ReactionRolePanelRow | undefined;
+  if (!panel) return;
+
+  const emoji = reaction.emoji.id
+    ? `<:${reaction.emoji.name}:${reaction.emoji.id}>` // emoji custom
+    : reaction.emoji.name!;                             // emoji unicode
+
+  const guild = reaction.message.guild!;
+  const member = await guild.members.fetch(user.id);
+  await handleReactionAdd(panel, emoji, member);
+});
+
+client.on(Events.MessageReactionRemove, async (reaction, user) => {
+  if (user.bot) return;
+  if (reaction.partial) await reaction.fetch();
+  if (!reaction.message.guildId) return;
+
+  const panel = getReactionRolePanelByMessageIdStmt.get(reaction.message.id) as ReactionRolePanelRow | undefined;
+  if (!panel) return;
+
+  const emoji = reaction.emoji.id
+    ? `<:${reaction.emoji.name}:${reaction.emoji.id}>`
+    : reaction.emoji.name!;
+
+  const guild = reaction.message.guild!;
+  const member = await guild.members.fetch(user.id);
+  await handleReactionRemove(panel, emoji, member);
 });
 
 setInterval(async () => {

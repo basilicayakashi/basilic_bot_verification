@@ -24,39 +24,39 @@ export type MessagesIn = {
     questionUpdatedSuccessfully: (index: number) => string;
     questionDeletedSuccessfully: (index: number) => string;
     alreadyBeenVerifiedBefore: string;
-    NoAuthorizedServerFoundInSetupVerificationPermissions : string;
+    NoAuthorizedServerFoundInSetupVerificationPermissions: string;
     CommandReservedByBasilic: string;
     YouCannotConfigureMoreThanFiveQuestions: string;
     QuestionAddedAtIndex: (index: number) => string;
     YouAreNotAllowedToViewVerificationQuestionsOnThisServer: string;
-    YouAreNotAllowedtoEditVerificationQuestionsOnThisServer : string;
+    YouAreNotAllowedtoEditVerificationQuestionsOnThisServer: string;
     VerifiedUserFound: (user_id: string, username: string, verified_at: string, verified_by: string) => string;
     globalKickHeader: (userId: string) => string;
     permissionAdded: (guildId: string) => string;
-    verificationQuestionsTitle : string;
-    typeLabel : string;
-    requiredLabel : string;
-    yes : string;
-    no : string;
+    verificationQuestionsTitle: string;
+    typeLabel: string;
+    requiredLabel: string;
+    yes: string;
+    no: string;
     setupVerificationDescription: string;
     checkVerifiedDescription: string;
     globalKickDescription: string;
     allowSetupVerificationDescription: string;
     allowManageQuestionsDescription: string;
-    addVerificationQuestionDescription : string;
-    listVerificationQuestionsDescription : string;
-    editVerificationQuestionDescription : string;
-    deleteVerificationQuestionDescription : string;
+    addVerificationQuestionDescription: string;
+    listVerificationQuestionsDescription: string;
+    editVerificationQuestionDescription: string;
+    deleteVerificationQuestionDescription: string;
     botHelpDescription: string;
     verifiedRoleIdDescription: string;
-    staffCategoryIdDescription : string;
+    staffCategoryIdDescription: string;
     userIdLookupDescription: string;
     staffRoleIdDescription: string;
     userIdKickDescription: string;
     questionLabelDescription: string;
     questionRequiredDescription: string;
     questionTypeDescription: string;
-    guildIdDescription : string;
+    guildIdDescription: string;
     questionIndexDescription: string;
     newQuestionLabelDescription: string;
     newQuestionTypeDescription: string;
@@ -149,6 +149,24 @@ export type MessagesIn = {
     reason: string;
     verificationAlreadyInProgress: string;
     refusalReasonSaved: string;
+    reactionRoleCategoryAlreadyExists: (name: string) => string;
+    reactionRoleCategoryCreated: (name: string) => string;
+    reactionRoleCategoryNotFound: (name: string) => string;
+    reactionRoleNewNameRequired: string;
+    reactionRoleCategoryRenamed: (oldName: string, newName: string) => string;
+    reactionRoleCategoryDeleted: (name: string) => string;
+    reactionRoleDescriptionAndEmojiRequired: string;
+    reactionRoleAlreadyInCategory: (role: string, category: string) => string;
+    reactionRoleAdded: (role: string, category: string, emoji: string) => string;
+    reactionRoleUpdated: (role: string, category: string) => string;
+    reactionRoleRemoved: (role: string, category: string) => string;
+    reactionRolePanelPublished: (category: string, channel: string) => string;
+    reactionRoleNoCategoryConfigured: string;
+    reactionRoleCategoriesTitle: string;
+    reactionRoleNoRole: string;
+    reactionRolePanelPublishedIn: (channelId: string) => string;
+    reactionRolePanelNotPublished: string;
+
 };
 
 export type MessagesOut = {
@@ -231,6 +249,8 @@ export type MessagesServer = {
     checkMemberBlacklistedOn: (lines: string) => string;
     by: string;
     reason: string;
+    reactionRolePanelTitle: (category: string) => string;
+    reactionRolePanelEmpty: string;
 };
 
 export type MessagesInternal = {

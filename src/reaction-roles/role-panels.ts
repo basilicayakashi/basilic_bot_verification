@@ -5,6 +5,7 @@ import {
   Guild,
   GuildMember,
 } from "discord.js";
+
 import {
   getReactionRoleEntriesStmt,
   getReactionRolePanelByCategoryStmt,
@@ -14,19 +15,22 @@ import {
   ReactionRolePanelRow,
 } from "../database/sql.js";
 
+import { MessagesServer } from "../langues/index.js";
+
 /** Construit le contenu de l'embed pour un panel de reaction roles */
 export function buildReactionRolePanelEmbed(
   category: ReactionRoleCategoryRow,
-  entries: ReactionRoleEntryRow[]
+  entries: ReactionRoleEntryRow[],
+  msgServer: MessagesServer
 ): EmbedBuilder {
   const lines = entries.map((e) => `${e.emoji} — ${e.description}`);
 
   return new EmbedBuilder()
-    .setTitle(`Rôles — ${category.name}`)
+    .setTitle(msgServer.reactionRolePanelTitle(category.name))
     .setDescription(
       lines.length > 0
         ? lines.join("\n")
-        : "*Aucun rôle configuré pour cette catégorie.*"
+        : `*${msgServer.reactionRolePanelEmpty}*`
     );
 }
 
@@ -35,9 +39,10 @@ export async function publishOrUpdatePanel(
   guild: Guild,
   category: ReactionRoleCategoryRow,
   entries: ReactionRoleEntryRow[],
-  channel: TextChannel
+  channel: TextChannel,
+  msgServer: MessagesServer
 ): Promise<Message> {
-  const embed = buildReactionRolePanelEmbed(category, entries);
+  const embed = buildReactionRolePanelEmbed(category, entries, msgServer);
   const existingPanel = getReactionRolePanelByCategoryStmt.get(
     category.id
   ) as ReactionRolePanelRow | undefined;

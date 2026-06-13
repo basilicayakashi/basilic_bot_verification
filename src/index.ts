@@ -731,35 +731,92 @@ export const commands = [
     ),
   new SlashCommandBuilder()
     .setName("role-category")
-    .setDescription("Gérer les catégories de reaction roles")
+    .setDescription("Manage reaction role categories")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Gérer les catégories de reaction roles",
+      [Locale.SpanishES]: "Gestionar las categorías de reaction roles",
+      [Locale.German]: "Reaction-Role-Kategorien verwalten",
+      [Locale.Polish]: "Zarządzaj kategoriami ról reakcji",
+    })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((o) =>
       o
         .setName("action")
-        .setDescription("Action à effectuer")
+        .setDescription("Action to perform")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Action à effectuer",
+          [Locale.SpanishES]: "Acción a realizar",
+          [Locale.German]: "Auszuführende Aktion",
+          [Locale.Polish]: "Akcja do wykonania",
+        })
         .setRequired(true)
         .addChoices(
-          { name: "create", value: "create" },
-          { name: "update", value: "update" },
-          { name: "delete", value: "delete" }
+          {
+            name: "create",
+            value: "create",
+            name_localizations: {
+              [Locale.French]: "créer",
+              [Locale.SpanishES]: "crear",
+              [Locale.German]: "erstellen",
+              [Locale.Polish]: "utwórz",
+            },
+          },
+          {
+            name: "update",
+            value: "update",
+            name_localizations: {
+              [Locale.French]: "modifier",
+              [Locale.SpanishES]: "actualizar",
+              [Locale.German]: "aktualisieren",
+              [Locale.Polish]: "zaktualizuj",
+            },
+          },
+          {
+            name: "delete",
+            value: "delete",
+            name_localizations: {
+              [Locale.French]: "supprimer",
+              [Locale.SpanishES]: "eliminar",
+              [Locale.German]: "löschen",
+              [Locale.Polish]: "usuń",
+            }
+          }
         )
     )
     .addStringOption((o) =>
       o
         .setName("name")
-        .setDescription("Nom de la catégorie")
+        .setDescription("Category name")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Nom de la catégorie",
+          [Locale.SpanishES]: "Nombre de la categoría",
+          [Locale.German]: "Name der Kategorie",
+          [Locale.Polish]: "Nazwa kategorii",
+        })
         .setRequired(true)
         .setAutocomplete(true)
     )
     .addStringOption((o) =>
       o
         .setName("new_name")
-        .setDescription("Nouveau nom (pour action update)")
+        .setDescription("New name (for update action)")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Nouveau nom (pour action update)",
+          [Locale.SpanishES]: "Nuevo nombre (para la acción de actualización)",
+          [Locale.German]: "Neuer Name (für die Aktualisierungsaktion)",
+          [Locale.Polish]: "Nowa nazwa (dla akcji aktualizacji)",
+        })
         .setRequired(false)
     ),
   new SlashCommandBuilder()
     .setName("role-manage")
-    .setDescription("Gérer les rôles d'une catégorie de reaction roles")
+    .setDescription("Manage roles within a reaction role category")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Gérer les rôles d'une catégorie de reaction roles",
+      [Locale.SpanishES]: "Gestionar los roles de una categoría de reaction roles",
+      [Locale.German]: "Rollen einer Reaction-Role-Kategorie verwalten",
+      [Locale.Polish]: "Zarządzaj rolami w kategorii ról reakcji",
+    })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((o) =>
       o
@@ -767,59 +824,145 @@ export const commands = [
         .setDescription("Action à effectuer")
         .setRequired(true)
         .addChoices(
-          { name: "add", value: "add" },
-          { name: "update", value: "update" },
-          { name: "delete", value: "delete" }
+          {
+            name: "add",
+            value: "add",
+            name_localizations: {
+              [Locale.French]: "ajouter",
+              [Locale.SpanishES]: "agregar",
+              [Locale.German]: "hinzufügen",
+              [Locale.Polish]: "dodaj",
+            },
+          },
+          {
+            name: "update",
+            value: "update",
+            name_localizations: {
+              [Locale.French]: "modifier",
+              [Locale.SpanishES]: "actualizar",
+              [Locale.German]: "aktualisieren",
+              [Locale.Polish]: "zaktualizuj",
+            }
+          },
+          {
+            name: "delete",
+            value: "delete",
+            name_localizations: {
+              [Locale.French]: "supprimer",
+              [Locale.SpanishES]: "eliminar",
+              [Locale.German]: "löschen",
+              [Locale.Polish]: "usuń",
+            }
+          }
         )
     )
     .addStringOption((o) =>
       o
-        .setName("categorie")
-        .setDescription("Nom de la catégorie")
+        .setName("category")
+        .setDescription("Category name")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Nom de la catégorie",
+          [Locale.SpanishES]: "Nombre de la categoría",
+          [Locale.German]: "Name der Kategorie",
+          [Locale.Polish]: "Nazwa kategorii",
+        })
         .setRequired(true)
+        .setAutocomplete(true)
     )
     .addRoleOption((o) =>
-      o.setName("role").setDescription("Rôle concerné").setRequired(true)
+      o
+        .setName("role")
+        .setDescription("Role concerned")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Rôle concerné",
+          [Locale.SpanishES]: "Rol correspondiente",
+          [Locale.German]: "Betroffene Rolle",
+          [Locale.Polish]: "Rola, której dotyczy",
+        })
+        .setRequired(true)
     )
     .addStringOption((o) =>
       o
         .setName("description")
-        .setDescription("Description affichée aux membres")
+        .setDescription("Description shown to members")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Description affichée aux membres",
+          [Locale.SpanishES]: "Descripción mostrada a los miembros",
+          [Locale.German]: "Beschreibung, die den Mitgliedern angezeigt wird",
+          [Locale.Polish]: "Opis wyświetlany członkom",
+        })
         .setRequired(false)
     )
     .addStringOption((o) =>
       o
         .setName("emoji")
-        .setDescription("Emoji associé (ex: 🦊 ou <:custom:123456>)")
+        .setDescription("Emoji associé")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Emoji associé",
+          [Locale.SpanishES]: "Emoji asociado",
+          [Locale.German]: "Assoziierter Emoji",
+          [Locale.Polish]: "Powiązany emoji",
+        })
         .setRequired(false)
     )
     .addRoleOption((o) =>
       o
         .setName("new_role")
-        .setDescription("Nouveau rôle (pour action update)")
+        .setDescription("New role (for update action)")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Nouveau rôle (pour action update)",
+          [Locale.SpanishES]: "Nuevo rol (para la acción update)",
+          [Locale.German]: "Neue Rolle (für Aktion update)",
+          [Locale.Polish]: "Nowa rola (dla akcji update)",
+        })
         .setRequired(false)
     ),
 
   // /role-create
   new SlashCommandBuilder()
     .setName("role-create")
-    .setDescription("Publier le panel de reaction roles d'une catégorie")
+    .setDescription("Publish the reaction role panel for a category")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Publier le panel de reaction roles d'une catégorie",
+      [Locale.SpanishES]: "Publicar el panel de reaction roles de una categoría",
+      [Locale.German]: "Das Reaction-Role-Panel einer Kategorie veröffentlichen",
+      [Locale.Polish]: "Opublikuj panel ról reakcji dla kategorii",
+    })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((o) =>
       o
-        .setName("categorie")
-        .setDescription("Nom de la catégorie")
+        .setName("category")
+        .setDescription("Category name")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Nom de la catégorie",
+          [Locale.SpanishES]: "Nombre de la categoría",
+          [Locale.German]: "Name der Kategorie",
+          [Locale.Polish]: "Nazwa kategorii",
+        })
         .setRequired(true)
+        .setAutocomplete(true)
     )
     .addChannelOption((o) =>
       o
         .setName("channel")
-        .setDescription("Salon où publier le panel")
+        .setDescription("Channel to publish the panel in")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Salon où publier le panel",
+          [Locale.SpanishES]: "Canal donde publicar el panel",
+          [Locale.German]: "Kanal, in dem das Panel veröffentlicht werden soll",
+          [Locale.Polish]: "Kanał, na którym opublikować panel",
+        })
         .setRequired(true)
     ),
   new SlashCommandBuilder()
     .setName("role-category-list")
-    .setDescription("Lister les catégories de reaction roles et leurs rôles")
+    .setDescription("List reaction role categories and their roles")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Lister les catégories de reaction roles et leurs rôles",
+      [Locale.SpanishES]: "Listar las categorías de reaction roles y sus roles",
+      [Locale.German]: "Reaction-Role-Kategorien und ihre Rollen auflisten",
+      [Locale.Polish]: "Wyświetl kategorie ról reakcji i ich role",
+    })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 ].map((command) => command.toJSON());
 
@@ -1497,7 +1640,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (interaction.isAutocomplete()) {
       const focusedOption = interaction.options.getFocused(true);
 
-      if (focusedOption.name === "categorie") {
+      if (focusedOption.name === "category" || focusedOption.name === "name") {
         const guildId = interaction.guildId!;
         const categories = getReactionRoleCategoriesStmt.all(guildId) as ReactionRoleCategoryRow[];
 
@@ -2447,24 +2590,24 @@ client.on(Events.InteractionCreate, async (interaction) => {
         if (action === "create") {
           const existing = getReactionRoleCategoryStmt.get(guildId, name);
           if (existing) {
-            await interaction.reply({ content: `La catégorie **${name}** existe déjà.`, ephemeral: true });
+            await interaction.reply({ content: msgIn.reactionRoleCategoryAlreadyExists(name), ephemeral: true });
             return;
           }
           insertReactionRoleCategoryStmt.run(guildId, name);
-          await interaction.reply({ content: `Catégorie **${name}** créée.`, ephemeral: true });
+          await interaction.reply({ content: msgIn.reactionRoleCategoryCreated(name), ephemeral: true });
 
         } else if (action === "update") {
           const newName = interaction.options.getString("new_name");
           if (!newName) {
-            await interaction.reply({ content: "Paramètre `new_name` requis pour update.", ephemeral: true });
+            await interaction.reply({ content: msgIn.reactionRoleNewNameRequired, ephemeral: true });
             return;
           }
           const result = updateReactionRoleCategoryStmt.run(newName, guildId, name);
           if (result.changes === 0) {
-            await interaction.reply({ content: `Catégorie **${name}** introuvable.`, ephemeral: true });
+            await interaction.reply({ content: msgIn.reactionRoleCategoryNotFound(name), ephemeral: true });
             return;
           }
-          await interaction.reply({ content: `Catégorie renommée **${name}** → **${newName}**.`, ephemeral: true });
+          await interaction.reply({ content: msgIn.reactionRoleCategoryRenamed(name, newName), ephemeral: true });
 
         } else if (action === "delete") {
           const category = getReactionRoleCategoryStmt.get(guildId, name) as ReactionRoleCategoryRow | undefined;
@@ -2485,19 +2628,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
           // Supprime la catégorie (CASCADE supprime entries + panel en DB)
           deleteReactionRoleCategoryStmt.run(guildId, name);
-          await interaction.reply({ content: `Catégorie **${name}** et tous ses rôles supprimés.`, ephemeral: true });
+          await interaction.reply({ content: msgIn.reactionRoleCategoryDeleted(name), ephemeral: true });
         }
       }
 
       if (interaction.commandName === "role-manage") {
         const action = interaction.options.getString("action", true);
-        const categoryName = interaction.options.getString("categorie", true);
+        const categoryName = interaction.options.getString("category", true);
         const role = interaction.options.getRole("role", true);
         const guildId = interaction.guildId!;
 
         const category = getReactionRoleCategoryStmt.get(guildId, categoryName) as ReactionRoleCategoryRow | undefined;
         if (!category) {
-          await interaction.reply({ content: `Catégorie **${categoryName}** introuvable.`, ephemeral: true });
+          await interaction.reply({ content: msgIn.reactionRoleCategoryNotFound(categoryName), ephemeral: true });
           return;
         }
 
@@ -2505,13 +2648,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
           const description = interaction.options.getString("description");
           const emoji = interaction.options.getString("emoji");
           if (!description || !emoji) {
-            await interaction.reply({ content: "`description` et `emoji` sont requis pour add.", ephemeral: true });
+            await interaction.reply({ content: msgIn.reactionRoleDescriptionAndEmojiRequired, ephemeral: true });
             return;
           }
           // Guard doublon
           const existing = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
           if (existing.some(e => e.role_id === role.id)) {
-            await interaction.reply({ content: `Le rôle ${role} est déjà dans la catégorie **${categoryName}**. Utilise \`action:update\` pour le modifier.`, ephemeral: true });
+            await interaction.reply({ content: msgIn.reactionRoleAlreadyInCategory(role.name, categoryName), ephemeral: true });
             return;
           }
 
@@ -2522,10 +2665,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
           if (panel) {
             const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
             const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
-            if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
+            if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel, msgServer);
           }
 
-          await interaction.reply({ content: `Rôle ${role} ajouté à **${categoryName}** avec l'emoji ${emoji}.`, ephemeral: true });
+          await interaction.reply({ content: msgIn.reactionRoleAdded(role.name, categoryName, emoji), ephemeral: true });
 
         } else if (action === "update") {
           const description = interaction.options.getString("description");
@@ -2538,10 +2681,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
           if (panel) {
             const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
             const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
-            if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
+            if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel, msgServer);
           }
 
-          await interaction.reply({ content: `Rôle ${role} mis à jour dans **${categoryName}**.`, ephemeral: true });
+          await interaction.reply({ content: msgIn.reactionRoleUpdated(role.name, categoryName), ephemeral: true });
 
         } else if (action === "delete") {
           deleteReactionRoleEntryStmt.run(category.id, role.id);
@@ -2560,31 +2703,31 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 } catch { }
                 deleteReactionRolePanelStmt.run(category.id); // à importer depuis sql.ts
               } else {
-                await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
+                await publishOrUpdatePanel(interaction.guild!, category, entries, channel, msgServer);
               }
             }
           }
 
-          await interaction.reply({ content: `Rôle ${role} retiré de **${categoryName}**.`, ephemeral: true });
+          await interaction.reply({ content: msgIn.reactionRoleRemoved(role.name, categoryName), ephemeral: true });
         }
       }
 
       if (interaction.commandName === "role-create") {
-        const categoryName = interaction.options.getString("categorie", true);
+        const categoryName = interaction.options.getString("category", true);
         const channel = interaction.options.getChannel("channel", true) as TextChannel;
         const guildId = interaction.guildId!;
 
         const category = getReactionRoleCategoryStmt.get(guildId, categoryName) as ReactionRoleCategoryRow | undefined;
         if (!category) {
-          await interaction.reply({ content: `Catégorie **${categoryName}** introuvable.`, ephemeral: true });
+          await interaction.reply({ content: msgIn.reactionRoleCategoryNotFound(categoryName), ephemeral: true });
           return;
         }
 
         const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
         await interaction.deferReply({ ephemeral: true });
 
-        await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
-        await interaction.editReply({ content: `Panel **${categoryName}** publié dans ${channel}.` });
+        await publishOrUpdatePanel(interaction.guild!, category, entries, channel, msgServer);
+        await interaction.editReply({ content: msgIn.reactionRolePanelPublished(categoryName, channel.id) });
       }
 
       if (interaction.commandName === "role-category-list") {

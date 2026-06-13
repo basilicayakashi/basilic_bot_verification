@@ -360,6 +360,23 @@ ${roleMsgDeleteText}
   memberBlacklistRemoved: "Mitglied von der Blacklist entfernt.",
   memberNotBlacklisted: "Dieses Mitglied steht nicht auf der Blacklist.",
   spamDetectionSaved: "Spam-Erkennungseinstellungen gespeichert.",
+  reactionRoleCategoryAlreadyExists: (name: string) => `Die Kategorie **${name}** existiert bereits.`,
+  reactionRoleCategoryCreated: (name: string) => `Kategorie **${name}** erstellt.`,
+  reactionRoleCategoryNotFound: (name: string) => `Kategorie **${name}** nicht gefunden.`,
+  reactionRoleNewNameRequired: "Der Parameter `new_name` ist für update erforderlich.",
+  reactionRoleCategoryRenamed: (oldName: string, newName: string) => `Kategorie umbenannt **${oldName}** → **${newName}**.`,
+  reactionRoleCategoryDeleted: (name: string) => `Kategorie **${name}** und alle ihre Rollen wurden gelöscht.`,
+  reactionRoleDescriptionAndEmojiRequired: "`description` und `emoji` sind für add erforderlich.",
+  reactionRoleAlreadyInCategory: (role: string, category: string) => `Die Rolle ${role} ist bereits in der Kategorie **${category}**. Verwende \`action:update\`, um sie zu ändern.`,
+  reactionRoleAdded: (role: string, category: string, emoji: string) => `Rolle ${role} wurde zu **${category}** mit dem Emoji ${emoji} hinzugefügt.`,
+  reactionRoleUpdated: (role: string, category: string) => `Rolle ${role} wurde in **${category}** aktualisiert.`,
+  reactionRoleRemoved: (role: string, category: string) => `Rolle ${role} wurde aus **${category}** entfernt.`,
+  reactionRolePanelPublished: (category: string, channel: string) => `Panel **${category}** wurde in ${channel} veröffentlicht.`,
+  reactionRoleNoCategoryConfigured: "Auf diesem Server ist keine Kategorie konfiguriert.",
+  reactionRoleCategoriesTitle: "Reaction-Role-Kategorien",
+  reactionRoleNoRole: "*Keine Rolle*",
+  reactionRolePanelPublishedIn: (channelId: string) => `\n📌 Panel veröffentlicht in <#${channelId}>`,
+  reactionRolePanelNotPublished: "*(Panel nicht veröffentlicht)*",
 };
 
 const de_out: MessagesOut = {
@@ -450,6 +467,8 @@ const de_server: MessagesServer = {
   checkMemberBlacklistedOn: (lines: string) => `⛔ Benutzer auf folgenden Servern gesperrt:\n\n${lines}`,
   by: "Von",
   reason: "Grund",
+  reactionRolePanelTitle: (category: string) => `Rollen — ${category}`,
+  reactionRolePanelEmpty: "Für diese Kategorie wurden keine Rollen konfiguriert.",
 };
 
 const de_internal: MessagesInternal = {

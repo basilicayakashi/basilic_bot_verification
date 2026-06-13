@@ -359,6 +359,23 @@ ${roleMsgDeleteText}
   memberBlacklistRemoved: "Miembro eliminado de la lista negra.",
   memberNotBlacklisted: "Este miembro no está en la lista negra.",
   spamDetectionSaved: "Configuración de detección de spam guardada.",
+  reactionRoleCategoryCreated: (name: string) => `Categoría **${name}** creada.`,
+  reactionRoleCategoryAlreadyExists: (name: string) => `Categoría **${name}** ya existe.`,
+  reactionRoleCategoryNotFound: (name: string) => `Categoría **${name}** no encontrada.`,
+  reactionRoleNewNameRequired: "El parámetro `new_name` es obligatorio para update.",
+  reactionRoleCategoryRenamed: (oldName: string, newName: string) => `Categoría renombrada **${oldName}** → **${newName}**.`,
+  reactionRoleCategoryDeleted: (name: string) => `La categoría **${name}** y todos sus roles han sido eliminados.`,
+  reactionRoleDescriptionAndEmojiRequired: "`description` y `emoji` son obligatorios para add.",
+  reactionRoleAlreadyInCategory: (role: string, category: string) => `El rol ${role} ya está en la categoría **${category}**. Usa \`action:update\` para modificarlo.`,
+  reactionRoleAdded: (role: string, category: string, emoji: string) => `Rol ${role} añadido a **${category}** con el emoji ${emoji}.`,
+  reactionRoleUpdated: (role: string, category: string) => `Rol ${role} actualizado en **${category}**.`,
+  reactionRoleRemoved: (role: string, category: string) => `Rol ${role} eliminado de **${category}**.`,
+  reactionRolePanelPublished: (category: string, channel: string) => `Panel **${category}** publicado en ${channel}.`,
+  reactionRoleNoCategoryConfigured: "No hay ninguna categoría configurada en este servidor.",
+  reactionRoleCategoriesTitle: "Categorías de reaction roles",
+  reactionRoleNoRole: "*Ningún rol*",
+  reactionRolePanelPublishedIn: (channelId: string) => `\n📌 Panel publicado en <#${channelId}>`,
+  reactionRolePanelNotPublished: "*(panel no publicado)*",
 };
 
 const es_out: MessagesOut = {
@@ -449,6 +466,8 @@ const es_server: MessagesServer = {
   checkMemberBlacklistedOn: (lines: string) => `⛔ Usuario en lista negra en:\n\n${lines}`,
   by: "Por",
   reason: "Razón",
+  reactionRolePanelTitle: (category: string) => `Roles — ${category}`,
+  reactionRolePanelEmpty: "No hay roles configurados para esta categoría.",
 };
 
 const es_internal: MessagesInternal = {

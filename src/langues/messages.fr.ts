@@ -364,6 +364,23 @@ ${roleMsgDeleteText}
   memberBlacklistRemoved: "Membre retiré de la blacklist.",
   memberNotBlacklisted: "Ce membre n'est pas blacklisté.",
   spamDetectionSaved: "Paramètres de détection de spam sauvegardés.",
+  reactionRoleCategoryAlreadyExists: (name: string) => `La catégorie **${name}** existe déjà.`,
+  reactionRoleCategoryCreated: (name: string) => `Catégorie **${name}** créée.`,
+  reactionRoleCategoryNotFound: (name: string) => `Catégorie **${name}** introuvable.`,
+  reactionRoleNewNameRequired: "Paramètre `new_name` requis pour update.",
+  reactionRoleCategoryRenamed: (oldName: string, newName: string) => `Catégorie renommée **${oldName}** → **${newName}**.`,
+  reactionRoleCategoryDeleted: (name: string) => `Catégorie **${name}** et tous ses rôles supprimés.`,
+  reactionRoleDescriptionAndEmojiRequired: "`description` et `emoji` sont requis pour add.",
+  reactionRoleAlreadyInCategory: (role: string, category: string) => `Le rôle ${role} est déjà dans la catégorie **${category}**. Utilise \`action:update\` pour le modifier.`,
+  reactionRoleAdded: (role: string, category: string, emoji: string) => `Rôle ${role} ajouté à **${category}** avec l'emoji ${emoji}.`,
+  reactionRoleUpdated: (role: string, category: string) => `Rôle ${role} mis à jour dans **${category}**.`,
+  reactionRoleRemoved: (role: string, category: string) => `Rôle ${role} retiré de **${category}**.`,
+  reactionRolePanelPublished: (category: string, channel: string) => `Panel **${category}** publié dans ${channel}.`,
+  reactionRoleNoCategoryConfigured: "Aucune catégorie configurée sur ce serveur.",
+  reactionRoleCategoriesTitle: "Catégories de reaction roles",
+  reactionRoleNoRole: "*Aucun rôle*",
+  reactionRolePanelPublishedIn: (channelId: string) => `\n📌 Panel publié dans <#${channelId}>`,
+  reactionRolePanelNotPublished: "*(panel non publié)*",
 };
 
 const fr_out: MessagesOut = {
@@ -454,6 +471,8 @@ const fr_server: MessagesServer = {
   checkMemberBlacklistedOn: (lines: string) => `⛔ Utilisateur blacklisté sur :\n\n${lines}`,
   by: "Par",
   reason: "Raison",
+  reactionRolePanelTitle: (category: string) => `Rôles — ${category}`,
+  reactionRolePanelEmpty: "Aucun rôle configuré pour cette catégorie.",
 };
 
 const fr_internal: MessagesInternal = {

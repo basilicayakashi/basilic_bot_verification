@@ -80,6 +80,7 @@ import {
   deleteReactionRoleEntryStmt,
   getReactionRolePanelByMessageIdStmt,
   deleteReactionRoleCategoryStmt,
+  deleteReactionRolePanelStmt,
 } from "./database/sql.js";
 
 import type {
@@ -98,7 +99,7 @@ import {
   handleReactionAdd,
   handleReactionRemove,
 }
-from "./reaction-roles/role-panels.js";
+  from "./reaction-roles/role-panels.js";
 
 import { handleVerificationButtons, handleVerificationModals } from "./moderation/verification-flow.js";
 
@@ -2480,6 +2481,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
             await interaction.reply({ content: "`description` et `emoji` sont requis pour add.", ephemeral: true });
             return;
           }
+          // Guard doublon
+          const existing = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+          if (existing.some(e => e.role_id === role.id)) {
+            await interaction.reply({ content: `Le rôle ${role} est déjà dans la catégorie **${categoryName}**. Utilise \`action:update\` pour le modifier.`, ephemeral: true });
+            return;
+          }
+
           insertReactionRoleEntryStmt.run(category.id, role.id, description, emoji);
 
           // Mettre à jour le panel existant si publié
@@ -2516,7 +2524,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
           if (panel) {
             const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
             const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
-            if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
+            if (channel) {
+              if (entries.length === 0) {
+                // Panel vide → supprimer le message directement
+                try {
+                  const msg = await channel.messages.fetch(panel.message_id);
+                  await msg.delete();
+                } catch { }
+                deleteReactionRolePanelStmt.run(category.id); // à importer depuis sql.ts
+              } else {
+                await publishOrUpdatePanel(interaction.guild!, category, entries, channel);
+              }
+            }
           }
 
           await interaction.reply({ content: `Rôle ${role} retiré de **${categoryName}**.`, ephemeral: true });

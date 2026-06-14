@@ -703,30 +703,60 @@ export const commands = [
       option
         .setName("role_1")
         .setDescription("First role that will trigger message deletion")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Premier rôle qui déclenchera la suppression du message",
+          [Locale.SpanishES]: "Primer rol que activará la eliminación del mensaje",
+          [Locale.German]: "Erste Rolle, die das Löschen der Nachricht auslöst",
+          [Locale.Polish]: "Pierwsza rola, która uruchomi usunięcie wiadomości",
+        })
         .setRequired(false)
     )
     .addRoleOption((option) =>
       option
         .setName("role_2")
         .setDescription("Second role that will trigger message deletion")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Deuxième rôle qui déclenchera la suppression du message",
+          [Locale.SpanishES]: "Segundo rol que activará la eliminación del mensaje",
+          [Locale.German]: "Zweite Rolle, die das Löschen der Nachricht auslöst",
+          [Locale.Polish]: "Druga rola, która uruchomi usunięcie wiadomości",
+        })
         .setRequired(false)
     )
     .addRoleOption((option) =>
       option
         .setName("role_3")
         .setDescription("Third role that will trigger message deletion")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Troisième rôle qui déclenchera la suppression du message",
+          [Locale.SpanishES]: "Tercer rol que activará la eliminación del mensaje",
+          [Locale.German]: "Dritte Rolle, die das Löschen der Nachricht auslöst",
+          [Locale.Polish]: "Trzecia rola, która uruchomi usunięcie wiadomości",
+        })
         .setRequired(false)
     )
     .addRoleOption((option) =>
       option
         .setName("role_4")
         .setDescription("Fourth role that will trigger message deletion")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Quatrième rôle qui déclenchera la suppression du message",
+          [Locale.SpanishES]: "Cuarto rol que activará la eliminación del mensaje",
+          [Locale.German]: "Vierte Rolle, die das Löschen der Nachricht auslöst",
+          [Locale.Polish]: "Czwarta rola, która uruchomi usunięcie wiadomości",
+        })
         .setRequired(false)
     )
     .addRoleOption((option) =>
       option
         .setName("role_5")
         .setDescription("Fifth role that will trigger message deletion")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Cinquième rôle qui déclenchera la suppression du message",
+          [Locale.SpanishES]: "Quinto rol que activará la eliminación del mensaje",
+          [Locale.German]: "Fünfte Rolle, die das Löschen der Nachricht auslöst",
+          [Locale.Polish]: "Piąta rola, która uruchomi usunięcie wiadomości",
+        })
         .setRequired(false)
     ),
   new SlashCommandBuilder()

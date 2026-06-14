@@ -109,6 +109,101 @@ Cette commande permet :
 
 ---
 
+# 🎭 Reaction Roles — Guide d'utilisation
+
+## 📂 Étape 1 — Créer une catégorie
+
+Avant d'ajouter des rôles, il faut créer une catégorie qui les regroupe.
+
+\`\`\`
+/role-category action:create name:animal
+\`\`\`
+
+Une catégorie représente un groupe thématique de rôles (ex : animaux, langues, centres d'intérêt...).
+
+## ➕ Étape 2 — Ajouter des rôles à la catégorie
+
+Pour chaque rôle que vous souhaitez proposer aux membres, utilisez :
+
+\`\`\`
+/role-manage action:add categorie:animal role:@renard description:Renard emoji:🦊
+/role-manage action:add categorie:animal role:@chien description:Chien emoji:🐕
+/role-manage action:add categorie:animal role:@chat description:Chat emoji:🐈
+\`\`\`
+
+> **Note :** Les emojis custom du serveur sont également supportés. Copiez leur identifiant depuis Discord sous la forme \`<:nomemoji:123456789>\`.
+
+## 📢 Étape 3 — Publier le panel
+
+Une fois vos rôles configurés, publiez le panel dans le salon de votre choix :
+
+\`\`\`
+/role-create categorie:animal channel:#rôles
+\`\`\`
+
+Le bot va alors :
+
+1. Créer un message embed dans le salon indiqué
+2. Lister les rôles configurés avec leurs emojis et descriptions
+3. Ajouter automatiquement les réactions correspondantes sous le message
+
+Le résultat ressemblera à :
+
+> **Rôles — animal**
+> 🦊 — Renard
+> 🐕 — Chien
+> 🐈 — Chat
+
+Les membres n'ont plus qu'à cliquer sur une réaction pour obtenir le rôle associé, et recliquer dessus pour le retirer.
+
+## ✏️ Modifier un rôle existant
+
+Pour changer la description ou l'emoji d'un rôle déjà configuré :
+
+\`\`\`
+/role-manage action:update categorie:animal role:@renard description:Renard arctique emoji:🦊
+\`\`\`
+
+Pour remplacer un rôle par un autre :
+
+\`\`\`
+/role-manage action:update categorie:animal role:@ancienrole new_role:@nouveaurole
+\`\`\`
+
+Le panel publié est automatiquement mis à jour.
+
+## 🗑️ Supprimer un rôle du panel
+
+\`\`\`
+/role-manage action:delete categorie:animal role:@chien
+\`\`\`
+
+Le panel est automatiquement mis à jour. Si c'était le dernier rôle de la catégorie, le message est supprimé.
+
+## 📋 Renommer une catégorie
+
+\`\`\`
+/role-category action:update name:animal new_name:animaux
+\`\`\`
+
+## ❌ Supprimer une catégorie
+
+\`\`\`
+/role-category action:delete name:animal
+\`\`\`
+
+Cela supprime la catégorie, tous ses rôles configurés, et le message de panel publié.
+
+## 🔍 Voir les catégories existantes
+
+\`\`\`
+/role-category-list
+\`\`\`
+
+Affiche toutes les catégories du serveur, les rôles qu'elles contiennent et si leur panel est publié.
+
+---
+
 ## 🎮 Notifications de jeux gratuits
 
 Le bot peut automatiquement publier des promotions de jeux gratuits provenant de :
@@ -150,6 +245,268 @@ Cette commande fournit une vue centralisée de tous les paramètres spécifiques
 
 ---
 
+## 🔒 Permissions
+
+La plupart des commandes de configuration nécessitent les permissions **Administrateur**.
+`,
+
+  helpAbout: `
+# 🤖 À propos du bot
+
+Ce bot fournit des fonctionnalités de **vérification des membres**, **détection de spam**, **analyse des membres** et **notifications de jeux gratuits** pour votre serveur Discord.
+
+---
+
+## ⚙️ Aperçu des paramètres du serveur
+
+Utilisez :
+
+\`/view-settings\`
+
+pour afficher l'intégralité de la configuration du bot sur le serveur, notamment :
+
+* les paramètres de vérification
+* les questions de vérification
+* les paramètres des jeux gratuits
+
+Cette commande fournit une vue centralisée de tous les paramètres spécifiques au serveur.
+
+---
+
+\`/role-used-msg-delete\` — Supprime automatiquement tout nouveau message qui mentionne l'un des rôles paramétrés. Seul le propriétaire du serveur n'est pas concerné. Utile pour éviter les abus de mentions de masse comme @everyone.
+`,
+
+  helpVerification: `
+## 🔐 Vérification des membres
+
+### Activer la vérification
+
+Utilisez :
+
+\`/setup-verification\`
+
+pour configurer la vérification des nouveaux membres.
+
+Vous pouvez définir :
+
+* le rôle vérifié attribué après approbation
+* le rôle de modération
+* la catégorie de modération
+* le délai maximal de vérification
+
+### Gérer les questions de vérification
+
+Après avoir activé la vérification, vous pouvez personnaliser les questions affichées aux nouveaux membres :
+
+* \`/add-verification-question\` → ajouter une question
+* \`/edit-verification-question\` → modifier une question existante
+* \`/delete-verification-question\` → supprimer une question
+
+Toutes les questions configurées peuvent être consultées avec :
+
+\`/view-settings\`
+
+### Fonctionnement de la vérification
+
+1. Le bot publie un bouton de vérification dans le salon configuré.
+2. Un nouveau membre clique sur le bouton et répond aux questions configurées.
+3. Un salon de vérification destiné à la modération est automatiquement créé.
+4. L'équipe de modération peut :
+   * approuver la demande de vérification
+   * refuser la demande de vérification
+   * blacklister le membre
+   * ouvrir un salon de discussion privé avec le membre afin d'obtenir des informations complémentaires
+5. Si la demande est approuvée, le rôle vérifié est automatiquement attribué.
+
+---
+
+## 👤 Vérification manuelle d'un membre
+
+Vous pouvez vérifier manuellement un membre, qu'il soit déjà présent sur le serveur ou non.
+
+Utilisez :
+
+\`/verify-member\`
+
+avec l'identifiant Discord du membre.
+
+Le bot :
+
+* attribuera immédiatement le rôle vérifié si le membre est déjà présent
+* le vérifiera automatiquement lorsqu'il rejoindra le serveur plus tard
+
+---
+
+## 🔎 Analyse d'un membre
+
+Utilisez :
+
+\`/check-member\`
+
+pour analyser un compte Discord.
+
+Cette commande permet :
+
+* de voir sur quels serveurs le membre est présent (uniquement les serveurs où le bot est installé)
+* d'identifier si le membre a été blacklisté
+* de consulter les motifs de blacklist enregistrés sur chaque serveur
+* d'aider les modérateurs à identifier des utilisateurs potentiellement problématiques dans plusieurs communautés
+`,
+
+  helpSpam: `
+## 🛡️ Détection de spam
+
+Le bot peut surveiller les activités suspectes.
+
+Utilisez :
+
+\`/setup-spam-detection\`
+
+pour configurer :
+
+* l'activation de la détection
+* le salon d'alerte
+* la mention du rôle de modération
+* les seuils de détection
+
+Lorsqu'une activité suspecte est détectée, des alertes sont automatiquement envoyées à l'équipe de modération.
+`,
+
+  helpReactionRoles: `
+# 🎭 Reaction Roles — Guide d'utilisation
+
+Les reaction roles permettent à vos membres de s'attribuer ou de retirer eux-mêmes des rôles en cliquant sur une réaction emoji sous un message.
+
+---
+
+## 📂 Étape 1 — Créer une catégorie
+
+Avant d'ajouter des rôles, il faut créer une catégorie qui les regroupe.
+
+\`\`\`
+/role-category action:create name:animal
+\`\`\`
+
+Une catégorie représente un groupe thématique de rôles (ex : animaux, langues, centres d'intérêt...).
+
+---
+
+## ➕ Étape 2 — Ajouter des rôles à la catégorie
+
+Pour chaque rôle que vous souhaitez proposer aux membres, utilisez :
+
+\`\`\`
+/role-manage action:add categorie:animal role:@renard description:Renard emoji:🦊
+/role-manage action:add categorie:animal role:@chien description:Chien emoji:🐕
+/role-manage action:add categorie:animal role:@chat description:Chat emoji:🐈
+\`\`\`
+
+> **Note :** Les emojis custom du serveur sont également supportés. Copiez leur identifiant depuis Discord sous la forme \`<:nomemoji:123456789>\`.
+
+---
+
+## 📢 Étape 3 — Publier le panel
+
+Une fois vos rôles configurés, publiez le panel dans le salon de votre choix :
+
+\`\`\`
+/role-create categorie:animal channel:#rôles
+\`\`\`
+
+Le bot va alors :
+
+1. Créer un message embed dans le salon indiqué
+2. Lister les rôles configurés avec leurs emojis et descriptions
+3. Ajouter automatiquement les réactions correspondantes sous le message
+
+Le résultat ressemblera à :
+
+> **Rôles — animal**
+> 🦊 — Renard
+> 🐕 — Chien
+> 🐈 — Chat
+
+Les membres n'ont plus qu'à cliquer sur une réaction pour obtenir le rôle associé, et recliquer dessus pour le retirer.
+
+---
+
+## ✏️ Modifier un rôle existant
+
+Pour changer la description ou l'emoji d'un rôle déjà configuré :
+
+\`\`\`
+/role-manage action:update categorie:animal role:@renard description:Renard arctique emoji:🦊
+\`\`\`
+
+Pour remplacer un rôle par un autre :
+
+\`\`\`
+/role-manage action:update categorie:animal role:@ancienrole new_role:@nouveaurole
+\`\`\`
+
+Le panel publié est automatiquement mis à jour.
+
+---
+
+## 🗑️ Supprimer un rôle du panel
+
+\`\`\`
+/role-manage action:delete categorie:animal role:@chien
+\`\`\`
+
+Le panel est automatiquement mis à jour. Si c'était le dernier rôle de la catégorie, le message est supprimé.
+
+---
+
+## 📋 Renommer une catégorie
+
+\`\`\`
+/role-category action:update name:animal new_name:animaux
+\`\`\`
+
+---
+
+## ❌ Supprimer une catégorie
+
+\`\`\`
+/role-category action:delete name:animal
+\`\`\`
+
+Cela supprime la catégorie, tous ses rôles configurés, et le message de panel publié.
+
+---
+
+## 🔍 Voir les catégories existantes
+
+\`\`\`
+/role-category-list
+\`\`\`
+
+Affiche toutes les catégories du serveur, les rôles qu'elles contiennent et si leur panel est publié.
+`,
+
+  helpFreeGames: `
+## 🎮 Notifications de jeux gratuits
+
+Le bot peut automatiquement publier des promotions de jeux gratuits provenant de :
+
+* Steam
+* Epic Games
+
+Les commandes dédiées permettent :
+
+* d'activer ou désactiver les notifications
+* de choisir un salon de publication
+* d'activer ou désactiver les plateformes
+
+Les jeux sont automatiquement :
+
+* publiés dans le salon configuré
+* triés selon leur date de fin de promotion
+* supprimés lorsque la promotion expire
+`,
+
+  helpPermissions: `
 ## 🔒 Permissions
 
 La plupart des commandes de configuration nécessitent les permissions **Administrateur**.

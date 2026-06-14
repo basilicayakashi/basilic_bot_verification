@@ -105,6 +105,101 @@ Ta komenda pozwala:
 
 ---
 
+# 🎭 Reaction Roles — Przewodnik użytkownika
+
+## 📂 Krok 1 — Utwórz kategorię
+
+Przed dodaniem ról należy utworzyć kategorię, która je grupuje.
+
+\`\`\`
+/role-category action:create name:zwierzę
+\`\`\`
+
+Kategoria reprezentuje tematyczną grupę ról (np. zwierzęta, języki, zainteresowania...).
+
+## ➕ Krok 2 — Dodaj role do kategorii
+
+Dla każdej roli, którą chcesz zaproponować członkom, użyj:
+
+\`\`\`
+/role-manage action:add categorie:zwierzę role:@lis description:Lis emoji:🦊
+/role-manage action:add categorie:zwierzę role:@pies description:Pies emoji:🐕
+/role-manage action:add categorie:zwierzę role:@kot description:Kot emoji:🐈
+\`\`\`
+
+> **Uwaga:** Obsługiwane są również niestandardowe emoji serwera. Skopiuj ich identyfikator z Discorda w formacie \`<:nazwaemoji:123456789>\`.
+
+## 📢 Krok 3 — Opublikuj panel
+
+Po skonfigurowaniu ról opublikuj panel w wybranym kanale:
+
+\`\`\`
+/role-create categorie:zwierzę channel:#role
+\`\`\`
+
+Bot wykona następujące czynności:
+
+1. Utworzy wiadomość embed we wskazanym kanale
+2. Wyświetli skonfigurowane role z ich emoji i opisami
+3. Automatycznie doda odpowiednie reakcje pod wiadomością
+
+Wynik będzie wyglądał następująco:
+
+> **Role — zwierzę**
+> 🦊 — Lis
+> 🐕 — Pies
+> 🐈 — Kot
+
+Członkowie mogą kliknąć reakcję, aby otrzymać przypisaną rolę, i kliknąć ponownie, aby ją usunąć.
+
+## ✏️ Edytuj istniejącą rolę
+
+Aby zmienić opis lub emoji już skonfigurowanej roli:
+
+\`\`\`
+/role-manage action:update categorie:zwierzę role:@lis description:Lis polarny emoji:🦊
+\`\`\`
+
+Aby zastąpić rolę inną:
+
+\`\`\`
+/role-manage action:update categorie:zwierzę role:@stararola new_role:@nowarola
+\`\`\`
+
+Opublikowany panel jest automatycznie aktualizowany.
+
+## 🗑️ Usuń rolę z panelu
+
+\`\`\`
+/role-manage action:delete categorie:zwierzę role:@pies
+\`\`\`
+
+Panel jest automatycznie aktualizowany. Jeśli była to ostatnia rola w kategorii, wiadomość zostaje usunięta.
+
+## 📋 Zmień nazwę kategorii
+
+\`\`\`
+/role-category action:update name:zwierzę new_name:zwierzęta
+\`\`\`
+
+## ❌ Usuń kategorię
+
+\`\`\`
+/role-category action:delete name:zwierzę
+\`\`\`
+
+Usuwa kategorię, wszystkie jej skonfigurowane role oraz opublikowaną wiadomość panelu.
+
+## 🔍 Wyświetl istniejące kategorie
+
+\`\`\`
+/role-category-list
+\`\`\`
+
+Wyświetla wszystkie kategorie serwera, zawarte w nich role oraz informację o tym, czy ich panel jest opublikowany.
+
+---
+
 ## 🎮 Darmowe gry
 
 Bot może automatycznie publikować promocje darmowych gier z:
@@ -150,6 +245,269 @@ Ta komenda zapewnia scentralizowany widok wszystkich ustawień serwera zarządza
 
 Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
 `,
+
+  helpAbout: `
+# 🤖 Informacje o bocie
+
+Ten bot oferuje funkcje **weryfikacji użytkowników**, **wykrywania spamu**, **analizy użytkowników** oraz **powiadomień o darmowych grach** dla Twojego serwera Discord.
+
+---
+
+## ⚙️ Przegląd ustawień serwera
+
+Użyj:
+
+\`/view-settings\`
+
+aby wyświetlić pełną konfigurację bota na serwerze, w tym:
+
+* ustawienia weryfikacji
+* pytania weryfikacyjne
+* ustawienia darmowych gier
+
+Ta komenda zapewnia scentralizowany podgląd wszystkich ustawień specyficznych dla serwera.
+
+---
+
+\`/role-used-msg-delete\` — Automatycznie usuwa każdą nową wiadomość zawierającą wzmiankę o jednej ze skonfigurowanych ról. Właściciel serwera nie podlega temu ograniczeniu. Funkcja ta jest przydatna do zapobiegania nadużyciom związanym z masowymi wzmiankami, takimi jak @everyone.
+`,
+
+helpVerification: `
+## 🔐 Weryfikacja użytkowników
+
+### Włączanie weryfikacji
+
+Użyj:
+
+\`/setup-verification\`
+
+aby skonfigurować weryfikację nowych użytkowników.
+
+Możesz określić:
+
+* rolę zweryfikowanego użytkownika przyznawaną po zatwierdzeniu
+* rolę moderacji
+* kategorię moderacji
+* maksymalny czas weryfikacji
+
+### Zarządzanie pytaniami weryfikacyjnymi
+
+Po włączeniu weryfikacji możesz dostosować pytania wyświetlane nowym użytkownikom:
+
+* \`/add-verification-question\` → dodaj pytanie
+* \`/edit-verification-question\` → edytuj istniejące pytanie
+* \`/delete-verification-question\` → usuń pytanie
+
+Wszystkie skonfigurowane pytania można wyświetlić za pomocą:
+
+\`/view-settings\`
+
+### Jak działa weryfikacja
+
+1. Bot publikuje przycisk weryfikacji w skonfigurowanym kanale.
+2. Nowy użytkownik klika przycisk i odpowiada na skonfigurowane pytania.
+3. Automatycznie tworzony jest kanał weryfikacyjny przeznaczony dla moderacji.
+4. Zespół moderacyjny może:
+   * zatwierdzić prośbę o weryfikację
+   * odrzucić prośbę o weryfikację
+   * dodać użytkownika do czarnej listy
+   * otworzyć prywatny kanał rozmowy z użytkownikiem w celu uzyskania dodatkowych informacji
+5. Jeśli prośba zostanie zatwierdzona, rola zweryfikowanego użytkownika zostanie przyznana automatycznie.
+
+---
+
+## 👤 Ręczna weryfikacja użytkownika
+
+Możesz ręcznie zweryfikować użytkownika, niezależnie od tego, czy znajduje się już na serwerze.
+
+Użyj:
+
+\`/verify-member\`
+
+podając identyfikator Discord użytkownika.
+
+Bot:
+
+* natychmiast przyzna rolę zweryfikowanego użytkownika, jeśli użytkownik jest już obecny na serwerze
+* automatycznie zweryfikuje użytkownika po jego późniejszym dołączeniu do serwera
+
+---
+
+## 🔎 Analiza użytkownika
+
+Użyj:
+
+\`/check-member\`
+
+aby przeanalizować konto Discord.
+
+Ta komenda pozwala:
+
+* sprawdzić, na których serwerach znajduje się użytkownik (wyłącznie na serwerach, na których zainstalowano bota)
+* ustalić, czy użytkownik został dodany do czarnej listy
+* wyświetlić powody umieszczenia na czarnej liście zapisane na poszczególnych serwerach
+* pomóc moderatorom identyfikować potencjalnie problematycznych użytkowników w wielu społecznościach
+`,
+
+helpSpam: `
+## 🛡️ Wykrywanie spamu
+
+Bot może monitorować podejrzaną aktywność.
+
+Użyj:
+
+\`/setup-spam-detection\`
+
+aby skonfigurować:
+
+* włączanie lub wyłączanie wykrywania spamu
+* kanał alertów
+* oznaczanie roli moderacji
+* progi wykrywania
+
+Gdy zostanie wykryta podejrzana aktywność, alerty są automatycznie wysyłane do zespołu moderacyjnego.
+`,
+
+helpFreeGames: `
+## 🎮 Powiadomienia o darmowych grach
+
+Bot może automatycznie publikować informacje o promocjach darmowych gier z:
+
+* Steam
+* Epic Games
+
+Dedykowane komendy umożliwiają:
+
+* włączanie lub wyłączanie powiadomień
+* wybór kanału publikacji
+* włączanie lub wyłączanie poszczególnych platform
+
+Gry są automatycznie:
+
+* publikowane na skonfigurowanym kanale
+* sortowane według daty zakończenia promocji
+* usuwane po wygaśnięciu promocji
+`,
+
+helpPermissions: `
+## 🔒 Uprawnienia
+
+Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
+`,
+
+helpReactionRoles: `
+# 🎭 Reaction Roles — Instrukcja użytkowania
+
+Reaction Roles pozwalają użytkownikom samodzielnie nadawać lub usuwać role poprzez kliknięcie reakcji emoji pod wiadomością.
+
+---
+
+## 📂 Krok 1 — Utwórz kategorię
+
+Przed dodaniem ról należy utworzyć kategorię, która będzie je grupować.
+
+\`\`\`
+/role-category action:create name:animal
+\`\`\`
+
+Kategoria reprezentuje tematyczną grupę ról (np. zwierzęta, języki lub zainteresowania).
+
+---
+
+## ➕ Krok 2 — Dodawanie ról do kategorii
+
+Dla każdej roli, którą chcesz udostępnić użytkownikom, użyj:
+
+\`\`\`
+/role-manage action:add category:animal role:@lis description:Lis emoji:🦊
+/role-manage action:add category:animal role:@pies description:Pies emoji:🐕
+/role-manage action:add category:animal role:@kot description:Kot emoji:🐈
+\`\`\`
+
+> **Uwaga:** Obsługiwane są również niestandardowe emoji serwera. Skopiuj ich identyfikator z Discorda w formacie \`<:nazwaemoji:123456789>\`.
+
+---
+
+## 📢 Krok 3 — Opublikuj panel
+
+Po skonfigurowaniu ról opublikuj panel na wybranym kanale:
+
+\`\`\`
+/role-create category:animal channel:#role
+\`\`\`
+
+Bot wykona następujące czynności:
+
+1. Utworzy wiadomość embed na wskazanym kanale
+2. Wyświetli skonfigurowane role wraz z emoji i opisami
+3. Automatycznie doda odpowiednie reakcje pod wiadomością
+
+Efekt będzie wyglądał następująco:
+
+> **Role — animal**
+> 🦊 — Lis
+> 🐕 — Pies
+> 🐈 — Kot
+
+Użytkownicy muszą jedynie kliknąć reakcję, aby otrzymać powiązaną rolę, a następnie kliknąć ją ponownie, aby ją usunąć.
+
+---
+
+## ✏️ Edytowanie istniejącej roli
+
+Aby zmienić opis lub emoji już skonfigurowanej roli:
+
+\`\`\`
+/role-manage action:update category:animal role:@lis description:Lis polarny emoji:🦊
+\`\`\`
+
+Aby zastąpić jedną rolę inną:
+
+\`\`\`
+/role-manage action:update category:animal role:@stararola new_role:@nowarola
+\`\`\`
+
+Opublikowany panel jest automatycznie aktualizowany.
+
+---
+
+## 🗑️ Usuwanie roli z panelu
+
+\`\`\`
+/role-manage action:delete category:animal role:@pies
+\`\`\`
+
+Panel jest automatycznie aktualizowany. Jeśli była to ostatnia rola w kategorii, wiadomość zostanie usunięta.
+
+---
+
+## 📋 Zmiana nazwy kategorii
+
+\`\`\`
+/role-category action:update name:animal new_name:zwierzeta
+\`\`\`
+
+---
+
+## ❌ Usuwanie kategorii
+
+\`\`\`
+/role-category action:delete name:animal
+\`\`\`
+
+Spowoduje to usunięcie kategorii, wszystkich skonfigurowanych ról oraz opublikowanej wiadomości panelu.
+
+---
+
+## 🔍 Wyświetlanie istniejących kategorii
+
+\`\`\`
+/role-category-list
+\`\`\`
+
+Wyświetla wszystkie kategorie na serwerze, role, które zawierają, oraz informację, czy ich panel został opublikowany.
+`,
+
   commandMustBeUsedInServer: "Ta komenda musi być użyta na serwerze.",
   actionMustBeUsedInServer: "Ta akcja musi być użyta na serwerze.",
   commandMustBeUsedInTextChannel: "Ta komenda musi być użyta na kanale tekstowym",

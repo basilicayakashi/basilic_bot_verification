@@ -1,5 +1,11 @@
 export type MessagesIn = {
     helpMessage: string;
+    helpAbout: string;
+    helpVerification: string;
+    helpSpam: string;
+    helpReactionRoles: string;
+    helpFreeGames: string;
+    helpPermissions: string;
     commandMustBeUsedInServer: string;
     actionMustBeUsedInServer: string;
     commandMustBeUsedInTextChannel: string;

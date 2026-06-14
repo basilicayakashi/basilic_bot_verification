@@ -105,6 +105,101 @@ Mit diesem Befehl kannst du:
 
 ---
 
+# 🎭 Reaction Roles — Benutzerhandbuch
+
+## 📂 Schritt 1 — Eine Kategorie erstellen
+
+Bevor du Rollen hinzufügst, musst du eine Kategorie erstellen, die sie gruppiert.
+
+\`\`\`
+/role-category action:create name:tier
+\`\`\`
+
+Eine Kategorie stellt eine thematische Gruppe von Rollen dar (z.B. Tiere, Sprachen, Interessen...).
+
+## ➕ Schritt 2 — Rollen zur Kategorie hinzufügen
+
+Für jede Rolle, die du den Mitgliedern anbieten möchtest, verwende:
+
+\`\`\`
+/role-manage action:add categorie:tier role:@fuchs description:Fuchs emoji:🦊
+/role-manage action:add categorie:tier role:@hund description:Hund emoji:🐕
+/role-manage action:add categorie:tier role:@katze description:Katze emoji:🐈
+\`\`\`
+
+> **Hinweis:** Benutzerdefinierte Server-Emojis werden ebenfalls unterstützt. Kopiere ihre ID aus Discord im Format \`<:emojiname:123456789>\`.
+
+## 📢 Schritt 3 — Das Panel veröffentlichen
+
+Sobald deine Rollen konfiguriert sind, veröffentliche das Panel im gewünschten Kanal:
+
+\`\`\`
+/role-create categorie:tier channel:#rollen
+\`\`\`
+
+Der Bot wird dann:
+
+1. Eine Embed-Nachricht im angegebenen Kanal erstellen
+2. Die konfigurierten Rollen mit ihren Emojis und Beschreibungen auflisten
+3. Die entsprechenden Reaktionen automatisch unter der Nachricht hinzufügen
+
+Das Ergebnis sieht so aus:
+
+> **Rollen — tier**
+> 🦊 — Fuchs
+> 🐕 — Hund
+> 🐈 — Katze
+
+Die Mitglieder klicken einfach auf eine Reaktion, um die zugehörige Rolle zu erhalten, und klicken erneut, um sie zu entfernen.
+
+## ✏️ Eine bestehende Rolle bearbeiten
+
+Um die Beschreibung oder das Emoji einer bereits konfigurierten Rolle zu ändern:
+
+\`\`\`
+/role-manage action:update categorie:tier role:@fuchs description:Polarfuchs emoji:🦊
+\`\`\`
+
+Um eine Rolle durch eine andere zu ersetzen:
+
+\`\`\`
+/role-manage action:update categorie:tier role:@alterole new_role:@neurole
+\`\`\`
+
+Das veröffentlichte Panel wird automatisch aktualisiert.
+
+## 🗑️ Eine Rolle aus dem Panel entfernen
+
+\`\`\`
+/role-manage action:delete categorie:tier role:@hund
+\`\`\`
+
+Das Panel wird automatisch aktualisiert. War es die letzte Rolle der Kategorie, wird die Nachricht gelöscht.
+
+## 📋 Eine Kategorie umbenennen
+
+\`\`\`
+/role-category action:update name:tier new_name:tiere
+\`\`\`
+
+## ❌ Eine Kategorie löschen
+
+\`\`\`
+/role-category action:delete name:tier
+\`\`\`
+
+Dies löscht die Kategorie, alle ihre konfigurierten Rollen und die veröffentlichte Panel-Nachricht.
+
+## 🔍 Bestehende Kategorien anzeigen
+
+\`\`\`
+/role-category-list
+\`\`\`
+
+Zeigt alle Serverkategorien, die darin enthaltenen Rollen und ob ihr Panel veröffentlicht ist.
+
+---
+
 ## 🎮 Kostenlose Spiele
 
 Der Bot kann automatisch kostenlose Spielaktionen veröffentlichen von:
@@ -149,6 +244,268 @@ Dieser Befehl bietet eine zentrale Übersicht über alle serverspezifischen Eins
 ## 🔒 Berechtigungen
 
 Die meisten Konfigurationsbefehle benötigen **Administratorrechte**.
+`,
+
+  helpAbout: `
+# 🤖 Über den Bot
+
+Dieser Bot bietet Funktionen zur **Mitgliederverifizierung**, **Spam-Erkennung**, **Mitgliederanalyse** und **Benachrichtigungen über kostenlose Spiele** für deinen Discord-Server.
+
+---
+
+## ⚙️ Übersicht der Servereinstellungen
+
+Verwende:
+
+\`/view-settings\`
+
+um die vollständige Konfiguration des Bots auf dem Server anzuzeigen, einschließlich:
+
+* der Verifizierungseinstellungen
+* der Verifizierungsfragen
+* der Einstellungen für kostenlose Spiele
+
+Dieser Befehl bietet eine zentrale Übersicht über alle serverspezifischen Einstellungen.
+
+---
+
+\`/role-used-msg-delete\` — Löscht automatisch jede neue Nachricht, die eine der konfigurierten Rollen erwähnt. Der Serverbesitzer ist von dieser Regel ausgenommen. Dies ist nützlich, um Missbrauch durch Massen-Erwähnungen wie @everyone zu verhindern.
+`,
+
+helpVerification: `
+## 🔐 Mitgliederverifizierung
+
+### Verifizierung aktivieren
+
+Verwende:
+
+\`/setup-verification\`
+
+um die Verifizierung neuer Mitglieder einzurichten.
+
+Du kannst Folgendes festlegen:
+
+* die verifizierte Rolle, die nach der Genehmigung vergeben wird
+* die Moderationsrolle
+* die Moderationskategorie
+* die maximale Verifizierungsdauer
+
+### Verifizierungsfragen verwalten
+
+Nach der Aktivierung der Verifizierung kannst du die Fragen anpassen, die neuen Mitgliedern angezeigt werden:
+
+* \`/add-verification-question\` → eine Frage hinzufügen
+* \`/edit-verification-question\` → eine bestehende Frage bearbeiten
+* \`/delete-verification-question\` → eine Frage löschen
+
+Alle konfigurierten Fragen können mit folgendem Befehl angezeigt werden:
+
+\`/view-settings\`
+
+### So funktioniert die Verifizierung
+
+1. Der Bot veröffentlicht einen Verifizierungsbutton im konfigurierten Kanal.
+2. Ein neues Mitglied klickt auf den Button und beantwortet die konfigurierten Fragen.
+3. Ein Verifizierungskanal für das Moderationsteam wird automatisch erstellt.
+4. Das Moderationsteam kann:
+   * die Verifizierungsanfrage genehmigen
+   * die Verifizierungsanfrage ablehnen
+   * das Mitglied auf die Blacklist setzen
+   * einen privaten Gesprächskanal mit dem Mitglied eröffnen, um zusätzliche Informationen zu erhalten
+5. Wird die Anfrage genehmigt, wird die verifizierte Rolle automatisch vergeben.
+
+---
+
+## 👤 Manuelle Mitgliederverifizierung
+
+Du kannst ein Mitglied manuell verifizieren, unabhängig davon, ob es sich bereits auf dem Server befindet oder nicht.
+
+Verwende:
+
+\`/verify-member\`
+
+mit der Discord-ID des Mitglieds.
+
+Der Bot:
+
+* weist die verifizierte Rolle sofort zu, wenn das Mitglied bereits auf dem Server ist
+* verifiziert das Mitglied automatisch, wenn es später dem Server beitritt
+
+---
+
+## 🔎 Mitgliederanalyse
+
+Verwende:
+
+\`/check-member\`
+
+um ein Discord-Konto zu analysieren.
+
+Dieser Befehl ermöglicht es:
+
+* zu sehen, auf welchen Servern das Mitglied vorhanden ist (nur Server, auf denen der Bot installiert ist)
+* festzustellen, ob das Mitglied auf einer Blacklist steht
+* die auf jedem Server gespeicherten Blacklist-Gründe einzusehen
+* Moderatoren dabei zu helfen, potenziell problematische Nutzer in mehreren Communities zu identifizieren
+`,
+
+helpSpam: `
+## 🛡️ Spam-Erkennung
+
+Der Bot kann verdächtige Aktivitäten überwachen.
+
+Verwende:
+
+\`/setup-spam-detection\`
+
+um Folgendes zu konfigurieren:
+
+* die Aktivierung oder Deaktivierung der Erkennung
+* den Alarmkanal
+* die Erwähnung der Moderationsrolle
+* die Erkennungsschwellenwerte
+
+Wenn verdächtige Aktivitäten erkannt werden, werden automatisch Warnmeldungen an das Moderationsteam gesendet.
+`,
+
+helpFreeGames: `
+## 🎮 Benachrichtigungen über kostenlose Spiele
+
+Der Bot kann automatisch Angebote für kostenlose Spiele veröffentlichen von:
+
+* Steam
+* Epic Games
+
+Mit den entsprechenden Befehlen kannst du:
+
+* Benachrichtigungen aktivieren oder deaktivieren
+* einen Veröffentlichungskanal auswählen
+* Plattformen aktivieren oder deaktivieren
+
+Die Spiele werden automatisch:
+
+* im konfigurierten Kanal veröffentlicht
+* nach dem Ende des Angebots sortiert
+* entfernt, sobald das Angebot abläuft
+`,
+
+helpPermissions: `
+## 🔒 Berechtigungen
+
+Die meisten Konfigurationsbefehle erfordern **Administrator**-Berechtigungen.
+`,
+
+helpReactionRoles: `
+# 🎭 Reaction Roles — Benutzerhandbuch
+
+Reaction Roles ermöglichen es deinen Mitgliedern, sich selbst Rollen zuzuweisen oder zu entfernen, indem sie auf eine Emoji-Reaktion unter einer Nachricht klicken.
+
+---
+
+## 📂 Schritt 1 — Eine Kategorie erstellen
+
+Bevor Rollen hinzugefügt werden können, muss eine Kategorie erstellt werden, die diese zusammenfasst.
+
+\`\`\`
+/role-category action:create name:animal
+\`\`\`
+
+Eine Kategorie stellt eine thematische Gruppe von Rollen dar (z. B. Tiere, Sprachen oder Interessen).
+
+---
+
+## ➕ Schritt 2 — Rollen zur Kategorie hinzufügen
+
+Verwende für jede Rolle, die du den Mitgliedern anbieten möchtest:
+
+\`\`\`
+/role-manage action:add category:animal role:@fuchs description:Fuchs emoji:🦊
+/role-manage action:add category:animal role:@hund description:Hund emoji:🐕
+/role-manage action:add category:animal role:@katze description:Katze emoji:🐈
+\`\`\`
+
+> **Hinweis:** Benutzerdefinierte Server-Emojis werden ebenfalls unterstützt. Kopiere ihre Kennung aus Discord im Format \`<:emojiname:123456789>\`.
+
+---
+
+## 📢 Schritt 3 — Das Panel veröffentlichen
+
+Sobald die Rollen konfiguriert sind, veröffentliche das Panel im gewünschten Kanal:
+
+\`\`\`
+/role-create category:animal channel:#rollen
+\`\`\`
+
+Der Bot wird dann:
+
+1. Eine Embed-Nachricht im angegebenen Kanal erstellen
+2. Die konfigurierten Rollen mit ihren Emojis und Beschreibungen auflisten
+3. Die entsprechenden Reaktionen automatisch unter der Nachricht hinzufügen
+
+Das Ergebnis sieht etwa so aus:
+
+> **Rollen — animal**
+> 🦊 — Fuchs
+> 🐕 — Hund
+> 🐈 — Katze
+
+Die Mitglieder müssen lediglich auf eine Reaktion klicken, um die entsprechende Rolle zu erhalten, und erneut darauf klicken, um sie zu entfernen.
+
+---
+
+## ✏️ Eine bestehende Rolle bearbeiten
+
+Um die Beschreibung oder das Emoji einer bereits konfigurierten Rolle zu ändern:
+
+\`\`\`
+/role-manage action:update category:animal role:@fuchs description:Polarfuchs emoji:🦊
+\`\`\`
+
+Um eine Rolle durch eine andere zu ersetzen:
+
+\`\`\`
+/role-manage action:update category:animal role:@alterolle new_role:@neuerolle
+\`\`\`
+
+Das veröffentlichte Panel wird automatisch aktualisiert.
+
+---
+
+## 🗑️ Eine Rolle aus dem Panel entfernen
+
+\`\`\`
+/role-manage action:delete category:animal role:@hund
+\`\`\`
+
+Das Panel wird automatisch aktualisiert. Falls es die letzte Rolle der Kategorie war, wird die Nachricht gelöscht.
+
+---
+
+## 📋 Eine Kategorie umbenennen
+
+\`\`\`
+/role-category action:update name:animal new_name:tiere
+\`\`\`
+
+---
+
+## ❌ Eine Kategorie löschen
+
+\`\`\`
+/role-category action:delete name:animal
+\`\`\`
+
+Dadurch werden die Kategorie, alle konfigurierten Rollen und die veröffentlichte Panel-Nachricht gelöscht.
+
+---
+
+## 🔍 Vorhandene Kategorien anzeigen
+
+\`\`\`
+/role-category-list
+\`\`\`
+
+Zeigt alle Kategorien des Servers, die darin enthaltenen Rollen und ob ihr Panel veröffentlicht wurde.
 `,
 
   commandMustBeUsedInServer: "Dieser Befehl muss innerhalb eines Servers verwendet werden.",

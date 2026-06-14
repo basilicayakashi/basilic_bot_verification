@@ -482,15 +482,35 @@ export const commands = [
     ),
 
   new SlashCommandBuilder()
-    .setName("bot-help")
-    .setDescription("Show the bot setup guide and useful commands")
+    .setName("help")
+    .setDescription("Display the bot documentation for a given section")
     .setDescriptionLocalizations({
-      [Locale.French]: "Afficher le guide de configuration du bot et les commandes utiles",
-      [Locale.SpanishES]: "Mostrar la guía de configuración del bot y comandos útiles",
-      [Locale.German]: "Die Bot-Setup-Anleitung und nützliche Befehle anzeigen",
-      [Locale.Polish]: "Pokaż przewodnik konfiguracji bota i przydatne polecenia",
+      [Locale.French]: "Afficher la documentation du bot pour une section donnée",
+      [Locale.SpanishES]: "Mostrar la documentación del bot para una sección",
+      [Locale.German]: "Bot-Dokumentation für einen Abschnitt anzeigen",
+      [Locale.Polish]: "Wyświetl dokumentację bota dla wybranej sekcji",
     })
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addStringOption((o) =>
+      o
+        .setName("section")
+        .setDescription("Section to display")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Section à afficher",
+          [Locale.SpanishES]: "Sección a mostrar",
+          [Locale.German]: "Anzuzeigender Abschnitt",
+          [Locale.Polish]: "Sekcja do wyświetlenia",
+        })
+        .setRequired(true)
+        .addChoices(
+          { name: "about", value: "about" },
+          { name: "verification", value: "verification" },
+          { name: "spam", value: "spam" },
+          { name: "reaction-roles", value: "reaction-roles" },
+          { name: "free-games", value: "free-games" },
+          { name: "permissions", value: "permissions" },
+        )
+    ),
 
   new SlashCommandBuilder()
     .setName("unblacklist-member")
@@ -2078,6 +2098,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         return;
       }
 
+      /*
       if (interaction.commandName === "bot-help") {
         const chunks = splitMessage(msgIn.helpMessage, 2000);
 
@@ -2088,6 +2109,35 @@ client.on(Events.InteractionCreate, async (interaction) => {
             content: chunks[i],
             flags: MessageFlags.Ephemeral,
           });
+        }
+
+        return;
+      }
+        */
+
+      if (interaction.commandName === "help") {
+        const section = interaction.options.getString("section", true);
+
+        const sectionMap: Record<string, string> = {
+          "about": msgIn.helpAbout,
+          "verification": msgIn.helpVerification,
+          "spam": msgIn.helpSpam,
+          "reaction-roles": msgIn.helpReactionRoles,
+          "free-games": msgIn.helpFreeGames,
+          "permissions": msgIn.helpPermissions,
+        };
+
+        const content = sectionMap[section];
+        if (!content) {
+          await replyEphemeral(interaction, msgIn.errorOccurred);
+          return;
+        }
+
+        const chunks = splitMessage(content);
+        await replyEphemeral(interaction, chunks[0]);
+
+        for (let i = 1; i < chunks.length; i++) {
+          await interaction.followUp({ content: chunks[i], flags: MessageFlags.Ephemeral });
         }
 
         return;

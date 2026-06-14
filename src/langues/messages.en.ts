@@ -105,6 +105,101 @@ This command allows you to:
 
 ---
 
+# 🎭 Reaction Roles — User Guide
+
+## 📂 Step 1 — Create a category
+
+Before adding roles, you need to create a category to group them.
+
+\`\`\`
+/role-category action:create name:animal
+\`\`\`
+
+A category represents a thematic group of roles (e.g. animals, languages, interests...).
+
+## ➕ Step 2 — Add roles to the category
+
+For each role you want to offer to members, use:
+
+\`\`\`
+/role-manage action:add categorie:animal role:@fox description:Fox emoji:🦊
+/role-manage action:add categorie:animal role:@dog description:Dog emoji:🐕
+/role-manage action:add categorie:animal role:@cat description:Cat emoji:🐈
+\`\`\`
+
+> **Note:** Custom server emojis are also supported. Copy their identifier from Discord in the format \`<:emojiname:123456789>\`.
+
+## 📢 Step 3 — Publish the panel
+
+Once your roles are configured, publish the panel in the channel of your choice:
+
+\`\`\`
+/role-create categorie:animal channel:#roles
+\`\`\`
+
+The bot will then:
+
+1. Create an embed message in the specified channel
+2. List the configured roles with their emojis and descriptions
+3. Automatically add the corresponding reactions under the message
+
+The result will look like:
+
+> **Roles — animal**
+> 🦊 — Fox
+> 🐕 — Dog
+> 🐈 — Cat
+
+Members simply click a reaction to get the associated role, and click again to remove it.
+
+## ✏️ Edit an existing role
+
+To change the description or emoji of an already configured role:
+
+\`\`\`
+/role-manage action:update categorie:animal role:@fox description:Arctic Fox emoji:🦊
+\`\`\`
+
+To replace a role with another:
+
+\`\`\`
+/role-manage action:update categorie:animal role:@oldrole new_role:@newrole
+\`\`\`
+
+The published panel is automatically updated.
+
+## 🗑️ Remove a role from the panel
+
+\`\`\`
+/role-manage action:delete categorie:animal role:@dog
+\`\`\`
+
+The panel is automatically updated. If it was the last role in the category, the message is deleted.
+
+## 📋 Rename a category
+
+\`\`\`
+/role-category action:update name:animal new_name:animals
+\`\`\`
+
+## ❌ Delete a category
+
+\`\`\`
+/role-category action:delete name:animal
+\`\`\`
+
+This deletes the category, all its configured roles, and the published panel message.
+
+## 🔍 View existing categories
+
+\`\`\`
+/role-category-list
+\`\`\`
+
+Displays all server categories, the roles they contain, and whether their panel is published.
+
+---
+
 ## 🎮 Free games notifications
 
 The bot can automatically publish **free game promotions** from:
@@ -150,6 +245,269 @@ This command provides a centralized overview of all server-specific settings man
 
 Most configuration commands require **Administrator** permissions.
 `,
+
+  helpAbout: `
+# 🤖 About the bot
+
+This bot provides **member verification**, **spam detection**, **member analysis**, and **free game notifications** for your Discord server.
+
+---
+
+## ⚙️ Server settings overview
+
+Use:
+
+\`/view-settings\`
+
+to display the complete bot configuration for the server, including:
+
+* verification settings
+* verification questions
+* free games settings
+
+This command provides a centralized overview of all server-specific settings.
+
+---
+
+\`/role-used-msg-delete\` — Automatically deletes any new message mentioning one of the configured roles. The server owner is exempt from this rule. Useful for preventing mass mention abuse such as @everyone.
+`,
+
+  helpVerification: `
+## 🔐 Member Verification
+
+### Enable verification
+
+Use:
+
+\`/setup-verification\`
+
+to configure verification for new members.
+
+You can define:
+
+* the verified role assigned upon approval
+* the moderation role
+* the moderation category
+* the maximum verification duration
+
+### Manage verification questions
+
+After enabling verification, you can customize the questions displayed to new members:
+
+* \`/add-verification-question\` → add a question
+* \`/edit-verification-question\` → edit an existing question
+* \`/delete-verification-question\` → delete a question
+
+All configured questions can be viewed using:
+
+\`/view-settings\`
+
+### How verification works
+
+1. The bot publishes a verification button in the configured channel.
+2. A new member clicks the button and answers the configured questions.
+3. A verification channel dedicated to moderation is automatically created.
+4. The moderation team can:
+   * approve the verification request
+   * reject the verification request
+   * blacklist the member
+   * open a private discussion channel with the member to obtain additional information
+5. If the request is approved, the verified role is automatically assigned.
+
+---
+
+## 👤 Manual member verification
+
+You can manually verify a member, whether they are already present on the server or not.
+
+Use:
+
+\`/verify-member\`
+
+with the member's Discord ID.
+
+The bot will:
+
+* immediately assign the verified role if the member is already present
+* automatically verify them when they join the server later
+
+---
+
+## 🔎 Member analysis
+
+Use:
+
+\`/check-member\`
+
+to analyze a Discord account.
+
+This command allows you to:
+
+* see on which servers the member is present (only servers where the bot is installed)
+* determine whether the member has been blacklisted
+* view the blacklist reasons recorded on each server
+* help moderators identify potentially problematic users across multiple communities
+`,
+
+helpSpam: `
+## 🛡️ Spam Detection
+
+The bot can monitor suspicious activity.
+
+Use:
+
+\`/setup-spam-detection\`
+
+to configure:
+
+* enabling or disabling spam detection
+* the alert channel
+* the moderation role mention
+* the detection thresholds
+
+When suspicious activity is detected, alerts are automatically sent to the moderation team.
+`,
+
+helpFreeGames: `
+## 🎮 Free Game Notifications
+
+The bot can automatically publish promotions for free games from:
+
+* Steam
+* Epic Games
+
+The dedicated commands allow you to:
+
+* enable or disable notifications
+* choose a publication channel
+* enable or disable platforms
+
+Games are automatically:
+
+* published in the configured channel
+* sorted by their promotion end date
+* removed when the promotion expires
+`,
+
+helpPermissions: `
+## 🔒 Permissions
+
+Most configuration commands require **Administrator** permissions.
+`,
+
+helpReactionRoles: `
+# 🎭 Reaction Roles — User Guide
+
+Reaction roles allow your members to assign or remove roles themselves by clicking on an emoji reaction under a message.
+
+---
+
+## 📂 Step 1 — Create a category
+
+Before adding roles, you must create a category to group them together.
+
+\`\`\`
+/role-category action:create name:animal
+\`\`\`
+
+A category represents a thematic group of roles (e.g. animals, languages, interests...).
+
+---
+
+## ➕ Step 2 — Add roles to the category
+
+For each role you want to offer to members, use:
+
+\`\`\`
+/role-manage action:add category:animal role:@fox description:Fox emoji:🦊
+/role-manage action:add category:animal role:@dog description:Dog emoji:🐕
+/role-manage action:add category:animal role:@cat description:Cat emoji:🐈
+\`\`\`
+
+> **Note:** Custom server emojis are also supported. Copy their identifier from Discord in the format \`<:emojiname:123456789>\`.
+
+---
+
+## 📢 Step 3 — Publish the panel
+
+Once your roles are configured, publish the panel in the channel of your choice:
+
+\`\`\`
+/role-create category:animal channel:#roles
+\`\`\`
+
+The bot will then:
+
+1. Create an embed message in the specified channel
+2. List the configured roles along with their emojis and descriptions
+3. Automatically add the corresponding reactions below the message
+
+The result will look like this:
+
+> **Roles — animal**
+> 🦊 — Fox
+> 🐕 — Dog
+> 🐈 — Cat
+
+Members simply need to click on a reaction to obtain the associated role, and click it again to remove it.
+
+---
+
+## ✏️ Edit an existing role
+
+To change the description or emoji of an already configured role:
+
+\`\`\`
+/role-manage action:update category:animal role:@fox description:Arctic Fox emoji:🦊
+\`\`\`
+
+To replace one role with another:
+
+\`\`\`
+/role-manage action:update category:animal role:@oldrole new_role:@newrole
+\`\`\`
+
+The published panel is automatically updated.
+
+---
+
+## 🗑️ Remove a role from the panel
+
+\`\`\`
+/role-manage action:delete category:animal role:@dog
+\`\`\`
+
+The panel is automatically updated. If it was the last role in the category, the message is deleted.
+
+---
+
+## 📋 Rename a category
+
+\`\`\`
+/role-category action:update name:animal new_name:animals
+\`\`\`
+
+---
+
+## ❌ Delete a category
+
+\`\`\`
+/role-category action:delete name:animal
+\`\`\`
+
+This deletes the category, all its configured roles, and the published panel message.
+
+---
+
+## 🔍 View existing categories
+
+\`\`\`
+/role-category-list
+\`\`\`
+
+Displays all categories on the server, the roles they contain, and whether their panel has been published.
+`,
+
   commandMustBeUsedInServer: "This command must be used inside a server.",
   actionMustBeUsedInServer: "This action must be used inside a server.",
   commandMustBeUsedInTextChannel: "This command must be used in a text channel",

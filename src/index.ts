@@ -255,14 +255,14 @@ export const commands = [
     .addStringOption((option) =>
       option
         .setName("reason")
-        .setDescription("Add a reason (optional)")
+        .setDescription("Add a reason")
         .setDescriptionLocalizations({
-          [Locale.French]: "Ajouter une raison (optionnel)",
-          [Locale.SpanishES]: "Agregar una razón (opcional)",
-          [Locale.German]: "Grund hinzufügen (optional)",
-          [Locale.Polish]: "Dodaj powód (opcjonalnie)",
+          [Locale.French]: "Ajouter une raison",
+          [Locale.SpanishES]: "Agregar una razón",
+          [Locale.German]: "Grund hinzufügen",
+          [Locale.Polish]: "Dodaj powód",
         })
-        .setRequired(false)
+        .setRequired(true)
     ),
 
   new SlashCommandBuilder()
@@ -1851,7 +1851,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         if (!context) return;
 
         const targetUserId = interaction.options.getString("user_id", true);
-        const reason = interaction.options.getString("reason", false);
+        const reason = interaction.options.getString("reason", true);
 
         const result = await blacklistMemberInGuild({
           guild: interaction.guild,

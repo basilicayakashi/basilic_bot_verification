@@ -439,7 +439,7 @@ export const getExpiredFreeGamePublicationsStmt = db.prepare(`
     fgp.message_id
   FROM free_games_publications fgp
   INNER JOIN free_games fg ON fg.id = fgp.free_game_id
-  WHERE fg.expires_at < CURRENT_TIMESTAMP
+  WHERE fg.expires_at < strftime('%Y-%m-%dT%H:%M:%S.000Z', 'now')
     AND fgp.channel_id IS NOT NULL
     AND fgp.message_id IS NOT NULL
 `);

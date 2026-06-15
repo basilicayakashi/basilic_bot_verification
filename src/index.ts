@@ -1583,7 +1583,7 @@ client.once(Events.ClientReady, async (readyClient) => {
     } catch (error) {
       console.error("❌ Erreur dnas la tâche réccurrente :", error);
     }
-  }, ONE_HOUR);
+  }, 20*ONE_MINUTE);
 });
 
 

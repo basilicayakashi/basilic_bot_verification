@@ -118,6 +118,10 @@ const STEAM_FREE_CHECK_INTERVAL_MINUTES = Number(
   process.env.STEAM_FREE_CHECK_INTERVAL_MINUTES ?? "60"
 );
 
+const BANNED_GUILD_IDS = new Set<string>([
+  "111", // exemple d'un serveur à blacklister
+]);
+
 // =========================
 // CLIENT
 // =========================
@@ -1252,16 +1256,8 @@ function isBasilicOrAuthorizedGuildOwner(interaction: any): boolean {
 }
 
 function isAuthorizedServer(interaction: any): boolean {
-  /*
-  const guildAllowed = getSetupPermissionStmt.get(
-    interaction.guild.id
-  ) as SetupVerificationPermissionRow | undefined;
 
-  return !!guildAllowed;
-  */
-
-  //au autorise tout serveur à utiliser le bot, sans condition
-  return true;
+  return !BANNED_GUILD_IDS.has(interaction.guild.id);
 }
 
 //si c'est moi
@@ -1583,7 +1579,7 @@ client.once(Events.ClientReady, async (readyClient) => {
     } catch (error) {
       console.error("❌ Erreur dnas la tâche réccurrente :", error);
     }
-  }, 20*ONE_MINUTE);
+  }, 20 * ONE_MINUTE);
 });
 
 

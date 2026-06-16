@@ -81,6 +81,7 @@ import {
   getReactionRolePanelByMessageIdStmt,
   deleteReactionRoleCategoryStmt,
   deleteReactionRolePanelStmt,
+  getBannedGuildStmt,
 } from "./database/sql.js";
 
 import type {
@@ -117,10 +118,6 @@ const isProduction = process.env.BOT_EN_PRODUCTION === "1";
 const STEAM_FREE_CHECK_INTERVAL_MINUTES = Number(
   process.env.STEAM_FREE_CHECK_INTERVAL_MINUTES ?? "60"
 );
-
-const BANNED_GUILD_IDS = new Set<string>([
-  "111", // exemple d'un serveur à blacklister
-]);
 
 // =========================
 // CLIENT
@@ -1257,7 +1254,7 @@ function isBasilicOrAuthorizedGuildOwner(interaction: any): boolean {
 
 function isAuthorizedServer(interaction: any): boolean {
 
-  return !BANNED_GUILD_IDS.has(interaction.guild.id);
+  return !getBannedGuildStmt.get(interaction.guild.id);
 }
 
 //si c'est moi

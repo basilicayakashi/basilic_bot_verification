@@ -217,6 +217,12 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS banned_guilds (
+    guild_id TEXT PRIMARY KEY
+  )
+`);
+
 export const getAllFreeGamesStmt = db.prepare(`
   SELECT *
   FROM free_games
@@ -571,6 +577,10 @@ export const getReactionRolePanelByMessageIdStmt = db.prepare(`
 
 export const deleteReactionRolePanelStmt = db.prepare(`
   DELETE FROM reaction_role_panels WHERE category_id = ?
+`);
+
+export const getBannedGuildStmt = db.prepare(`
+  SELECT 1 FROM banned_guilds WHERE guild_id = ? LIMIT 1
 `);
 
 export type VerifiedUserRow = {

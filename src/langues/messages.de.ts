@@ -736,7 +736,8 @@ ${roleMsgDeleteText}
   reactionRolePanelNotPublished: "*(Panel nicht veröffentlicht)*",
   welcomeMessageSaved: "✅ Willkommensnachricht gespeichert.",
   welcomeMessageDeleted: "✅ Willkommensnachricht gelöscht.",
-  welcomeMessageNoneConfigured: "❌ Keine Willkommensnachricht für diesen Server konfiguriert.",
+  welcomeMessageNoneConfigured: "❌ Keine Willkommensnachricht für diesen Server konfiguriert.",  
+  welcomeMessageNotFound: "❌ Message introuvable. Vérifie que l'ID est correct et que le bot a accès au salon.",
 };
 
 const de_out: MessagesOut = {

@@ -175,6 +175,7 @@ export type MessagesIn = {
     welcomeMessageSaved: string;
     welcomeMessageDeleted: string;
     welcomeMessageNoneConfigured: string;
+    welcomeMessageNotFound: string;
 };
 
 export type MessagesOut = {

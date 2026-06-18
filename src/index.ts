@@ -1015,12 +1015,12 @@ export const commands = [
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   new SlashCommandBuilder()
     .setName("set-welcome-message")
-    .setDescription("Set the welcome message sent in DM to new members")
+    .setDescription("ID of the message to use as welcome message")
     .setDescriptionLocalizations({
-      [Locale.French]: "Définir le message de bienvenue envoyé en DM aux nouveaux membres",
-      [Locale.German]: "Willkommensnachricht festlegen, die neuen Mitgliedern als DM gesendet wird",
-      [Locale.SpanishES]: "Establecer el mensaje de bienvenida enviado por DM a los nuevos miembros",
-      [Locale.Polish]: "Ustaw wiadomość powitalną wysyłaną w DM do nowych członków",
+      [Locale.French]: "ID du message à utiliser comme message de bienvenue",
+      [Locale.German]: "ID der Nachricht, die als Willkommensnachricht verwendet werden soll",
+      [Locale.SpanishES]: "ID del mensaje a usar como mensaje de bienvenida",
+      [Locale.Polish]: "ID wiadomości do użycia jako wiadomość powitalna",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((opt) =>
@@ -1047,7 +1047,7 @@ export const commands = [
       [Locale.Polish]: "Usuń wiadomość powitalną z tego serwera",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-  new SlashCommandBuilder() 
+  new SlashCommandBuilder()
     .setName("view-welcome-message")
     .setDescription("View the configured welcome message")
     .setDescriptionLocalizations({
@@ -2365,21 +2365,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       if (interaction.commandName === "set-welcome-message") {
         const member = await interaction.guild.members.fetch(interaction.user.id);
-        const message = interaction.options.getString("message", true);
-
         if (!isAdministrator(member, interaction)) {
-          await interaction.reply({
-            content: msgIn.onlyStaffCanUseCommand,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
+          return interaction.reply({ content: msgIn.onlyStaffCanUseCommand, flags: MessageFlags.Ephemeral });
         }
 
-        upsertGuildWelcomeMessageStmt.run(interaction.guildId, message, new Date().toISOString());
-        return interaction.reply({
-          content: msgIn.welcomeMessageSaved,
-          flags: MessageFlags.Ephemeral,
-        });
+        const messageId = interaction.options.getString("message_id", true);
+
+        // Cherche le message dans tous les salons texte du serveur
+        let messageContent: string | null = null;
+        for (const [, channel] of interaction.guild.channels.cache) {
+          if (!("messages" in channel)) continue;
+          const fetched = await channel.messages.fetch(messageId).catch(() => null);
+          if (fetched) {
+            messageContent = fetched.content;
+            break;
+          }
+        }
+
+        if (!messageContent) {
+          return interaction.reply({ content: msgIn.welcomeMessageNotFound, flags: MessageFlags.Ephemeral });
+        }
+
+        upsertGuildWelcomeMessageStmt.run(interaction.guildId, messageContent, new Date().toISOString());
+        return interaction.reply({ content: msgIn.welcomeMessageSaved, flags: MessageFlags.Ephemeral });
       }
 
       if (interaction.commandName === "delete-welcome-message") {

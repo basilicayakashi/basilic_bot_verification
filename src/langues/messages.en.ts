@@ -737,6 +737,7 @@ ${roleMsgDeleteText}
   welcomeMessageSaved: "✅ Welcome message saved.",
   welcomeMessageDeleted: "✅ Welcome message deleted.",
   welcomeMessageNoneConfigured: "❌ No welcome message configured for this server.",
+  welcomeMessageNotFound: "❌ Message introuvable. Vérifie que l'ID est correct et que le bot a accès au salon.",
 };
 
 const en_out: MessagesOut = {

@@ -745,6 +745,7 @@ ${roleMsgDeleteText}
   welcomeMessageSaved: "✅ Wiadomość powitalna zapisana.",
   welcomeMessageDeleted: "✅ Wiadomość powitalna usunięta.",
   welcomeMessageNoneConfigured: "❌ Brak skonfigurowanej wiadomości powitalnej na tym serwerze.",
+  welcomeMessageNotFound: "❌ Wiadomość nie znaleziona. Sprawdź, czy ID jest poprawne i czy bot ma dostęp do kanału.",
 };
 
 const pl_out: MessagesOut = {

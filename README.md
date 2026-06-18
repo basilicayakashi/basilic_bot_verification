@@ -178,6 +178,8 @@ free-games
 
 permissions
 
+donation
+
 ```
 
 

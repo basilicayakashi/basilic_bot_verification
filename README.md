@@ -1,4 +1,4 @@
-\# Discord Moderation \& Community Management Bot
+# Discord Moderation \& Community Management Bot
 
 
 
@@ -6,11 +6,11 @@ A powerful Discord bot focused on community security, member verification, moder
 
 
 
-\## Features
+## Features
 
 
 
-\### 🔐 Member Verification
+### 🔐 Member Verification
 
 
 
@@ -32,7 +32,7 @@ Protect your community with a customizable verification system.
 
 
 
-\### 🛡️ Shared Blacklist System
+### 🛡️ Shared Blacklist System
 
 
 
@@ -50,7 +50,7 @@ Moderators can identify problematic users across multiple communities.
 
 
 
-\### 🚨 Spam Detection
+### 🚨 Spam Detection
 
 
 
@@ -68,7 +68,7 @@ Automatically detect suspicious activity and alert moderators.
 
 
 
-\### 👋 Welcome Messages
+### 👋 Welcome Messages
 
 
 
@@ -86,7 +86,7 @@ Create personalized welcome messages for new members.
 
 
 
-\### 🎭 Reaction Roles
+### 🎭 Reaction Roles
 
 
 
@@ -104,7 +104,7 @@ Allow members to self-assign roles.
 
 
 
-\### 🎮 Free Games Notifications
+### 🎮 Free Games Notifications
 
 
 
@@ -122,7 +122,7 @@ Automatically share free game promotions.
 
 
 
-\### ⚙️ Multi-language Support
+### ⚙️ Multi-language Support
 
 
 
@@ -142,7 +142,7 @@ The bot supports multiple languages:
 
 
 
-\## Commands
+## Commands
 
 
 
@@ -182,7 +182,7 @@ permissions
 
 
 
-\## Built With
+## Built With
 
 
 
@@ -194,7 +194,7 @@ permissions
 
 
 
-\## Goal
+## Goal
 
 
 

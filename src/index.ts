@@ -1015,23 +1015,23 @@ export const commands = [
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   new SlashCommandBuilder()
     .setName("set-welcome-message")
-    .setDescription("ID of the message to use as welcome message")
+    .setDescription("Set the welcome message sent in DM to new members")
     .setDescriptionLocalizations({
-      [Locale.French]: "ID du message à utiliser comme message de bienvenue",
-      [Locale.German]: "ID der Nachricht, die als Willkommensnachricht verwendet werden soll",
-      [Locale.SpanishES]: "ID del mensaje a usar como mensaje de bienvenida",
-      [Locale.Polish]: "ID wiadomości do użycia jako wiadomość powitalna",
+      [Locale.French]: "Définir le message de bienvenue envoyé en DM aux nouveaux membres",
+      [Locale.German]: "Willkommensnachricht festlegen, die neuen Mitgliedern als DM gesendet wird",
+      [Locale.SpanishES]: "Establecer el mensaje de bienvenida enviado por DM a los nuevos miembros",
+      [Locale.Polish]: "Ustaw wiadomość powitalną wysyłaną w DM do nowych członków",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((opt) =>
       opt
-        .setName("message")
-        .setDescription("The message to send. Use {{mention}} to mention the new member.")
+        .setName("message_id")
+        .setDescription("ID of the message to use as welcome message")
         .setDescriptionLocalizations({
-          [Locale.French]: "Le message à envoyer. Utilise {{mention}} pour mentionner le nouveau membre.",
-          [Locale.German]: "Die zu sendende Nachricht. Verwende {{mention}}, um das neue Mitglied zu erwähnen.",
-          [Locale.SpanishES]: "El mensaje a enviar. Usa {{mention}} para mencionar al nuevo miembro.",
-          [Locale.Polish]: "Wiadomość do wysłania. Użyj {{mention}}, aby wspomnieć nowego członka.",
+          [Locale.French]: "ID du message à utiliser comme message de bienvenue",
+          [Locale.German]: "ID der Nachricht, die als Willkommensnachricht verwendet werden soll",
+          [Locale.SpanishES]: "ID del mensaje a usar como mensaje de bienvenida",
+          [Locale.Polish]: "ID wiadomości do użycia jako wiadomość powitalna",
         })
         .setRequired(true)
         .setMaxLength(2000)

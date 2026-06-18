@@ -2403,7 +2403,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         return;
       }
 
-      if (interaction.commandName === "test-welcome-message") {
+      if (interaction.commandName === "view-welcome-message") {
         const member = await interaction.guild.members.fetch(interaction.user.id);
 
         if (!isAdministrator(member, interaction)) {

@@ -272,7 +272,7 @@ Este comando proporciona una vista centralizada de todos los ajustes específico
 \`/role-used-msg-delete\` — Elimina automáticamente cualquier mensaje nuevo que mencione uno de los roles configurados. El propietario del servidor es el único que no se ve afectado. Resulta útil para evitar abusos de menciones masivas como @everyone.
 `,
 
-helpVerification: `
+  helpVerification: `
 ## 🔐 Verificación de miembros
 
 ### Activar la verificación
@@ -349,7 +349,7 @@ Este comando permite:
 * ayudar a los moderadores a identificar usuarios potencialmente problemáticos en varias comunidades
 `,
 
-helpSpam: `
+  helpSpam: `
 ## 🛡️ Detección de spam
 
 El bot puede supervisar actividades sospechosas.
@@ -368,7 +368,7 @@ para configurar:
 Cuando se detecta una actividad sospechosa, las alertas se envían automáticamente al equipo de moderación.
 `,
 
-helpFreeGames: `
+  helpFreeGames: `
 ## 🎮 Notificaciones de juegos gratuitos
 
 El bot puede publicar automáticamente promociones de juegos gratuitos procedentes de:
@@ -389,13 +389,13 @@ Los juegos se:
 * se eliminan cuando la promoción expira
 `,
 
-helpPermissions: `
+  helpPermissions: `
 ## 🔒 Permisos
 
 La mayoría de los comandos de configuración requieren permisos de **Administrador**.
 `,
 
-helpReactionRoles: `
+  helpReactionRoles: `
 # 🎭 Reaction Roles — Guía de uso
 
 Los reaction roles permiten que los miembros se asignen o eliminen roles por sí mismos haciendo clic en una reacción con emoji debajo de un mensaje.
@@ -734,6 +734,9 @@ ${roleMsgDeleteText}
   reactionRoleNoRole: "*Ningún rol*",
   reactionRolePanelPublishedIn: (channelId: string) => `\n📌 Panel publicado en <#${channelId}>`,
   reactionRolePanelNotPublished: "*(panel no publicado)*",
+  welcomeMessageSaved: "✅ Mensaje de bienvenida guardado.",
+  welcomeMessageDeleted: "✅ Mensaje de bienvenida eliminado.",
+  welcomeMessageNoneConfigured: "❌ No hay mensaje de bienvenida configurado en este servidor.",
 };
 
 const es_out: MessagesOut = {

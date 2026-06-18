@@ -172,7 +172,9 @@ export type MessagesIn = {
     reactionRoleNoRole: string;
     reactionRolePanelPublishedIn: (channelId: string) => string;
     reactionRolePanelNotPublished: string;
-
+    welcomeMessageSaved: string;
+    welcomeMessageDeleted: string;
+    welcomeMessageNoneConfigured: string;
 };
 
 export type MessagesOut = {

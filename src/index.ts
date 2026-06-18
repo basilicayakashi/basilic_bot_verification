@@ -28,10 +28,6 @@ import { SpamAlertService } from "./moderation/spam-alert.js";
 import {
   getVerifiedUserStmt,
   insertVerifiedUserStmt,
-  insertSetupPermissionStmt,
-  getSetupPermissionStmt,
-  getAuthorizedGuildIdsStmt,
-  getSetupPermissionByGuildStmt,
   getBlacklistedUserStmt,
   getBlacklistedUsersEverywhereStmt,
   insertBlacklistedUserStmt,
@@ -82,6 +78,8 @@ import {
   deleteReactionRoleCategoryStmt,
   deleteReactionRolePanelStmt,
   getBannedGuildStmt,
+  getAllFreeGamesSettingsStmt,
+  getFreeGamePublicationByMessageIdStmt
 } from "./database/sql.js";
 
 import type {
@@ -1015,6 +1013,38 @@ export const commands = [
       [Locale.Polish]: "Wyświetl kategorie ról reakcji i ich role",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  new SlashCommandBuilder()
+    .setName("set-welcome-message")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Définir le message de bienvenue envoyé en DM aux nouveaux membres",
+      [Locale.German]: "Willkommensnachricht festlegen, die neuen Mitgliedern als DM gesendet wird",
+      [Locale.SpanishES]: "Establecer el mensaje de bienvenida enviado por DM a los nuevos miembros",
+      [Locale.Polish]: "Ustaw wiadomość powitalną wysyłaną w DM do nowych członków",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addStringOption((opt) =>
+      opt
+        .setName("message")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Le message à envoyer. Utilise {{mention}} pour mentionner le nouveau membre.",
+          [Locale.German]: "Die zu sendende Nachricht. Verwende {{mention}}, um das neue Mitglied zu erwähnen.",
+          [Locale.SpanishES]: "El mensaje a enviar. Usa {{mention}} para mencionar al nuevo miembro.",
+          [Locale.Polish]: "Wiadomość do wysłania. Użyj {{mention}}, aby wspomnieć nowego członka.",
+        })
+        .setRequired(true)
+        .setMaxLength(2000)
+    ),
+
+  new SlashCommandBuilder()
+    .setName("delete-welcome-message")
+    .setDescription("Delete the welcome message for this server")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Supprimer le message de bienvenue du serveur",
+      [Locale.German]: "Die Willkommensnachricht für diesen Server löschen",
+      [Locale.SpanishES]: "Eliminar el mensaje de bienvenida de este servidor",
+      [Locale.Polish]: "Usuń wiadomość powitalną z tego serwera",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -1076,19 +1106,6 @@ function normalizeSupportedLocale(locale: string | null | undefined): "fr" | "en
   return "en";
 }
 
-async function canUseSetupVerification(interaction: any): Promise<boolean> {
-  const permission = getSetupPermissionStmt.get(
-    interaction.guild.id,
-    interaction.user.id
-  ) as SetupVerificationPermissionRow | undefined;
-
-  if (!isBasilic(interaction) && !permission) {
-    return false;
-  }
-
-  return true;
-}
-
 async function blacklistMemberInGuild(params: {
   guild: any;
   targetUserId: string;
@@ -1130,20 +1147,15 @@ async function blacklistMemberInGuild(params: {
   return { kicked: false, username: resolvedUsername };
 }
 
+//recherche dans quels serveurs le membre est présent
 async function findUserGuilds(targetUserId: string): Promise<string[]> {
-  const rows = getAuthorizedGuildIdsStmt.all() as AuthorizedGuildRow[];
-  const uniqueGuildIds = [...new Set(rows.map((row) => row.guild_id))];
   const foundGuilds: string[] = [];
 
-  for (const guildId of uniqueGuildIds) {
+  for (const [guildId, guild] of client.guilds.cache) {
     try {
-      const guild = await client.guilds.fetch(guildId).catch(() => null);
-      if (!guild) continue;
-
       const member = await guild.members.fetch(targetUserId).catch(() => null);
       if (!member) continue;
-
-      foundGuilds.push(`${guild.name} (${guild.id})`);
+      foundGuilds.push(`${guild.name} (${guildId})`);
     } catch {
       // ignore
     }
@@ -1536,6 +1548,31 @@ async function cleanupExpiredFreeGameMessages(): Promise<void> {
   }
 }
 
+async function cleanupOrphanFreeGameMessages(): Promise<void> {
+  // Récupère tous les salons configurés (un par guild)
+  const settings = getAllFreeGamesSettingsStmt.all() as { guild_id: string; channel_id: string }[];
+
+  for (const { guild_id, channel_id } of settings) {
+    const channel = await client.channels.fetch(channel_id).catch(() => null);
+    if (!channel || !("messages" in channel)) continue;
+
+    // Récupère les 100 derniers messages du salon
+    const messages = await channel.messages.fetch({ limit: 100 }).catch(() => null);
+    if (!messages) continue;
+
+    for (const [messageId, message] of messages) {
+      // Ignore les messages qui ne viennent pas du bot
+      if (message.author.id !== client.user?.id) continue;
+
+      // Vérifie si ce message_id est dans free_games_publications pour ce guild
+      const publication = getFreeGamePublicationByMessageIdStmt.get(guild_id, messageId);
+      if (!publication) {
+        await message.delete().catch(() => null);
+      }
+    }
+  }
+}
+
 
 // =========================
 // READY
@@ -1563,6 +1600,7 @@ client.once(Events.ClientReady, async (readyClient) => {
   }
 
   await cleanupExpiredFreeGameMessages();
+  await cleanupOrphanFreeGameMessages();
   await publishFreeGamesForAllGuilds();
 
   const ONE_MINUTE = 60 * 1000;
@@ -1572,6 +1610,7 @@ client.once(Events.ClientReady, async (readyClient) => {
   setInterval(async () => {
     try {
       await cleanupExpiredFreeGameMessages();
+      await cleanupOrphanFreeGameMessages();
       await publishFreeGamesForAllGuilds();
     } catch (error) {
       console.error("❌ Erreur dnas la tâche réccurrente :", error);
@@ -2314,6 +2353,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       if (interaction.commandName === "set-welcome-message") {
         const member = await interaction.guild.members.fetch(interaction.user.id);
+        const message = interaction.options.getString("message", true);
 
         if (!isAdministrator(member, interaction)) {
           await interaction.reply({
@@ -2323,22 +2363,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        const locale = interaction.options.getString("language", true);
-        const dmMessage = interaction.options.getString("message", true).trim();
-
-        upsertGuildWelcomeMessageStmt.run(
-          interaction.guild.id,
-          locale,
-          dmMessage.replaceAll("{n}", "\n").replaceAll("{N}", "\n"),
-          new Date().toISOString()
-        );
-
-        await interaction.reply({
-          content: `✅ Welcome message saved for \`${locale}\`.`,
+        upsertGuildWelcomeMessageStmt.run(interaction.guildId, message, new Date().toISOString());
+        return interaction.reply({
+          content: msgIn.welcomeMessageSaved,
           flags: MessageFlags.Ephemeral,
         });
-
-        return;
       }
 
       if (interaction.commandName === "delete-welcome-message") {
@@ -2352,73 +2381,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        const locale = interaction.options.getString("language", true);
-
-        const existingMessage = getGuildWelcomeMessageStmt.get(
-          interaction.guild.id,
-          locale
-        ) as GuildWelcomeMessageRow | undefined;
-
-        if (!existingMessage) {
-          await interaction.reply({
-            content: `No welcome message exists for \`${locale}\` on this server.`,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        deleteGuildWelcomeMessageStmt.run(interaction.guild.id, locale);
+        deleteGuildWelcomeMessageStmt.run(interaction.guild.id);
 
         await interaction.reply({
-          content: `✅ Welcome message deleted for \`${locale}\`.`,
+          content: msgIn.welcomeMessageDeleted,
           flags: MessageFlags.Ephemeral,
         });
-
-        return;
-      }
-
-      if (interaction.commandName === "view-welcome-messages") {
-        const member = await interaction.guild.members.fetch(interaction.user.id);
-
-        if (!isAdministrator(member, interaction)) {
-          await interaction.reply({
-            content: msgIn.onlyStaffCanUseCommand,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        const welcomeMessages = getGuildWelcomeMessagesAllStmt.all(
-          interaction.guild.id
-        ) as GuildWelcomeMessageRow[];
-
-        if (welcomeMessages.length === 0) {
-          await interaction.reply({
-            content: "No welcome messages are configured for this server.",
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
-        }
-
-        const content =
-          "**Configured welcome messages:**\n\n" +
-          welcomeMessages
-            .map((row) => `- \`${row.locale}\` → ${row.dm_message}`)
-            .join("\n");
-
-        const chunks = splitMessage(content);
-
-        await interaction.reply({
-          content: chunks[0],
-          flags: MessageFlags.Ephemeral,
-        });
-
-        for (let i = 1; i < chunks.length; i++) {
-          await interaction.followUp({
-            content: chunks[i],
-            flags: MessageFlags.Ephemeral,
-          });
-        }
 
         return;
       }
@@ -2434,39 +2402,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        const locale = interaction.options.getString("language", true);
-
-        const localizedWelcome = getGuildWelcomeMessageStmt.get(
-          interaction.guild.id,
-          locale
-        ) as GuildWelcomeMessageRow | undefined;
-
-        const fallbackWelcome =
-          locale === "en"
-            ? undefined
-            : (getGuildWelcomeMessageStmt.get(
-              interaction.guild.id,
-              "en"
-            ) as GuildWelcomeMessageRow | undefined);
-
-        const welcomeMessage = localizedWelcome ?? fallbackWelcome;
-
-        if (!welcomeMessage) {
-          await interaction.reply({
-            content: `No welcome message exists for \`${locale}\`, and no English fallback is configured either.`,
-            flags: MessageFlags.Ephemeral,
-          });
-          return;
+        const welcomeRow = getGuildWelcomeMessageStmt.get(interaction.guild.id) as GuildWelcomeMessageRow | undefined;
+        if (!welcomeRow) {
+          return interaction.reply({ content: msgIn.welcomeMessageNoneConfigured, flags: MessageFlags.Ephemeral });
         }
-
-        await interaction.reply({
-          content:
-            `**Preview for \`${locale}\`:**\n\n` +
-            welcomeMessage.dm_message,
-          flags: MessageFlags.Ephemeral,
+        const preview = welcomeRow.dm_message.replace("{{mention}}", `<@${interaction.user.id}>`);
+        return interaction.reply({
+          content: preview,
+          flags: MessageFlags.Ephemeral
         });
-
-        return;
       }
 
       if (interaction.commandName === "list-members-by-role-count") {
@@ -3006,9 +2950,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // =========================
 client.on(Events.GuildMemberAdd, async (member) => {
   try {
-    const guildAllowed = getSetupPermissionByGuildStmt.get(member.guild.id);
+    //est-ce que le serveur est blacklisté? 
+    const guildBanned = getBannedGuildStmt.get(member.guild.id);
 
-    if (!guildAllowed) return;
+    //si blacklisté, on ne fait rien
+    if (guildBanned) return;
 
     // =========================
     // 1️⃣ BLACKLIST (PRIORITAIRE)
@@ -3038,26 +2984,11 @@ client.on(Events.GuildMemberAdd, async (member) => {
     // =========================
     // 2️⃣ WELCOME DM
     // =========================
-    const targetLocale = normalizeSupportedLocale(member.guild.preferredLocale);
-
-    const localizedWelcome = getGuildWelcomeMessageStmt.get(
-      member.guild.id,
-      targetLocale
-    ) as GuildWelcomeMessageRow | undefined;
-
-    const fallbackWelcome =
-      targetLocale === "en"
-        ? undefined
-        : (getGuildWelcomeMessageStmt.get(
-          member.guild.id,
-          "en"
-        ) as GuildWelcomeMessageRow | undefined);
-
-    const welcomeMessage = localizedWelcome ?? fallbackWelcome;
-
-    if (welcomeMessage) {
+    const welcomeRow = getGuildWelcomeMessageStmt.get(member.guild.id) as GuildWelcomeMessageRow | undefined;
+    if (welcomeRow) {
+      const msg = welcomeRow.dm_message.replace("{{mention}}", `<@${member.id}>`);
       try {
-        await member.send(welcomeMessage.dm_message);
+        await member.send(msg);
       } catch {
         // DMs fermés
       }

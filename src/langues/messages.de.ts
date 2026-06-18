@@ -272,7 +272,7 @@ Dieser Befehl bietet eine zentrale Übersicht über alle serverspezifischen Eins
 \`/role-used-msg-delete\` — Löscht automatisch jede neue Nachricht, die eine der konfigurierten Rollen erwähnt. Der Serverbesitzer ist von dieser Regel ausgenommen. Dies ist nützlich, um Missbrauch durch Massen-Erwähnungen wie @everyone zu verhindern.
 `,
 
-helpVerification: `
+  helpVerification: `
 ## 🔐 Mitgliederverifizierung
 
 ### Verifizierung aktivieren
@@ -349,7 +349,7 @@ Dieser Befehl ermöglicht es:
 * Moderatoren dabei zu helfen, potenziell problematische Nutzer in mehreren Communities zu identifizieren
 `,
 
-helpSpam: `
+  helpSpam: `
 ## 🛡️ Spam-Erkennung
 
 Der Bot kann verdächtige Aktivitäten überwachen.
@@ -368,7 +368,7 @@ um Folgendes zu konfigurieren:
 Wenn verdächtige Aktivitäten erkannt werden, werden automatisch Warnmeldungen an das Moderationsteam gesendet.
 `,
 
-helpFreeGames: `
+  helpFreeGames: `
 ## 🎮 Benachrichtigungen über kostenlose Spiele
 
 Der Bot kann automatisch Angebote für kostenlose Spiele veröffentlichen von:
@@ -389,13 +389,13 @@ Die Spiele werden automatisch:
 * entfernt, sobald das Angebot abläuft
 `,
 
-helpPermissions: `
+  helpPermissions: `
 ## 🔒 Berechtigungen
 
 Die meisten Konfigurationsbefehle erfordern **Administrator**-Berechtigungen.
 `,
 
-helpReactionRoles: `
+  helpReactionRoles: `
 # 🎭 Reaction Roles — Benutzerhandbuch
 
 Reaction Roles ermöglichen es deinen Mitgliedern, sich selbst Rollen zuzuweisen oder zu entfernen, indem sie auf eine Emoji-Reaktion unter einer Nachricht klicken.
@@ -734,6 +734,9 @@ ${roleMsgDeleteText}
   reactionRoleNoRole: "*Keine Rolle*",
   reactionRolePanelPublishedIn: (channelId: string) => `\n📌 Panel veröffentlicht in <#${channelId}>`,
   reactionRolePanelNotPublished: "*(Panel nicht veröffentlicht)*",
+  welcomeMessageSaved: "✅ Willkommensnachricht gespeichert.",
+  welcomeMessageDeleted: "✅ Willkommensnachricht gelöscht.",
+  welcomeMessageNoneConfigured: "❌ Keine Willkommensnachricht für diesen Server konfiguriert.",
 };
 
 const de_out: MessagesOut = {

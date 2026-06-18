@@ -272,7 +272,7 @@ Ta komenda zapewnia scentralizowany podgląd wszystkich ustawień specyficznych 
 \`/role-used-msg-delete\` — Automatycznie usuwa każdą nową wiadomość zawierającą wzmiankę o jednej ze skonfigurowanych ról. Właściciel serwera nie podlega temu ograniczeniu. Funkcja ta jest przydatna do zapobiegania nadużyciom związanym z masowymi wzmiankami, takimi jak @everyone.
 `,
 
-helpVerification: `
+  helpVerification: `
 ## 🔐 Weryfikacja użytkowników
 
 ### Włączanie weryfikacji
@@ -349,7 +349,7 @@ Ta komenda pozwala:
 * pomóc moderatorom identyfikować potencjalnie problematycznych użytkowników w wielu społecznościach
 `,
 
-helpSpam: `
+  helpSpam: `
 ## 🛡️ Wykrywanie spamu
 
 Bot może monitorować podejrzaną aktywność.
@@ -368,7 +368,7 @@ aby skonfigurować:
 Gdy zostanie wykryta podejrzana aktywność, alerty są automatycznie wysyłane do zespołu moderacyjnego.
 `,
 
-helpFreeGames: `
+  helpFreeGames: `
 ## 🎮 Powiadomienia o darmowych grach
 
 Bot może automatycznie publikować informacje o promocjach darmowych gier z:
@@ -389,13 +389,13 @@ Gry są automatycznie:
 * usuwane po wygaśnięciu promocji
 `,
 
-helpPermissions: `
+  helpPermissions: `
 ## 🔒 Uprawnienia
 
 Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
 `,
 
-helpReactionRoles: `
+  helpReactionRoles: `
 # 🎭 Reaction Roles — Instrukcja użytkowania
 
 Reaction Roles pozwalają użytkownikom samodzielnie nadawać lub usuwać role poprzez kliknięcie reakcji emoji pod wiadomością.
@@ -742,6 +742,9 @@ ${roleMsgDeleteText}
   reactionRoleNoRole: "*Brak roli*",
   reactionRolePanelPublishedIn: (channelId: string) => `\n📌 Panel opublikowany w <#${channelId}>`,
   reactionRolePanelNotPublished: "*(panel nieopublikowany)*",
+  welcomeMessageSaved: "✅ Wiadomość powitalna zapisana.",
+  welcomeMessageDeleted: "✅ Wiadomość powitalna usunięta.",
+  welcomeMessageNoneConfigured: "❌ Brak skonfigurowanej wiadomości powitalnej na tym serwerze.",
 };
 
 const pl_out: MessagesOut = {

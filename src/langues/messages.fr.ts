@@ -738,6 +738,9 @@ ${roleMsgDeleteText}
   reactionRoleNoRole: "*Aucun rôle*",
   reactionRolePanelPublishedIn: (channelId: string) => `\n📌 Panel publié dans <#${channelId}>`,
   reactionRolePanelNotPublished: "*(panel non publié)*",
+  welcomeMessageSaved: "✅ Message de bienvenue enregistré.",
+  welcomeMessageDeleted: "✅ Message de bienvenue supprimé.",
+  welcomeMessageNoneConfigured: "❌ Aucun message de bienvenue configuré sur ce serveur.",
 };
 
 const fr_out: MessagesOut = {

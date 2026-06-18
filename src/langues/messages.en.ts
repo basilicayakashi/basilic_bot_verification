@@ -349,7 +349,7 @@ This command allows you to:
 * help moderators identify potentially problematic users across multiple communities
 `,
 
-helpSpam: `
+  helpSpam: `
 ## 🛡️ Spam Detection
 
 The bot can monitor suspicious activity.
@@ -368,7 +368,7 @@ to configure:
 When suspicious activity is detected, alerts are automatically sent to the moderation team.
 `,
 
-helpFreeGames: `
+  helpFreeGames: `
 ## 🎮 Free Game Notifications
 
 The bot can automatically publish promotions for free games from:
@@ -389,13 +389,13 @@ Games are automatically:
 * removed when the promotion expires
 `,
 
-helpPermissions: `
+  helpPermissions: `
 ## 🔒 Permissions
 
 Most configuration commands require **Administrator** permissions.
 `,
 
-helpReactionRoles: `
+  helpReactionRoles: `
 # 🎭 Reaction Roles — User Guide
 
 Reaction roles allow your members to assign or remove roles themselves by clicking on an emoji reaction under a message.
@@ -734,6 +734,9 @@ ${roleMsgDeleteText}
   reactionRoleNoRole: "*No role*",
   reactionRolePanelPublishedIn: (channelId: string) => `\n📌 Panel published in <#${channelId}>`,
   reactionRolePanelNotPublished: "*(panel not published)*",
+  welcomeMessageSaved: "✅ Welcome message saved.",
+  welcomeMessageDeleted: "✅ Welcome message deleted.",
+  welcomeMessageNoneConfigured: "❌ No welcome message configured for this server.",
 };
 
 const en_out: MessagesOut = {

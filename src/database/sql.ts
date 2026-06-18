@@ -16,14 +16,6 @@ db.exec(`
 )
 `);
 
-// Table pour stocker les permissions de qui peut utiliser la commande de setup
-db.exec(`
-  CREATE TABLE IF NOT EXISTS setup_verification_permissions (
-    guild_id TEXT PRIMARY KEY,
-    created_at TEXT NOT NULL
-  )
-`);
-
 //table pour black lister les membres
 db.exec(`
   CREATE TABLE IF NOT EXISTS blacklisted_users (
@@ -90,10 +82,9 @@ db.exec(`
 db.exec(`
   CREATE TABLE IF NOT EXISTS guild_welcome_messages (
     guild_id TEXT NOT NULL,
-    locale TEXT NOT NULL,
     dm_message TEXT NOT NULL,
     updated_at TEXT NOT NULL,
-    PRIMARY KEY (guild_id, locale)
+    PRIMARY KEY (guild_id)
   );
 `);
 
@@ -238,29 +229,6 @@ export const insertVerifiedUserStmt = db.prepare(`
   VALUES (?, ?, ?, ?, ?)
 `);
 
-export const insertSetupPermissionStmt = db.prepare(`
-  INSERT OR REPLACE INTO setup_verification_permissions
-  (guild_id, created_at)
-  VALUES (?, ?)
-`);
-
-export const getSetupPermissionStmt = db.prepare(`
-  SELECT * FROM setup_verification_permissions
-  WHERE guild_id = ?
-`);
-
-export const getAuthorizedGuildIdsStmt = db.prepare(`
-  SELECT DISTINCT guild_id
-  FROM setup_verification_permissions
-`);
-
-export const getSetupPermissionByGuildStmt = db.prepare(`
-  SELECT 1
-  FROM setup_verification_permissions
-  WHERE guild_id = ?
-  LIMIT 1
-`);
-
 export const getBlacklistedUserStmt = db.prepare(`
   SELECT * FROM blacklisted_users
   WHERE guild_id = ? AND user_id = ?
@@ -274,13 +242,12 @@ export const getBlacklistedUsersEverywhereStmt = db.prepare(`
 
 export const getGuildWelcomeMessageStmt = db.prepare(`
   SELECT * FROM guild_welcome_messages  
-  WHERE guild_id = ? AND locale  = ?
+  WHERE guild_id = ?
 `);
 
 export const getGuildWelcomeMessagesAllStmt = db.prepare(`
   SELECT * FROM guild_welcome_messages
   WHERE guild_id = ?
-  ORDER BY locale ASC
 `);
 
 export const insertBlacklistedUserStmt = db.prepare(`
@@ -291,8 +258,8 @@ export const insertBlacklistedUserStmt = db.prepare(`
 
 export const upsertGuildWelcomeMessageStmt = db.prepare(`
   INSERT OR REPLACE INTO guild_welcome_messages  
-  (guild_id, locale, dm_message, updated_at)
-  VALUES (?, ?, ?, ?)
+  (guild_id, dm_message, updated_at)
+  VALUES (?, ?, ?)
 `);
 
 export const deleteBlacklistedUserStmt = db.prepare(`
@@ -302,7 +269,7 @@ export const deleteBlacklistedUserStmt = db.prepare(`
 
 export const deleteGuildWelcomeMessageStmt = db.prepare(`
   DELETE FROM guild_welcome_messages  
-  WHERE guild_id = ? AND locale = ?
+  WHERE guild_id = ?
 `);
 
 export const upsertGuildVerificationSettingsStmt = db.prepare(`
@@ -448,6 +415,16 @@ export const getExpiredFreeGamePublicationsStmt = db.prepare(`
   WHERE fg.expires_at < strftime('%Y-%m-%dT%H:%M:%S.000Z', 'now')
     AND fgp.channel_id IS NOT NULL
     AND fgp.message_id IS NOT NULL
+`);
+
+export const getAllFreeGamesSettingsStmt = db.prepare(`
+  SELECT guild_id, channel_id FROM free_games_settings
+  WHERE enabled = TRUE AND channel_id IS NOT NULL
+`);
+
+export const getFreeGamePublicationByMessageIdStmt = db.prepare(`
+  SELECT 1 FROM free_games_publications
+  WHERE guild_id = ? AND message_id = ?
 `);
 
 export const deleteFreeGamePublicationStmt = db.prepare(`

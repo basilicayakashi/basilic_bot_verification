@@ -509,6 +509,7 @@ export const commands = [
           { name: "reaction-roles", value: "reaction-roles" },
           { name: "free-games", value: "free-games" },
           { name: "permissions", value: "permissions" },
+          { name: "donation", value: "donation" },
         )
     ),
 
@@ -688,6 +689,8 @@ export const commands = [
         })
         .setRequired(false)
     ),
+
+    /*
   new SlashCommandBuilder()
     .setName("donation")
     .setDescription("Support the bot development")
@@ -697,6 +700,7 @@ export const commands = [
       [Locale.German]: "Die Entwicklung des Bots unterstützen",
       [Locale.Polish]: "Wesprzyj rozwój bota",
     }),
+  */
   new SlashCommandBuilder()
     .setName("role-used-msg-delete")
     .setDescription("Delete new messages mentioning a configured role")
@@ -2163,30 +2167,57 @@ client.on(Events.InteractionCreate, async (interaction) => {
       if (interaction.commandName === "help") {
         const section = interaction.options.getString("section", true);
 
-        const sectionMap: Record<string, string> = {
-          "about": msgIn.helpAbout,
-          "verification": msgIn.helpVerification,
-          "welcome-message": msgIn.helpWelcomeMessage,
-          "spam": msgIn.helpSpam,
-          "reaction-roles": msgIn.helpReactionRoles,
-          "free-games": msgIn.helpFreeGames,
-          "permissions": msgIn.helpPermissions,
-        };
+        if (section === "donation") {
+          const v_paypal = "https://www.paypal.com/paypalme/Basilic64";
+          const v_kofi = "https://ko-fi.com/basilic64";
 
-        const content = sectionMap[section];
-        if (!content) {
-          await replyEphemeral(interaction, msgIn.errorOccurred);
+          const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder()
+              .setLabel("PayPal")
+              .setStyle(ButtonStyle.Link)
+              .setURL(v_paypal),
+
+            new ButtonBuilder()
+              .setLabel("Ko-fi")
+              .setStyle(ButtonStyle.Link)
+              .setURL(v_kofi)
+          );
+
+          await interaction.reply({
+            content: "**Support the bot**\n\nThank you for supporting the project ❤️",
+            components: [row],
+            flags: MessageFlags.Ephemeral,
+          });
+
           return;
         }
+        else {
+          const sectionMap: Record<string, string> = {
+            "about": msgIn.helpAbout,
+            "verification": msgIn.helpVerification,
+            "welcome-message": msgIn.helpWelcomeMessage,
+            "spam": msgIn.helpSpam,
+            "reaction-roles": msgIn.helpReactionRoles,
+            "free-games": msgIn.helpFreeGames,
+            "permissions": msgIn.helpPermissions,
+          };
 
-        const chunks = splitMessage(content);
-        await replyEphemeral(interaction, chunks[0]);
 
-        for (let i = 1; i < chunks.length; i++) {
-          await interaction.followUp({ content: chunks[i], flags: MessageFlags.Ephemeral });
+          const content = sectionMap[section];
+          if (!content) {
+            await replyEphemeral(interaction, msgIn.errorOccurred);
+            return;
+          }
+
+          const chunks = splitMessage(content);
+          await replyEphemeral(interaction, chunks[0]);
+
+          for (let i = 1; i < chunks.length; i++) {
+            await interaction.followUp({ content: chunks[i], flags: MessageFlags.Ephemeral });
+          }
+
+          return;
         }
-
-        return;
       }
 
       if (interaction.commandName === "unblacklist-member") {

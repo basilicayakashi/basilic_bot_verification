@@ -349,6 +349,38 @@ Ta komenda pozwala:
 * pomóc moderatorom identyfikować potencjalnie problematycznych użytkowników w wielu społecznościach
 `,
 
+helpWelcomeMessage: `
+## 👋 Wiadomości powitalne
+
+Bot może wysyłać spersonalizowaną wiadomość powitalną do nowych członków serwera.
+
+Aby skonfigurować tę wiadomość:
+
+1. Najpierw napisz wiadomość powitalną na kanale serwera.
+2. Skopiuj ID tej wiadomości.
+3. Użyj polecenia:
+
+\`\`\`
+/set-welcome-message message_id:<ID_WIADOMOŚCI>
+\`\`\`
+
+Bot skopiuje treść tej wiadomości i użyje jej do wysyłania powitania nowym członkom.
+
+Możesz wpisać \`{{mention}}\` w wiadomości: bot zastąpi to wzmianką o nowym członku, aby go oznaczyć.
+
+Aby przetestować wygląd skonfigurowanej wiadomości, użyj:
+
+\`\`\`
+/view-welcome-message
+\`\`\`
+
+Aby usunąć skonfigurowaną wiadomość powitalną, użyj:
+
+\`\`\`
+/delete-welcome-message
+\`\`\`
+`,
+
   helpSpam: `
 ## 🛡️ Wykrywanie spamu
 

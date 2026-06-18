@@ -2,6 +2,7 @@ export type MessagesIn = {
     helpMessage: string;
     helpAbout: string;
     helpVerification: string;
+    helpWelcomeMessage: string;
     helpSpam: string;
     helpReactionRoles: string;
     helpFreeGames: string;

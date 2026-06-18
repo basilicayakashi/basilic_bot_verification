@@ -349,6 +349,38 @@ Este comando permite:
 * ayudar a los moderadores a identificar usuarios potencialmente problemáticos en varias comunidades
 `,
 
+helpWelcomeMessage: `
+## 👋 Mensajes de bienvenida
+
+El bot puede enviar un mensaje de bienvenida personalizado a los nuevos miembros de un servidor.
+
+Para configurar este mensaje:
+
+1. Primero escribe el mensaje de bienvenida en un canal del servidor.
+2. Copia el ID de ese mensaje.
+3. Usa el comando:
+
+\`\`\`
+/set-welcome-message message_id:<ID_DEL_MENSAJE>
+\`\`\`
+
+El bot copiará el contenido de ese mensaje y lo usará para enviarlo a los nuevos miembros.
+
+Puedes escribir \`{{mention}}\` en el mensaje: el bot lo reemplazará por la mención del nuevo miembro para hacerle ping.
+
+Para probar cómo se verá el mensaje configurado, usa:
+
+\`\`\`
+/view-welcome-message
+\`\`\`
+
+Para eliminar el mensaje de bienvenida configurado, usa:
+
+\`\`\`
+/delete-welcome-message
+\`\`\`
+`,
+
   helpSpam: `
 ## 🛡️ Detección de spam
 

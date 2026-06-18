@@ -353,6 +353,38 @@ Cette commande permet :
 * d'aider les modérateurs à identifier des utilisateurs potentiellement problématiques dans plusieurs communautés
 `,
 
+  helpWelcomeMessage: `
+## 👋 Messages de bienvenue
+
+Le bot peut envoyer un message de bienvenue personnalisé aux nouveaux membres d'un serveur.
+
+Pour configurer ce message :
+
+1. Écrivez d'abord le message de bienvenue dans un salon du serveur.
+2. Copiez l'ID de ce message.
+3. Utilisez la commande :
+
+\`\`\`
+/set-welcome-message message_id:<ID_DU_MESSAGE>
+\`\`\`
+
+Le bot copiera alors le contenu de ce message et l'utilisera pour l'envoyer aux nouveaux membres.
+
+Vous pouvez écrire \`{{mention}}\` dans le message : le bot le remplacera par la mention du nouveau membre afin de le ping.
+
+Pour tester le rendu du message configuré, utilisez :
+
+\`\`\`
+/view-welcome-message
+\`\`\`
+
+Pour supprimer le message de bienvenue configuré, utilisez :
+
+\`\`\`
+/delete-welcome-message
+\`\`\`
+`,
+
   helpSpam: `
 ## 🛡️ Détection de spam
 

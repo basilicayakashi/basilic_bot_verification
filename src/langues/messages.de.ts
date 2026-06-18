@@ -349,6 +349,39 @@ Dieser Befehl ermöglicht es:
 * Moderatoren dabei zu helfen, potenziell problematische Nutzer in mehreren Communities zu identifizieren
 `,
 
+helpWelcomeMessage: `
+## 👋 Willkommensnachrichten
+
+Der Bot kann neuen Mitgliedern eines Servers eine personalisierte Willkommensnachricht senden.
+
+So richtest du diese Nachricht ein:
+
+1. Schreibe zuerst die Willkommensnachricht in einen Kanal des Servers.
+2. Kopiere die ID dieser Nachricht.
+3. Verwende den Befehl:
+
+\`\`\`
+/set-welcome-message message_id:<NACHRICHTEN_ID>
+\`\`\`
+
+Der Bot kopiert den Inhalt dieser Nachricht und verwendet ihn, um ihn an neue Mitglieder zu senden.
+
+Du kannst \`{{mention}}\` in die Nachricht schreiben: Der Bot ersetzt es durch die Erwähnung des neuen Mitglieds, um die Person zu pingen.
+
+Um die konfigurierte Nachricht zu testen, verwende:
+
+\`\`\`
+/view-welcome-message
+\`\`\`
+
+Um die konfigurierte Willkommensnachricht zu löschen, verwende:
+
+\`\`\`
+/delete-welcome-message
+\`\`\`
+`,
+
+
   helpSpam: `
 ## 🛡️ Spam-Erkennung
 

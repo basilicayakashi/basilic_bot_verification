@@ -349,6 +349,38 @@ This command allows you to:
 * help moderators identify potentially problematic users across multiple communities
 `,
 
+helpWelcomeMessage: `
+## 👋 Welcome messages
+
+The bot can send a custom welcome message to new members of a server.
+
+To configure this message:
+
+1. First write the welcome message in a server channel.
+2. Copy that message ID.
+3. Use the command:
+
+\`\`\`
+/set-welcome-message message_id:<MESSAGE_ID>
+\`\`\`
+
+The bot will copy the content of that message and use it when sending the welcome message to new members.
+
+You can write \`{{mention}}\` in the message: the bot will replace it with the new member's mention to ping them.
+
+To test the configured message preview, use:
+
+\`\`\`
+/view-welcome-message
+\`\`\`
+
+To delete the configured welcome message, use:
+
+\`\`\`
+/delete-welcome-message
+\`\`\`
+`,
+
   helpSpam: `
 ## 🛡️ Spam Detection
 

@@ -489,7 +489,7 @@ export const commands = [
       [Locale.German]: "Bot-Dokumentation für einen Abschnitt anzeigen",
       [Locale.Polish]: "Wyświetl dokumentację bota dla wybranej sekcji",
     })
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    //.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((o) =>
       o
         .setName("section")
@@ -1271,34 +1271,9 @@ async function replyEphemeral(interaction: any, content: string) {
   });
 }
 
-function isBasilicOrAuthorizedGuildOwner(interaction: any): boolean {
-  /*
-  if (isBasilic(interaction)) return true;
-
-  return isAuthorizedServer(interaction) && isGuildOwner(interaction);
-  */
-
-  return isGuildOwner(interaction);
-}
-
 function isAuthorizedServer(interaction: any): boolean {
 
   return !getBannedGuildStmt.get(interaction.guild.id);
-}
-
-//si c'est moi
-function isBasilic(interaction: any): boolean {
-  /*
-  const BASILIC_IDS: string[] = [
-    "260716512711540736", // compte principal
-    "1482664456998621325", // compte secondaire
-    "165957640281784320", // sparkydapikachu
-  ];
-  
-  return BASILIC_IDS.includes(interaction.user.id);
-  */
-
-  return false;
 }
 
 function isUsedOnAServer(
@@ -1500,7 +1475,7 @@ async function requireAuthorizedGuildOwner(
   interaction: any,
   deniedMessage: string
 ): Promise<boolean> {
-  if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
+  if (!isGuildOwner(interaction)) {
     await replyEphemeral(interaction, deniedMessage);
     return false;
   }
@@ -1766,7 +1741,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       //sur toutes les commandes autres que "allow-setup-verification"
       if (
         interaction.commandName !== "allow-setup-verification" &&
-        !isBasilic(interaction) &&
         !isAuthorizedServer(interaction)
       ) {
         await replyEphemeral(interaction, msgIn.NotAuthorizedServer);
@@ -1774,7 +1748,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
 
       if (interaction.commandName === "setup-verification") {
-        if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
+        if (!isGuildOwner(interaction)) {
           await interaction.reply({
             content: msgIn.notAllowedConfigureVerification,
             flags: MessageFlags.Ephemeral,
@@ -2058,7 +2032,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
 
       if (interaction.commandName === "edit-verification-question") {
-        if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
+        if (!isGuildOwner(interaction)) {
           await interaction.reply({
             content: msgIn.YouAreNotAllowedtoEditVerificationQuestionsOnThisServer,
             flags: MessageFlags.Ephemeral,
@@ -2106,7 +2080,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
 
       if (interaction.commandName === "delete-verification-question") {
-        if (!isBasilicOrAuthorizedGuildOwner(interaction)) {
+        if (!isGuildOwner(interaction)) {
           await interaction.reply({
             content: msgIn.YouAreNotAllowedtoEditVerificationQuestionsOnThisServer,
             flags: MessageFlags.Ephemeral,

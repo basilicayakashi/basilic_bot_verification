@@ -1015,6 +1015,7 @@ export const commands = [
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   new SlashCommandBuilder()
     .setName("set-welcome-message")
+    .setDescription("Set the welcome message sent in DM to new members")
     .setDescriptionLocalizations({
       [Locale.French]: "Définir le message de bienvenue envoyé en DM aux nouveaux membres",
       [Locale.German]: "Willkommensnachricht festlegen, die neuen Mitgliedern als DM gesendet wird",
@@ -1025,6 +1026,7 @@ export const commands = [
     .addStringOption((opt) =>
       opt
         .setName("message")
+        .setDescription("The message to send. Use {{mention}} to mention the new member.")
         .setDescriptionLocalizations({
           [Locale.French]: "Le message à envoyer. Utilise {{mention}} pour mentionner le nouveau membre.",
           [Locale.German]: "Die zu sendende Nachricht. Verwende {{mention}}, um das neue Mitglied zu erwähnen.",
@@ -1043,6 +1045,16 @@ export const commands = [
       [Locale.German]: "Die Willkommensnachricht für diesen Server löschen",
       [Locale.SpanishES]: "Eliminar el mensaje de bienvenida de este servidor",
       [Locale.Polish]: "Usuń wiadomość powitalną z tego serwera",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  new SlashCommandBuilder() 
+    .setName("view-welcome-message")
+    .setDescription("View the configured welcome message")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Afficher le message de bienvenue configuré",
+      [Locale.German]: "Die konfigurierte Willkommensnachricht anzeigen",
+      [Locale.SpanishES]: "Ver el mensaje de bienvenida configurado",
+      [Locale.Polish]: "Wyświetl skonfigurowaną wiadomość powitalną",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 ].map((command) => command.toJSON());

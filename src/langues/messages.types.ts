@@ -177,6 +177,8 @@ export type MessagesIn = {
     welcomeMessageDeleted: string;
     welcomeMessageNoneConfigured: string;
     welcomeMessageNotFound: string;
+    blacklistJoinNotificationsEnabled: (channelId: string) => string;
+    ChannelMustBeTextChannel: string;
 };
 
 export type MessagesOut = {

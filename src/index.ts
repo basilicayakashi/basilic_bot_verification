@@ -82,7 +82,7 @@ import {
   getFreeGamePublicationByMessageIdStmt
 } from "./database/sql.js";
 
-import type {
+import {
   VerifiedUserRow,
   SetupVerificationPermissionRow,
   BlacklistedUserRow,
@@ -91,6 +91,10 @@ import type {
   GuildVerificationSettingsRow,
   GuildSpamSettingsRow,
   GuildWelcomeMessageRow,
+  upsertNewComerNotificationStmt,
+  getNewComerNotificationStmt,
+  deleteNewComerNotificationStmt,
+  NewComerNotificationRow,
 } from "./database/sql.js";
 
 import {
@@ -262,6 +266,7 @@ export const commands = [
           [Locale.Polish]: "Dodaj powód",
         })
         .setRequired(true)
+        .setMaxLength(1000)
     ),
 
   new SlashCommandBuilder()
@@ -690,17 +695,17 @@ export const commands = [
         .setRequired(false)
     ),
 
-    /*
-  new SlashCommandBuilder()
-    .setName("donation")
-    .setDescription("Support the bot development")
-    .setDescriptionLocalizations({
-      [Locale.French]: "Soutenir le développement du bot",
-      [Locale.SpanishES]: "Apoyar el desarrollo del bot",
-      [Locale.German]: "Die Entwicklung des Bots unterstützen",
-      [Locale.Polish]: "Wesprzyj rozwój bota",
-    }),
-  */
+  /*
+new SlashCommandBuilder()
+  .setName("donation")
+  .setDescription("Support the bot development")
+  .setDescriptionLocalizations({
+    [Locale.French]: "Soutenir le développement du bot",
+    [Locale.SpanishES]: "Apoyar el desarrollo del bot",
+    [Locale.German]: "Die Entwicklung des Bots unterstützen",
+    [Locale.Polish]: "Wesprzyj rozwój bota",
+  }),
+*/
   new SlashCommandBuilder()
     .setName("role-used-msg-delete")
     .setDescription("Delete new messages mentioning a configured role")
@@ -1062,6 +1067,29 @@ export const commands = [
       [Locale.Polish]: "Wyświetl skonfigurowaną wiadomość powitalną",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  new SlashCommandBuilder()
+    .setName("setup-blacklist-join-notifications")
+    .setDescription("Send alerts when a new member was already blacklisted elsewhere")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Envoyer des alertes lorsqu’un nouveau membre a déjà été blacklisté ailleurs",
+      [Locale.German]: "Warnungen senden, wenn ein neues Mitglied bereits anderswo auf der schwarzen Liste steht",
+      [Locale.SpanishES]: "Enviar alertas cuando un nuevo miembro ya fue incluido en la lista negra en otro servidor",
+      [Locale.Polish]: "Wysyłaj alerty, gdy nowy członek był już wcześniej na czarnej liście gdzie indziej",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("Channel where alerts will be sent")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Salon où les alertes seront envoyées",
+          [Locale.SpanishES]: "Canal donde se enviarán las alertas",
+          [Locale.German]: "Kanal, in den die Warnungen gesendet werden",
+          [Locale.Polish]: "Kanał, na który będą wysyłane alerty",
+        })
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(true)
+    ),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -2805,6 +2833,36 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         await interaction.reply({ embeds: [embed], ephemeral: true });
       }
+
+      if (interaction.commandName === "setup-blacklist-join-notifications") {
+        if (!isUsedOnAServer(interaction)) {
+          await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
+          return;
+        }
+
+        const member = await interaction.guild.members.fetch(interaction.user.id);
+
+        if (!isAdministrator(member, interaction)) {
+          await replyEphemeral(interaction, msgIn.onlyStaffCanUseCommand);
+          return;
+        }
+
+        const channel = interaction.options.getChannel("channel", true);
+
+        if (channel.type !== ChannelType.GuildText) {
+          await replyEphemeral(interaction, msgIn.ChannelMustBeTextChannel);
+          return;
+        }
+
+        upsertNewComerNotificationStmt.run(interaction.guild.id, channel.id);
+
+        await interaction.reply({
+          content: msgIn.blacklistJoinNotificationsEnabled(channel.id),
+          flags: MessageFlags.Ephemeral,
+        });
+
+        return;
+      }
     }
 
     // =========================================
@@ -3055,6 +3113,54 @@ client.on(Events.GuildMemberAdd, async (member) => {
       error
     );
   }
+
+  // Si la vérification est configurée, on ne notifie pas ici.
+  // Le contrôle blacklist se fera au moment de la demande de vérification.
+  const guildSettings = getGuildVerificationSettingsStmt.get(member.guild.id) as
+    | GuildVerificationSettingsRow
+    | undefined;
+
+  if (!guildSettings && !member.user.bot) {
+    const notificationSettings = getNewComerNotificationStmt.get(
+      member.guild.id
+    ) as NewComerNotificationRow | undefined;
+
+    if (notificationSettings) {
+      const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
+        member.id
+      ) as BlacklistedUserRow[];
+
+      if (blacklistedEverywhere.length > 0) {
+        const channel = await member.guild.channels.fetch(
+          notificationSettings.channel_id
+        ).catch(() => null);
+
+        if (channel && channel.type === ChannelType.GuildText) {
+          const lines = blacklistedEverywhere.map((entry) => {
+            const timestamp = Math.floor(
+              new Date(entry.blacklisted_at).getTime() / 1000
+            );
+
+            return [
+              `• Serveur : ${entry.guild_id}`,
+              `  Date : <t:${timestamp}:f>`,
+              `  Par : <@${entry.blacklisted_by}>`,
+              `  Raison : ${entry.reason ?? "Aucune raison fournie"}`,
+            ].join("\n");
+          });
+
+          await channel.send({
+            content:
+              `⚠️ **Nouveau membre déjà blacklisté ailleurs**\n\n` +
+              `Membre : ${member.user.tag} (${member.id})\n\n` +
+              lines.join("\n\n"),
+          });
+        }
+      }
+    }
+  }
+
+
 });
 
 client.on(Events.GuildMemberRemove, async (member) => {

@@ -209,6 +209,13 @@ db.exec(`
 `);
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS guild_blacklist_join_notifications (
+    guild_id TEXT PRIMARY KEY,
+    channel_id TEXT NOT NULL
+  );
+`);
+
+db.exec(`
   CREATE TABLE IF NOT EXISTS banned_guilds (
     guild_id TEXT PRIMARY KEY
   )
@@ -560,6 +567,23 @@ export const getBannedGuildStmt = db.prepare(`
   SELECT 1 FROM banned_guilds WHERE guild_id = ? LIMIT 1
 `);
 
+export const upsertNewComerNotificationStmt = db.prepare(`
+  INSERT OR REPLACE INTO guild_blacklist_join_notifications
+  (guild_id, channel_id)
+  VALUES (?, ?)
+`);
+
+export const getNewComerNotificationStmt = db.prepare(`
+  SELECT * FROM guild_blacklist_join_notifications
+  WHERE guild_id = ?
+`);
+
+export const deleteNewComerNotificationStmt = db.prepare(`
+  DELETE FROM guild_blacklist_join_notifications
+  WHERE guild_id = ?
+`);
+
+
 export type VerifiedUserRow = {
   user_id: string;
   username: string;
@@ -686,4 +710,9 @@ export type ReactionRolePanelRow = {
   guild_id: string;
   channel_id: string;
   message_id: string;
+};
+
+export type NewComerNotificationRow = {
+  guild_id: string;
+  channel_id: string;
 };

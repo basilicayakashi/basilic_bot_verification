@@ -273,7 +273,7 @@ Este comando proporciona una vista centralizada de todos los ajustes específico
 
 🔔 Notificaciones de Miembros en Lista Negra
 
-Mediante el comando /setup-blacklist-join-notifications, el bot puede enviar alertas a un canal dedicado cuando un miembro que se une al servidor ya ha sido incluido en la lista negra de otro servidor que utiliza el bot.
+Mediante el comando \`/setup-blacklist-alerts\`, el bot puede enviar alertas a un canal dedicado cuando un miembro que se une al servidor ya ha sido incluido en la lista negra de otro servidor que utiliza el bot.
 
 La notificación muestra los servidores afectados y el motivo registrado de la inclusión en la lista negra, permitiendo al equipo de moderación actuar rápidamente si es necesario.
 `,

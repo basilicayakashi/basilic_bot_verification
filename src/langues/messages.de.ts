@@ -273,7 +273,7 @@ Dieser Befehl bietet eine zentrale Übersicht über alle serverspezifischen Eins
 
 🔔 Benachrichtigungen über Blacklist-Mitglieder
 
-Mit dem Befehl /setup-blacklist-join-notifications kann der Bot Warnungen in einen dafür vorgesehenen Kanal senden, wenn ein neu beitretendes Mitglied bereits auf einem anderen Server, der den Bot verwendet, auf der Blacklist steht.
+Mit dem Befehl \`/setup-blacklist-alerts\` kann der Bot Warnungen in einen dafür vorgesehenen Kanal senden, wenn ein neu beitretendes Mitglied bereits auf einem anderen Server, der den Bot verwendet, auf der Blacklist steht.
 
 Die Benachrichtigung zeigt die betroffenen Server sowie den gespeicherten Grund für den Blacklist-Eintrag an, sodass das Team sofort informiert wird und gegebenenfalls Maßnahmen ergreifen kann.
 `,

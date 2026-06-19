@@ -273,7 +273,7 @@ This command provides a centralized overview of all server-specific settings.
 
 🔔 Blacklist Join Notifications
 
-Using the /setup-blacklist-join-notifications command, the bot can send alerts to a dedicated channel whenever a member joining the server has previously been blacklisted on another server using the bot.
+Using the \`/setup-blacklist-alerts\` command, the bot can send alerts to a dedicated channel whenever a member joining the server has previously been blacklisted on another server using the bot.
 
 The notification displays the affected servers and the recorded blacklist reason, allowing staff members to be informed immediately and take appropriate action.
 `,

@@ -273,7 +273,7 @@ Ta komenda zapewnia scentralizowany podgląd wszystkich ustawień specyficznych 
 
 🔔 Powiadomienia o Czarnych Listach
 
-Za pomocą komendy /setup-blacklist-join-notifications bot może wysyłać powiadomienia na dedykowany kanał, gdy nowy członek dołączający do serwera został wcześniej umieszczony na czarnej liście na innym serwerze korzystającym z bota.
+Za pomocą komendy \`/setup-blacklist-alerts\` bot może wysyłać powiadomienia na dedykowany kanał, gdy nowy członek dołączający do serwera został wcześniej umieszczony na czarnej liście na innym serwerze korzystającym z bota.
 
 Powiadomienie zawiera informacje o serwerach, których dotyczy wpis, oraz zapisany powód umieszczenia na czarnej liście, dzięki czemu administracja może szybko podjąć odpowiednie działania.
 `,

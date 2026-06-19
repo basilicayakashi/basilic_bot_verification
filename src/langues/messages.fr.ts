@@ -277,7 +277,7 @@ Cette commande fournit une vue centralisée de tous les paramètres spécifiques
 
 🔔 Blacklist Join Notifications
 
-Grâce à la commande /setup-blacklist-join-notifications, le bot peut envoyer des alertes dans un salon dédié lorsqu'un membre rejoignant le serveur a déjà été blacklisté sur un autre serveur utilisant le bot.
+Grâce à la commande \`/setup-blacklist-alerts\`, le bot peut envoyer des alertes dans un salon dédié lorsqu'un membre rejoignant le serveur a déjà été blacklisté sur un autre serveur utilisant le bot.
 
 La notification indique les serveurs concernés ainsi que le motif de blacklist enregistré, permettant au staff d'être immédiatement informé et de prendre les mesures appropriées.
 `,

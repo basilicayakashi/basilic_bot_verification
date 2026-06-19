@@ -1068,7 +1068,7 @@ new SlashCommandBuilder()
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   new SlashCommandBuilder()
-    .setName("setup-blacklist-join-notifications")
+    .setName("setup-blacklist-alerts")
     .setDescription("Send alerts when a new member was already blacklisted elsewhere")
     .setDescriptionLocalizations({
       [Locale.French]: "Envoyer des alertes lorsqu’un nouveau membre a déjà été blacklisté ailleurs",
@@ -2834,7 +2834,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         await interaction.reply({ embeds: [embed], ephemeral: true });
       }
 
-      if (interaction.commandName === "setup-blacklist-join-notifications") {
+      if (interaction.commandName === "setup-blacklist-alerts") {
         if (!isUsedOnAServer(interaction)) {
           await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
           return;

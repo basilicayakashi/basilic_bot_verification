@@ -885,7 +885,7 @@ const fr_server: MessagesServer = {
 
   blackListedMemberFound: (memberTag: string, memberId: string, msgLines: string) => `⚠️ **Nouveau membre déjà blacklisté ailleurs**
   
-  Membre : ${memberTag} (${memberId})
+  Membre : ${memberTag} (${memberId} - <@${memberId}>)
 
   ${msgLines}
   `,

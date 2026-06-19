@@ -883,7 +883,7 @@ const pl_server: MessagesServer = {
 
   blackListedMemberFound: (memberTag: string, memberId: string, msgLines: string) => `⚠️ **Nowy członek już został na czarnej liście gdzie indziej**
   
-  Członek : ${memberTag} (${memberId})
+  Członek : ${memberTag} (${memberId} - <@${memberId}>)
 
   ${msgLines}
   `,

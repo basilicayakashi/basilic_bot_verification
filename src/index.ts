@@ -2317,6 +2317,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const verifiedRole = interaction.guild!.roles.cache.get(settings.verified_role_id);
         const staffRole = interaction.guild!.roles.cache.get(settings.staff_role_id);
         const SettingsMsgDeletedFromRoles = getGuildRoleMessageDeleteSettingsStmt.get(interaction.guild!.id) as GuildRoleMessageDeleteSettingsRow | undefined;
+        const notificationSettings = getNewComerNotificationStmt.get(interaction.guild.id) as NewComerNotificationRow | undefined;
 
         const verifiedRoleDisplay = verifiedRole
           ? `<@&${settings.verified_role_id}>`
@@ -2335,6 +2336,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
           freeGamesSettings?.channel_id
             ? `<#${freeGamesSettings.channel_id}>`
             : "—";
+
+        const blacklistChannel =
+          notificationSettings ? msgIn.viewSettingsBlacklistNotificationChannel(`<#${notificationSettings.channel_id}>`)
+            : msgIn.viewSettingsBlacklistNotificationChannel("-");
 
         const questions =
           getGuildVerificationQuestionsStmt.all(
@@ -2391,7 +2396,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
             freeGamesChannel,
             freeGamesSettings?.include_steam === 1,
             freeGamesSettings?.include_epicgames === 1,
-            roleMsgDeleteText),
+            roleMsgDeleteText,
+            blacklistChannel),
           flags: MessageFlags.Ephemeral,
         });
 

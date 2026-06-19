@@ -689,14 +689,16 @@ Wyświetla wszystkie kategorie na serwerze, role, które zawierają, oraz inform
     freeGamesChannel: string,
     includeSteam: boolean,
     includeEpicGames: boolean,
-    roleMsgDeleteText: string
+    roleMsgDeleteText: string,
+    BlcklistAlertChannel: string
   ) => `**Aktualna konfiguracja bota**
 
 ## Weryfikacja
 
 1) Zweryfikowana rola: ${verifiedRoleDisplay}
 2) Rola moderacji: ${staffRoleDisplay}
-3) Limit czasu weryfikacji: ${verificationTimeoutHours} godz.
+3) Limit czasu weryfikacji: ${verificationTimeoutHours} godz
+4) ${BlcklistAlertChannel}
 
 ${questionsText}
 
@@ -786,6 +788,7 @@ ${roleMsgDeleteText}
   welcomeMessageNotFound: "❌ Wiadomość nie znaleziona. Sprawdź, czy ID jest poprawne i czy bot ma dostęp do kanału",
   blacklistJoinNotificationsEnabled: (channelId: string) => `Powiadomienia włączone na kanale <#${channelId}>`,
   ChannelMustBeTextChannel : "Kanał musi być kanałem tekstowym",
+  viewSettingsBlacklistNotificationChannel: (channel: string) => `Kanał powiadomień o użytkownikach z czarnej listy: ${channel}`,
 };
 
 const pl_out: MessagesOut = {

@@ -681,7 +681,8 @@ Displays all categories on the server, the roles they contain, and whether their
     freeGamesChannel: string,
     includeSteam: boolean,
     includeEpicGames: boolean,
-    roleMsgDeleteText: string
+    roleMsgDeleteText: string,
+    BlcklistAlertChannel: string
   ) => `**Current bot configuration**
 
 ## Verification
@@ -689,6 +690,7 @@ Displays all categories on the server, the roles they contain, and whether their
 1) Verified role: ${verifiedRoleDisplay}
 2) Moderation role: ${staffRoleDisplay}
 3) Verification timeout: ${verificationTimeoutHours} hour(s)
+4) ${BlcklistAlertChannel}
 
 ${questionsText}
 
@@ -778,6 +780,7 @@ ${roleMsgDeleteText}
   welcomeMessageNotFound: "❌ Message not found. Verifies that the message ID is correct and that the bot has access to the room",
   blacklistJoinNotificationsEnabled: (channelId: string) => `Notifications enabled in <#${channelId}>`,
   ChannelMustBeTextChannel : "The channel must be a text channel",
+  viewSettingsBlacklistNotificationChannel: (channel: string) => `Blacklisted member notification channel: ${channel}`,
 };
 
 const en_out: MessagesOut = {

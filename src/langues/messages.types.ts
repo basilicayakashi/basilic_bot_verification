@@ -131,7 +131,8 @@ export type MessagesIn = {
         freeGamesChannel: string,
         includeSteam: boolean,
         includeEpicGames: boolean,
-        roleMsgDeleteText: string
+        roleMsgDeleteText: string,
+        BlcklistAlertChannel: string
     ) => string;
     NotAuthorizedServer: string;
     ManualVerificationProcessed: (
@@ -179,6 +180,7 @@ export type MessagesIn = {
     welcomeMessageNotFound: string;
     blacklistJoinNotificationsEnabled: (channelId: string) => string;
     ChannelMustBeTextChannel: string;
+    viewSettingsBlacklistNotificationChannel: (channel: string) => string;
 };
 
 export type MessagesOut = {

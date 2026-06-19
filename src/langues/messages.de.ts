@@ -682,7 +682,8 @@ Zeigt alle Kategorien des Servers, die darin enthaltenen Rollen und ob ihr Panel
     freeGamesChannel: string,
     includeSteam: boolean,
     includeEpicGames: boolean,
-    roleMsgDeleteText: string
+    roleMsgDeleteText: string,
+    BlcklistAlertChannel: string
   ) => `**Aktuelle Bot-Konfiguration**
 
 ## Verifizierung
@@ -690,6 +691,7 @@ Zeigt alle Kategorien des Servers, die darin enthaltenen Rollen und ob ihr Panel
 1) Verifizierte Rolle: ${verifiedRoleDisplay}
 2) Moderationsrolle: ${staffRoleDisplay}
 3) Verifizierungszeitlimit: ${verificationTimeoutHours} Stunde(n)
+4) ${BlcklistAlertChannel}
 
 ${questionsText}
 
@@ -779,6 +781,7 @@ ${roleMsgDeleteText}
   welcomeMessageNotFound: "❌ Nachricht nicht gefunden. Überprüft, ob die Nachrichten-ID korrekt ist und der Bot Zugang zum Raum hat",
   blacklistJoinNotificationsEnabled: (channelId: string) => `Benachrichtigungen in <#${channelId}> aktiviert`,
   ChannelMustBeTextChannel : "Der Kanal muss ein Textkanal sein",
+  viewSettingsBlacklistNotificationChannel: (channel: string) => `Benachrichtigungskanal für blacklistete Mitglieder: ${channel}`,
 };
 
 const de_out: MessagesOut = {

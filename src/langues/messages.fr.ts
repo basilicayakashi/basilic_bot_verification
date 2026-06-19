@@ -685,7 +685,8 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
     freeGamesChannel: string,
     includeSteam: boolean,
     includeEpicGames: boolean,
-    roleMsgDeleteText: string
+    roleMsgDeleteText: string,
+    BlcklistAlertChannel: string
   ) => `**Configuration actuelle du bot**
 
 ## Vérification
@@ -693,6 +694,7 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
 1) Rôle vérifié : ${verifiedRoleDisplay}
 2) Rôle de modération : ${staffRoleDisplay}
 3) Délai de vérification : ${verificationTimeoutHours} heure(s)
+4) ${BlcklistAlertChannel}
 
 ${questionsText}
 
@@ -782,6 +784,7 @@ ${roleMsgDeleteText}
   welcomeMessageNotFound: "❌ Message introuvable. Vérifie que l'ID est correct et que le bot a accès au salon",
   blacklistJoinNotificationsEnabled: (channelId: string) => `Notifications activées dans <#${channelId}>`,
   ChannelMustBeTextChannel : "Le salon doit être un salon textuel",
+  viewSettingsBlacklistNotificationChannel: (channel: string) => `Salon de notification des membres blacklistés : ${channel}`,
 };
 
 const fr_out: MessagesOut = {

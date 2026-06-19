@@ -1033,6 +1033,19 @@ new SlashCommandBuilder()
       [Locale.Polish]: "Ustaw wiadomość powitalną wysyłaną w DM do nowych członków",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("Channel containing the message")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Salon qui contient le message",
+          [Locale.German]: "Kanal mit der Nachricht",
+          [Locale.SpanishES]: "Canal que contiene el mensaje",
+          [Locale.Polish]: "Kanał zawierający wiadomość",
+        })
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(true)
+    )
     .addStringOption((opt) =>
       opt
         .setName("message_id")
@@ -2410,24 +2423,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return interaction.reply({ content: msgIn.onlyStaffCanUseCommand, flags: MessageFlags.Ephemeral });
         }
 
+        const channel = interaction.options.getChannel("channel", true);
         const messageId = interaction.options.getString("message_id", true);
 
-        // Cherche le message dans tous les salons texte du serveur
-        let messageContent: string | null = null;
-        for (const [, channel] of interaction.guild.channels.cache) {
-          if (!("messages" in channel)) continue;
-          const fetched = await channel.messages.fetch(messageId).catch(() => null);
-          if (fetched) {
-            messageContent = fetched.content;
-            break;
-          }
-        }
-
-        if (!messageContent) {
+        if (!("messages" in channel)) {
           return interaction.reply({ content: msgIn.welcomeMessageNotFound, flags: MessageFlags.Ephemeral });
         }
 
-        upsertGuildWelcomeMessageStmt.run(interaction.guildId, messageContent, new Date().toISOString());
+        const fetched = await channel.messages.fetch(messageId).catch(() => null);
+        if (!fetched) {
+          return interaction.reply({ content: msgIn.welcomeMessageNotFound, flags: MessageFlags.Ephemeral });
+        }
+
+        upsertGuildWelcomeMessageStmt.run(interaction.guildId, fetched.content, new Date().toISOString());
         return interaction.reply({ content: msgIn.welcomeMessageSaved, flags: MessageFlags.Ephemeral });
       }
 

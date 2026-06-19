@@ -355,7 +355,7 @@ Dieser Befehl ermöglicht es:
 * Moderatoren dabei zu helfen, potenziell problematische Nutzer in mehreren Communities zu identifizieren
 `,
 
-helpWelcomeMessage: `
+  helpWelcomeMessage: `
 ## 👋 Willkommensnachrichten
 
 Der Bot kann neuen Mitgliedern eines Servers eine personalisierte Willkommensnachricht senden.
@@ -737,6 +737,7 @@ ${roleMsgDeleteText}
       **Überwachte Rollen :** ${rolesDisplay}
       `,
   unknownServer: "Unbekannter Server",
+  Serveur: "Server",
   by: "Von",
   reason: "Grund",
   verificationAlreadyInProgress: "⏳ Deine Verifizierung wird bereits vom Staff bearbeitet",
@@ -777,10 +778,10 @@ ${roleMsgDeleteText}
   reactionRolePanelNotPublished: "*(Panel nicht veröffentlicht)*",
   welcomeMessageSaved: "✅ Willkommensnachricht gespeichert",
   welcomeMessageDeleted: "✅ Willkommensnachricht gelöscht",
-  welcomeMessageNoneConfigured: "❌ Keine Willkommensnachricht für diesen Server konfiguriert",  
+  welcomeMessageNoneConfigured: "❌ Keine Willkommensnachricht für diesen Server konfiguriert",
   welcomeMessageNotFound: "❌ Nachricht nicht gefunden. Überprüft, ob die Nachrichten-ID korrekt ist und der Bot Zugang zum Raum hat",
   blacklistJoinNotificationsEnabled: (channelId: string) => `Benachrichtigungen in <#${channelId}> aktiviert`,
-  ChannelMustBeTextChannel : "Der Kanal muss ein Textkanal sein",
+  ChannelMustBeTextChannel: "Der Kanal muss ein Textkanal sein",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Benachrichtigungskanal für blacklistete Mitglieder: ${channel}`,
 };
 
@@ -874,6 +875,17 @@ const de_server: MessagesServer = {
   reason: "Grund",
   reactionRolePanelTitle: (category: string) => `Rollen — ${category}`,
   reactionRolePanelEmpty: "Für diese Kategorie wurden keine Rollen konfiguriert",
+  blacklistServerMessage: (guildName: string, timestamp: string, blacklisted_by: string, reason: string) => `• Server : ${guildName}
+  Datum : ${timestamp}
+  Von : ${blacklisted_by}
+  Grund : ${reason}`,
+
+  blackListedMemberFound: (memberTag: string, memberId: string, msgLines: string) => `⚠️ **Neues Mitglied bereits anderswo auf der schwarzen Liste**
+  
+  Mitglied : ${memberTag} (${memberId})
+
+  ${msgLines}
+  `,
 };
 
 const de_internal: MessagesInternal = {

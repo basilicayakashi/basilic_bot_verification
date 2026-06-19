@@ -355,7 +355,7 @@ Ta komenda pozwala:
 * pomóc moderatorom identyfikować potencjalnie problematycznych użytkowników w wielu społecznościach
 `,
 
-helpWelcomeMessage: `
+  helpWelcomeMessage: `
 ## 👋 Wiadomości powitalne
 
 Bot może wysyłać spersonalizowaną wiadomość powitalną do nowych członków serwera.
@@ -744,6 +744,7 @@ ${roleMsgDeleteText}
       **Monitorowane role :** ${rolesDisplay}
       `,
   unknownServer: "Nieznany serwer",
+  Serveur: "Serwer",
   by: "Przez",
   reason: "Powód",
   verificationAlreadyInProgress: "⏳ Twoja weryfikacja jest już przetwarzana przez staff",
@@ -787,7 +788,7 @@ ${roleMsgDeleteText}
   welcomeMessageNoneConfigured: "❌ Brak skonfigurowanej wiadomości powitalnej na tym serwerze",
   welcomeMessageNotFound: "❌ Wiadomość nie znaleziona. Sprawdź, czy ID jest poprawne i czy bot ma dostęp do kanału",
   blacklistJoinNotificationsEnabled: (channelId: string) => `Powiadomienia włączone na kanale <#${channelId}>`,
-  ChannelMustBeTextChannel : "Kanał musi być kanałem tekstowym",
+  ChannelMustBeTextChannel: "Kanał musi być kanałem tekstowym",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Kanał powiadomień o użytkownikach z czarnej listy: ${channel}`,
 };
 
@@ -875,6 +876,17 @@ const pl_server: MessagesServer = {
   reason: "Powód",
   reactionRolePanelTitle: (category: string) => `Role — ${category}`,
   reactionRolePanelEmpty: "Dla tej kategorii nie skonfigurowano żadnych ról",
+  blacklistServerMessage: (guildName: string, timestamp: string, blacklisted_by: string, reason: string) => `• Serwer : ${guildName}
+  Data : ${timestamp}
+  Przez : ${blacklisted_by}
+  Powód : ${reason}`,
+
+  blackListedMemberFound: (memberTag: string, memberId: string, msgLines: string) => `⚠️ **Nowy członek już został na czarnej liście gdzie indziej**
+  
+  Członek : ${memberTag} (${memberId})
+
+  ${msgLines}
+  `,
 };
 
 const pl_internal: MessagesInternal = {

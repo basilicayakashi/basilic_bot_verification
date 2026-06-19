@@ -1,3 +1,5 @@
+import { GuildMember } from "discord.js";
+
 export type MessagesIn = {
     helpMessage: string;
     helpAbout: string;
@@ -153,6 +155,7 @@ export type MessagesIn = {
     RoleIntrouvable: (roleDisplay: string) => string;
     AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string) => string;
     unknownServer: string;
+    Serveur: string;
     by: string;
     reason: string;
     verificationAlreadyInProgress: string;
@@ -265,6 +268,8 @@ export type MessagesServer = {
     reason: string;
     reactionRolePanelTitle: (category: string) => string;
     reactionRolePanelEmpty: string;
+    blacklistServerMessage: (guildName: string, timestamp: string, blacklisted_by: string, reason: string) => string;
+    blackListedMemberFound: (memberTag: string, memberId: string, msgLines: string) => string;
 };
 
 export type MessagesInternal = {

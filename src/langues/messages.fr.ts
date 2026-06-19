@@ -740,6 +740,7 @@ ${roleMsgDeleteText}
       **Rôles surveillés :** ${rolesDisplay}
       `,
   unknownServer: "Serveur inconnu",
+  Serveur: "Serveur",
   by: "Par",
   reason: "Raison",
   verificationAlreadyInProgress: "⏳ Ta vérification est déjà en cours de traitement par le staff",
@@ -877,6 +878,17 @@ const fr_server: MessagesServer = {
   reason: "Raison",
   reactionRolePanelTitle: (category: string) => `Rôles — ${category}`,
   reactionRolePanelEmpty: "Aucun rôle configuré pour cette catégorie",
+  blacklistServerMessage: (guildName: string, timestamp: string, blacklisted_by: string, reason: string) =>  `• Serveur : ${guildName}
+  Date : ${timestamp}
+  Par : ${blacklisted_by}
+  Raison : ${reason}`,
+
+  blackListedMemberFound: (memberTag: string, memberId: string, msgLines: string) => `⚠️ **Nouveau membre déjà blacklisté ailleurs**
+  
+  Membre : ${memberTag} (${memberId})
+
+  ${msgLines}
+  `,
 };
 
 const fr_internal: MessagesInternal = {

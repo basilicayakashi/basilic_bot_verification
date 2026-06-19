@@ -3119,54 +3119,47 @@ client.on(Events.GuildMemberAdd, async (member) => {
       error
     );
   }
+});
 
-  // Si la vérification est configurée, on ne notifie pas ici.
-  // Le contrôle blacklist se fera au moment de la demande de vérification.
-  const guildSettings = getGuildVerificationSettingsStmt.get(member.guild.id) as
-    | GuildVerificationSettingsRow
-    | undefined;
+client.on(Events.GuildMemberAdd, async (member) => {
+  if (member.user.bot) return;
 
-  if (!guildSettings && !member.user.bot) {
+  const locale = normalizeSupportedLocale(member.guild.preferredLocale);
+  const msgServer = getMessagesServer(locale);
+
+  try {
     const notificationSettings = getNewComerNotificationStmt.get(
       member.guild.id
     ) as NewComerNotificationRow | undefined;
 
-    if (notificationSettings) {
-      const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
-        member.id
-      ) as BlacklistedUserRow[];
+    if (!notificationSettings) return;
 
-      if (blacklistedEverywhere.length > 0) {
-        const channel = await member.guild.channels.fetch(
-          notificationSettings.channel_id
-        ).catch(() => null);
+    const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
+      member.id
+    ) as BlacklistedUserRow[];
 
-        if (channel && channel.type === ChannelType.GuildText) {
-          const lines = blacklistedEverywhere.map((entry) => {
-            const timestamp = Math.floor(
-              new Date(entry.blacklisted_at).getTime() / 1000
-            );
+    if (blacklistedEverywhere.length === 0) return;
 
-            return [
-              `• Serveur : ${entry.guild_id}`,
-              `  Date : <t:${timestamp}:f>`,
-              `  Par : <@${entry.blacklisted_by}>`,
-              `  Raison : ${entry.reason ?? "Aucune raison fournie"}`,
-            ].join("\n");
-          });
+    const channel = await member.guild.channels
+      .fetch(notificationSettings.channel_id)
+      .catch(() => null);
 
-          await channel.send({
-            content:
-              `⚠️ **Nouveau membre déjà blacklisté ailleurs**\n\n` +
-              `Membre : ${member.user.tag} (${member.id})\n\n` +
-              lines.join("\n\n"),
-          });
-        }
-      }
-    }
+    if (!channel || channel.type !== ChannelType.GuildText) return;
+
+    const lines = blacklistedEverywhere.map((entry) => {
+      const timestamp = Math.floor(
+        new Date(entry.blacklisted_at).getTime() / 1000
+      );
+
+      return msgServer.blacklistServerMessage(entry.guild_id, `<t:${timestamp}:f>`, `<@${entry.blacklisted_by}>`, entry.reason ?? "-");
+    });
+
+    await channel.send({
+      content: msgServer.blackListedMemberFound(member.user.tag, member.id, lines.join("\n\n")),
+    });
+  } catch (error) {
+    console.error(`[blacklist-join-notification] Erreur pour ${member.id}:`, error);
   }
-
-
 });
 
 client.on(Events.GuildMemberRemove, async (member) => {

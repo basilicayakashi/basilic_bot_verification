@@ -12,23 +12,23 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 
+// ✅ CORRECT
 import {
-  deletePendingVerificationSubmissionStmt,
-  getBlacklistedUsersEverywhereStmt,
+  deletePendingVerificationSubmission,
+  getBlacklistedUser,
+  getBlacklistedUsersEverywhere,
+  getGuildVerificationQuestions,
+  getGuildVerificationSettings,
+  getVerifiedUser,
+  insertVerifiedUser,
 } from "../database/sql.js";
+import { firstValueFrom } from "rxjs";
 
 const pendingVerifications = new Set<string>();
 
 export type VerificationFlowDeps = {
   client: any;
 
-  getVerifiedUserStmt: any;
-  insertVerifiedUserStmt: any;
-
-  getBlacklistedUserStmt: any;
-  getGuildVerificationSettingsStmt: any;
-  getGuildVerificationQuestionsStmt: any;
-  getBlacklistedUsersEverywhereStmt: any;
 
   buildDisabledDecisionButtonsRow: (
     finalAction: "approved" | "rejected" | "blacklisted",
@@ -77,9 +77,8 @@ export async function handleVerificationButtons({
   if (interaction.customId === "start_verification") {
     const member = await interaction.guild.members.fetch(interaction.user.id);
 
-    const blacklistedUser = deps.getBlacklistedUserStmt.get(
-      interaction.guild.id,
-      member.id
+    const blacklistedUser = await firstValueFrom(
+      getBlacklistedUser(interaction.guild.id, member.id)
     );
 
     if (blacklistedUser) {
@@ -95,8 +94,12 @@ export async function handleVerificationButtons({
       return true;
     }
 
-    const existingVerification = deps.getVerifiedUserStmt.get(interaction.guild.id, member.id);
-    const guildSettings = deps.getGuildVerificationSettingsStmt.get(interaction.guild.id);
+    const existingVerification = await firstValueFrom(
+      getVerifiedUser(interaction.guild.id, member.id)
+    );
+    const guildSettings = await firstValueFrom(
+      getGuildVerificationSettings(interaction.guild.id)
+    );
 
     if (!guildSettings) {
       await interaction.reply({
@@ -114,7 +117,7 @@ export async function handleVerificationButtons({
         );
       }
 
-      deletePendingVerificationSubmissionStmt.run(interaction.guild.id, member.id);
+      await firstValueFrom(deletePendingVerificationSubmission(interaction.guild.id, member.id));
 
       try {
         await member.send(msgOut.YourVerifiedStatusRestored(interaction.guild.name));
@@ -150,8 +153,8 @@ export async function handleVerificationButtons({
       }
     }
 
-    const questions = deps.getGuildVerificationQuestionsStmt.all(
-      interaction.guild.id
+    const questions = await firstValueFrom(
+      getGuildVerificationQuestions(interaction.guild.id)
     );
 
     if (questions.length === 0) {
@@ -174,7 +177,7 @@ export async function handleVerificationButtons({
           .setCustomId(question.question_key)
           .setPlaceholder(msgServer.answerPlaceholder)
           .setStyle(TextInputStyle.Short)
-          .setRequired(question.required === 1)
+          .setRequired(question.required === true)
           .setMaxLength(50);
 
         labelComponents.push(
@@ -190,7 +193,7 @@ export async function handleVerificationButtons({
           .setCustomId(question.question_key)
           .setPlaceholder(msgServer.answerPlaceholder)
           .setStyle(TextInputStyle.Paragraph)
-          .setRequired(question.required === 1)
+          .setRequired(question.required === true)
           .setMaxLength(150);
 
         labelComponents.push(
@@ -204,9 +207,9 @@ export async function handleVerificationButtons({
       if (question.question_type === "file_image") {
         const upload = new FileUploadBuilder()
           .setCustomId(question.question_key)
-          .setMinValues(question.required === 1 ? 1 : 0)
+          .setMinValues(question.required === true ? 1 : 0)
           .setMaxValues(1)
-          .setRequired(question.required === 1);
+          .setRequired(question.required === true);
 
         labelComponents.push(
           new LabelBuilder()
@@ -229,7 +232,9 @@ export async function handleVerificationButtons({
     interaction.customId.startsWith("staff_discuss_")
   ) {
     const staffMember = await interaction.guild.members.fetch(interaction.user.id);
-    const guildSettings = deps.getGuildVerificationSettingsStmt.get(interaction.guild.id);
+    const guildSettings = await firstValueFrom(
+      getGuildVerificationSettings(interaction.guild.id)
+    );
 
     if (!guildSettings) {
       await interaction.reply({
@@ -318,12 +323,14 @@ export async function handleVerificationButtons({
     if (isValidate) {
       const nowIso = new Date().toISOString();
 
-      deps.insertVerifiedUserStmt.run(
-        guildSettings.guild_id,
-        targetMember.id,
-        targetMember.user.tag,
-        nowIso,
-        `${staffMember.user.tag} (${staffMember.id})`
+      await firstValueFrom(
+        insertVerifiedUser(
+          guildSettings.guild_id,
+          targetMember.id,
+          targetMember.user.tag,
+          nowIso,
+          `${staffMember.user.tag} (${staffMember.id})`
+        )
       );
 
       if (!targetMember.roles.cache.has(guildSettings.verified_role_id)) {
@@ -492,7 +499,9 @@ export async function handleVerificationModals({
 
   if (interaction.customId.startsWith("staff_blacklist_modal_")) {
     const staffMember = await interaction.guild.members.fetch(interaction.user.id);
-    const guildSettings = deps.getGuildVerificationSettingsStmt.get(interaction.guild.id);
+    const guildSettings = await firstValueFrom(
+      getGuildVerificationSettings(interaction.guild.id)
+    );
 
     if (!guildSettings) {
       await interaction.reply({
@@ -561,7 +570,9 @@ export async function handleVerificationModals({
 
   if (interaction.customId.startsWith("staff_refuse_modal_")) {
     const staffMember = await interaction.guild.members.fetch(interaction.user.id);
-    const guildSettings = deps.getGuildVerificationSettingsStmt.get(interaction.guild.id);
+    const guildSettings = await firstValueFrom(
+      getGuildVerificationSettings(interaction.guild.id)
+    );
 
     if (!guildSettings) {
       await interaction.reply({
@@ -638,13 +649,12 @@ export async function handleVerificationModals({
     pendingVerifications.add(member.id);
 
     try {
-      deletePendingVerificationSubmissionStmt.run(
-        interaction.guild.id,
-        member.id
+      await firstValueFrom(
+        deletePendingVerificationSubmission(interaction.guild.id, member.id)
       );
 
-      const questions = deps.getGuildVerificationQuestionsStmt.all(
-        interaction.guild.id
+      const questions = await firstValueFrom(
+        getGuildVerificationQuestions(interaction.guild.id)
       );
 
       if (questions.length === 0) {
@@ -658,8 +668,8 @@ export async function handleVerificationModals({
       const accountAgeText = deps.formatAccountAge(member.user.createdAt, msgServer);
       const createdTimestamp = Math.floor(member.user.createdAt.getTime() / 1000);
 
-      const guildSettings = deps.getGuildVerificationSettingsStmt.get(
-        interaction.guild.id
+      const guildSettings = await firstValueFrom(
+        getGuildVerificationSettings(interaction.guild.id)
       );
 
       if (!guildSettings) {
@@ -735,7 +745,7 @@ export async function handleVerificationModals({
         if (question.question_type === "file_image") {
           const files = interaction.fields.getUploadedFiles(
             question.question_key,
-            question.required === 1
+            question.required === true
           );
 
           const file = files?.first();
@@ -758,7 +768,9 @@ export async function handleVerificationModals({
       });
 
       // ── MESSAGE 2 : statut blacklist ──────────────────────────────────
-      const blacklistedEverywhere = deps.getBlacklistedUsersEverywhereStmt.all(member.id);
+      const blacklistedEverywhere = await firstValueFrom(
+        getBlacklistedUsersEverywhere(member.id)
+      );
 
       let statusContent: string;
 

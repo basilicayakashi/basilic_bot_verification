@@ -10,7 +10,7 @@ import {
   Locale,
 } from "discord.js";
 
-import { getMessagesUser, getMessagesOut, getMessagesServer, getMessagesInternal} from "./../langues/index.js";
+import { getMessagesUser, getMessagesOut, getMessagesServer, getMessagesInternal } from "./../langues/index.js";
 
 type RecentMessage = {
   messageId: string;
@@ -24,14 +24,16 @@ type RecentMessage = {
 };
 
 export type GuildSpamSettings = {
-  enabled: number;
+  enabled: boolean;
   alert_channel_id: string | null;
   staff_role_id: string | null;
   message_threshold: number;
   window_seconds: number;
 };
 
-type GetGuildSpamSettings = (guildId: string) => GuildSpamSettings | undefined;
+type GetGuildSpamSettings = (
+  guildId: string
+) => Promise<GuildSpamSettings | null | undefined>;
 
 type SpamAlertConfig = {
   getGuildSpamSettings: GetGuildSpamSettings;
@@ -91,9 +93,9 @@ export class SpamAlertService {
   public async handleMessage(message: Message): Promise<void> {
     if (!message.inGuild()) return;
 
-    const guildSettings = this.config.getGuildSpamSettings(message.guild.id);
+    const guildSettings = await this.config.getGuildSpamSettings(message.guild.id);
     if (!guildSettings) return;
-    if (guildSettings.enabled !== 1) return;
+    if (!guildSettings.enabled) return;
     if (!guildSettings.alert_channel_id) return;
 
     if (message.author.bot && this.config.ignoreBots) return;
@@ -124,7 +126,7 @@ export class SpamAlertService {
       channelId: message.channelId,
       channelName:
         message.channel.type === ChannelType.GuildText ||
-        message.channel.type === ChannelType.GuildAnnouncement
+          message.channel.type === ChannelType.GuildAnnouncement
           ? message.channel.name
           : "unknown",
       content: message.content,
@@ -323,17 +325,17 @@ export class SpamAlertService {
       (a, b) => a.createdTimestamp - b.createdTimestamp
     );
 
-  const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`spam:false_positive:${sourceMessage.guild.id}:${sourceMessage.author.id}`)
-      .setLabel(msgServer.spamFalsePositive)
-      .setStyle(ButtonStyle.Secondary),
+    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`spam:false_positive:${sourceMessage.guild.id}:${sourceMessage.author.id}`)
+        .setLabel(msgServer.spamFalsePositive)
+        .setStyle(ButtonStyle.Secondary),
 
-    new ButtonBuilder()
-      .setCustomId(`spam:ban:${sourceMessage.guild.id}:${sourceMessage.author.id}`)
-      .setLabel(msgServer.spamBan)
-      .setStyle(ButtonStyle.Danger)
-  );
+      new ButtonBuilder()
+        .setCustomId(`spam:ban:${sourceMessage.guild.id}:${sourceMessage.author.id}`)
+        .setLabel(msgServer.spamBan)
+        .setStyle(ButtonStyle.Danger)
+    );
 
     const distinctChannels = [
       ...new Set(matched.map((m) => `<#${m.channelId}>`)),
@@ -351,19 +353,19 @@ export class SpamAlertService {
       .setTitle(msgServer.spamAlertTitle)
       .setDescription(
         [
-        `**${msgServer.spamUserLabel} :** <@${sourceMessage.author.id}> (\`${sourceMessage.author.id}\`)`,
-        `**${msgServer.spamScoreLabel} :** ${suspicion.score}`,
-        `**${msgServer.spamOccurrencesLabel} :** ${matched.length}`,
-        `**${msgServer.spamChannelsLabel} :** ${distinctChannels || msgServer.spamUnknown}`,
-        "",
-        `**${msgServer.spamReasonsLabel} :**`,
-        ...suspicion.reasonLines.map((line) => `- ${line}`),
-        "",
-        `**${msgServer.spamSampleLabel} :**`,
-        truncateForEmbed(sampleContent, 300),
-        "",
-        `**${msgServer.spamLinksLabel} :** ${links || msgServer.spamUnknown}`,
-      ].join("\n")
+          `**${msgServer.spamUserLabel} :** <@${sourceMessage.author.id}> (\`${sourceMessage.author.id}\`)`,
+          `**${msgServer.spamScoreLabel} :** ${suspicion.score}`,
+          `**${msgServer.spamOccurrencesLabel} :** ${matched.length}`,
+          `**${msgServer.spamChannelsLabel} :** ${distinctChannels || msgServer.spamUnknown}`,
+          "",
+          `**${msgServer.spamReasonsLabel} :**`,
+          ...suspicion.reasonLines.map((line) => `- ${line}`),
+          "",
+          `**${msgServer.spamSampleLabel} :**`,
+          truncateForEmbed(sampleContent, 300),
+          "",
+          `**${msgServer.spamLinksLabel} :** ${links || msgServer.spamUnknown}`,
+        ].join("\n")
       )
       .setTimestamp(new Date());
 
@@ -372,10 +374,10 @@ export class SpamAlertService {
       : msgServer.spamModerationFallback;
 
     const sentMessage = await (alertChannel as TextChannel).send({
-    content: `${prefix} — activité suspecte détectée, vérification manuelle recommandée.`,
-    embeds: [embed],
-    components: [buttons],
-  });
+      content: `${prefix} — activité suspecte détectée, vérification manuelle recommandée.`,
+      embeds: [embed],
+      components: [buttons],
+    });
 
     const alertKey = this.buildAlertKey(sourceMessage.guild.id, sourceMessage.author.id);
     this.activeAlerts.set(alertKey, sentMessage.id);

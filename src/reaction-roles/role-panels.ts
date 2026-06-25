@@ -6,10 +6,12 @@ import {
   GuildMember,
 } from "discord.js";
 
+import { firstValueFrom } from "rxjs";
+
 import {
-  getReactionRoleEntriesStmt,
-  getReactionRolePanelByCategoryStmt,
-  insertReactionRolePanelStmt,
+  getReactionRoleEntries,
+  getReactionRolePanelByCategory,
+  insertReactionRolePanel,
   ReactionRoleCategoryRow,
   ReactionRoleEntryRow,
   ReactionRolePanelRow,
@@ -43,24 +45,25 @@ export async function publishOrUpdatePanel(
   msgServer: MessagesServer
 ): Promise<Message> {
   const embed = buildReactionRolePanelEmbed(category, entries, msgServer);
-  const existingPanel = getReactionRolePanelByCategoryStmt.get(
-    category.id
-  ) as ReactionRolePanelRow | undefined;
+
+  const existingPanel = await firstValueFrom(
+    getReactionRolePanelByCategory(category.id)
+  );
 
   let message: Message;
 
   if (existingPanel) {
-    // Récupérer et éditer le message existant si possible
     try {
       const existingChannel = (await guild.channels.fetch(
         existingPanel.channel_id
       )) as TextChannel | null;
+
       const existingMessage = existingChannel
-        ? await existingChannel.messages.fetch(existingPanel.message_id)
+        ? await existingChannel.messages.fetch(existingPanel.message_id).catch(() => null)
         : null;
 
       if (existingMessage) {
-        await existingMessage.reactions.removeAll();
+        await existingMessage.reactions.removeAll().catch(() => null);
         message = await existingMessage.edit({ embeds: [embed] });
       } else {
         message = await channel.send({ embeds: [embed] });
@@ -74,15 +77,17 @@ export async function publishOrUpdatePanel(
 
   // Ajouter les réactions dans l'ordre
   for (const entry of entries) {
-    await message.react(entry.emoji);
+    await message.react(entry.emoji).catch(() => null);
   }
 
-  // Sauvegarder en DB
-  insertReactionRolePanelStmt.run(
-    category.id,
-    guild.id,
-    channel.id,
-    message.id
+  // Sauvegarder en DB PostgreSQL
+  await firstValueFrom(
+    insertReactionRolePanel(
+      category.id,
+      guild.id,
+      channel.id,
+      message.id
+    )
   );
 
   return message;
@@ -94,9 +99,10 @@ export async function handleReactionAdd(
   emoji: string,
   member: GuildMember
 ): Promise<void> {
-  const entries = getReactionRoleEntriesStmt.all(
-    panel.category_id
-  ) as ReactionRoleEntryRow[];
+  const entries = await firstValueFrom(
+    getReactionRoleEntries(panel.category_id)
+  );
+
   const entry = entries.find((e) => e.emoji === emoji);
   if (!entry) return;
 
@@ -114,9 +120,10 @@ export async function handleReactionRemove(
   emoji: string,
   member: GuildMember
 ): Promise<void> {
-  const entries = getReactionRoleEntriesStmt.all(
-    panel.category_id
-  ) as ReactionRoleEntryRow[];
+  const entries = await firstValueFrom(
+    getReactionRoleEntries(panel.category_id)
+  );
+
   const entry = entries.find((e) => e.emoji === emoji);
   if (!entry) return;
 

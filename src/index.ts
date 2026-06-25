@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import { firstValueFrom } from "rxjs";
+
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -26,63 +28,59 @@ import {
 import { SpamAlertService } from "./moderation/spam-alert.js";
 
 import {
-  getVerifiedUserStmt,
-  insertVerifiedUserStmt,
-  getBlacklistedUserStmt,
-  getBlacklistedUsersEverywhereStmt,
-  insertBlacklistedUserStmt,
-  deleteBlacklistedUserStmt,
-  upsertGuildVerificationSettingsStmt,
-  deleteGuildVerificationQuestionsStmt,
-  insertGuildVerificationQuestionStmt,
-  getGuildVerificationSettingsStmt,
-  getGuildVerificationQuestionsStmt,
-  getGuildVerificationQuestionByIndexStmt,
-  updateGuildVerificationQuestionStmt,
-  deleteGuildVerificationQuestionByIdStmt,
-  reorderGuildVerificationQuestionsStmt,
-  getGuildSpamSettingsStmt,
-  upsertGuildSpamSettingsStmt,
-  insertPendingVerificationSubmissionStmt,
-  deletePendingVerificationSubmissionStmt,
-  getExpiredPendingVerificationSubmissionsStmt,
-  getGuildWelcomeMessageStmt,
-  getGuildWelcomeMessagesAllStmt,
-  upsertGuildWelcomeMessageStmt,
-  deleteGuildWelcomeMessageStmt,
-  getFreeGamesSettingsStmt,
-  insertFreeGamePublicationStmt,
-  getEnabledFreeGamesSettingsStmt,
-  upsertFreeGamesSettingsStmt,
-  getPublishedFreeGameIdsForGuildStmt,
-  getAllFreeGamesStmt,
-  getExpiredFreeGamePublicationsStmt,
-  deleteFreeGamePublicationStmt,
-  getGuildRoleMessageDeleteSettingsStmt,
-  upsertGuildRoleMessageDeleteSettingsStmt,
-  GuildRoleMessageDeleteSettingsRow,
-  getReactionRoleEntriesStmt,
-  ReactionRoleEntryRow,
-  getReactionRolePanelByCategoryStmt,
-  insertReactionRolePanelStmt,
-  ReactionRoleCategoryRow,
-  ReactionRolePanelRow,
-  getReactionRoleCategoriesStmt,
-  getReactionRoleCategoryStmt,
-  updateReactionRoleCategoryStmt,
-  insertReactionRoleCategoryStmt,
-  updateReactionRoleEntryStmt,
-  insertReactionRoleEntryStmt,
-  deleteReactionRoleEntryStmt,
-  getReactionRolePanelByMessageIdStmt,
-  deleteReactionRoleCategoryStmt,
-  deleteReactionRolePanelStmt,
-  getBannedGuildStmt,
-  getAllFreeGamesSettingsStmt,
-  getFreeGamePublicationByMessageIdStmt
-} from "./database/sql.js";
-
-import {
+  initDb,
+  getVerifiedUser,
+  insertVerifiedUser,
+  getBlacklistedUser,
+  getBlacklistedUsersEverywhere,
+  insertBlacklistedUser,
+  deleteBlacklistedUser,
+  upsertGuildVerificationSettings,
+  deleteGuildVerificationQuestions,
+  insertGuildVerificationQuestion,
+  getGuildVerificationSettings,
+  getGuildVerificationQuestions,
+  getGuildVerificationQuestionByIndex,
+  updateGuildVerificationQuestion,
+  deleteGuildVerificationQuestionById,
+  reorderGuildVerificationQuestion,
+  getGuildSpamSettings,
+  upsertGuildSpamSettings,
+  insertPendingVerificationSubmission,
+  deletePendingVerificationSubmission,
+  getExpiredPendingVerificationSubmissions,
+  getGuildWelcomeMessage,
+  upsertGuildWelcomeMessage,
+  deleteGuildWelcomeMessage,
+  getFreeGamesSettings,
+  insertFreeGamePublication,
+  getEnabledFreeGamesSettings,
+  upsertFreeGamesSettings,
+  getPublishedFreeGameIdsForGuild,
+  getAllFreeGames,
+  getExpiredFreeGamePublications,
+  deleteFreeGamePublication,
+  getGuildRoleMessageDeleteSettings,
+  upsertGuildRoleMessageDeleteSettings,
+  getReactionRoleEntries,
+  getReactionRolePanelByCategory,
+  insertReactionRolePanel,
+  getReactionRoleCategories,
+  getReactionRoleCategory,
+  updateReactionRoleCategory,
+  insertReactionRoleCategory,
+  updateReactionRoleEntry,
+  insertReactionRoleEntry,
+  deleteReactionRoleEntry,
+  getReactionRolePanelByMessageId,
+  deleteReactionRoleCategory,
+  deleteReactionRolePanel,
+  getBannedGuild,
+  getAllFreeGamesSettings,
+  getFreeGamePublicationByMessageId,
+  upsertNewComerNotification,
+  getNewComerNotification,
+  deleteNewComerNotification,
   VerifiedUserRow,
   SetupVerificationPermissionRow,
   BlacklistedUserRow,
@@ -91,11 +89,24 @@ import {
   GuildVerificationSettingsRow,
   GuildSpamSettingsRow,
   GuildWelcomeMessageRow,
-  upsertNewComerNotificationStmt,
-  getNewComerNotificationStmt,
-  deleteNewComerNotificationStmt,
+  GuildRoleMessageDeleteSettingsRow,
+  ReactionRoleEntryRow,
+  ReactionRoleCategoryRow,
+  ReactionRolePanelRow,
   NewComerNotificationRow,
 } from "./database/sql.js";
+
+function dbValue<T>(observable: import("rxjs").Observable<T>): Promise<T> {
+  return firstValueFrom(observable);
+}
+
+const getVerifiedUserStmt = { get: (guildId: string, userId: string) => dbValue(getVerifiedUser(guildId, userId)) };
+const insertVerifiedUserStmt = { run: (guildId: string, userId: string, username: string, verifiedAt: string, verifiedBy: string) => dbValue(insertVerifiedUser(guildId, userId, username, verifiedAt, verifiedBy)) };
+const getBlacklistedUserStmt = { get: (guildId: string, userId: string) => dbValue(getBlacklistedUser(guildId, userId)) };
+const getGuildVerificationSettingsStmt = { get: (guildId: string) => dbValue(getGuildVerificationSettings(guildId)) };
+const getGuildVerificationQuestionsStmt = { all: (guildId: string) => dbValue(getGuildVerificationQuestions(guildId)) };
+const getBlacklistedUsersEverywhereStmt = { all: (userId: string) => dbValue(getBlacklistedUsersEverywhere(userId)) };
+
 
 import {
   publishOrUpdatePanel,
@@ -141,8 +152,8 @@ const client = new Client({
 });
 
 const spamAlertService = new SpamAlertService({
-  getGuildSpamSettings: (guildId: string) =>
-    getGuildSpamSettingsStmt.get(guildId) as GuildSpamSettingsRow | undefined,
+  getGuildSpamSettings: async (guildId: string) =>
+    (await dbValue(getGuildSpamSettings(guildId))) as GuildSpamSettingsRow | undefined,
 });
 
 // =========================
@@ -1186,14 +1197,14 @@ async function blacklistMemberInGuild(params: {
     // on garde la fallback
   }
 
-  insertBlacklistedUserStmt.run(
+  await dbValue(insertBlacklistedUser(
     guild.id,
     targetUserId,
     resolvedUsername,
     nowIso,
     moderatorId,
     reason ?? null
-  );
+  ));
 
   const member = await guild.members.fetch(targetUserId).catch(() => null);
 
@@ -1312,9 +1323,8 @@ async function replyEphemeral(interaction: any, content: string) {
   });
 }
 
-function isAuthorizedServer(interaction: any): boolean {
-
-  return !getBannedGuildStmt.get(interaction.guild.id);
+async function isAuthorizedServer(interaction: any): Promise<boolean> {
+  return !(await dbValue(getBannedGuild(interaction.guild.id)));
 }
 
 function isUsedOnAServer(
@@ -1419,11 +1429,11 @@ function buildFreeGameEmbed(game: FreeGameRow): EmbedBuilder {
 }
 
 async function publishFreeGamesForGuild(guildId: string): Promise<void> {
-  const settings = getFreeGamesSettingsStmt.get(guildId) as any;
+  const settings = await dbValue(getFreeGamesSettings(guildId)) as any;
 
   console.log(`[FREEGAMES] settings for ${guildId}:`, settings);
 
-  if (!settings || settings.enabled !== 1) return;
+  if (!settings || settings.enabled !== true && settings.enabled !== 1) return;
 
   const channel = await client.channels.fetch(settings.channel_id).catch((error) => {
     console.error(`[FREEGAMES] cannot fetch channel ${settings.channel_id}:`, error);
@@ -1435,11 +1445,11 @@ async function publishFreeGamesForGuild(guildId: string): Promise<void> {
     return;
   }
 
-  const allGames = getAllFreeGamesStmt.all() as FreeGameRow[];
+  const allGames = await dbValue(getAllFreeGames()) as FreeGameRow[];
   console.log(`[FREEGAMES] games in db: ${allGames.length}`);
 
   const publishedIds = (
-    getPublishedFreeGameIdsForGuildStmt.all(guildId) as { free_game_id: number }[]
+    await dbValue(getPublishedFreeGameIdsForGuild(guildId)) as { free_game_id: number }[]
   ).map(r => r.free_game_id);
 
   console.log(`[FREEGAMES] already published for ${guildId}: ${publishedIds.length}`);
@@ -1462,17 +1472,17 @@ async function publishFreeGamesForGuild(guildId: string): Promise<void> {
       embeds: [buildFreeGameEmbed(game)]
     });
 
-    insertFreeGamePublicationStmt.run(
+    await dbValue(insertFreeGamePublication(
       guildId,
       game.id,
       settings.channel_id,
       sentMessage.id
-    );
+    ));
   }
 }
 
 async function publishFreeGamesForAllGuilds(): Promise<void> {
-  const settingsRows = getEnabledFreeGamesSettingsStmt.all() as any[];
+  const settingsRows = await dbValue(getEnabledFreeGamesSettings()) as any[];
 
   console.log(`[FREEGAMES] enabled guilds: ${settingsRows.length}`);
 
@@ -1496,9 +1506,9 @@ async function getGuildVerificationSettingsOrReply(
   interaction: any,
   msgIn: any
 ): Promise<GuildVerificationSettingsRow | null> {
-  const settings = getGuildVerificationSettingsStmt.get(
+  const settings = await dbValue(getGuildVerificationSettings(
     interaction.guild.id
-  ) as GuildVerificationSettingsRow | undefined;
+  )) as GuildVerificationSettingsRow | undefined;
 
   if (!settings) {
     await replyEphemeral(interaction, msgIn.verificationNotConfigured);
@@ -1559,7 +1569,7 @@ async function requireAdminOnGuild(
 }
 
 async function cleanupExpiredFreeGameMessages(): Promise<void> {
-  const rows = getExpiredFreeGamePublicationsStmt.all() as {
+  const rows = await dbValue(getExpiredFreeGamePublications()) as {
     guild_id: string;
     free_game_id: number;
     channel_id: string;
@@ -1577,13 +1587,13 @@ async function cleanupExpiredFreeGameMessages(): Promise<void> {
       await message.delete().catch(() => null);
     }
 
-    deleteFreeGamePublicationStmt.run(row.guild_id, row.free_game_id);
+    await dbValue(deleteFreeGamePublication(row.guild_id, row.free_game_id));
   }
 }
 
 async function cleanupOrphanFreeGameMessages(): Promise<void> {
   // Récupère tous les salons configurés (un par guild)
-  const settings = getAllFreeGamesSettingsStmt.all() as { guild_id: string; channel_id: string }[];
+  const settings = await dbValue(getAllFreeGamesSettings()) as { guild_id: string; channel_id: string }[];
 
   for (const { guild_id, channel_id } of settings) {
     const channel = await client.channels.fetch(channel_id).catch(() => null);
@@ -1598,7 +1608,7 @@ async function cleanupOrphanFreeGameMessages(): Promise<void> {
       if (message.author.id !== client.user?.id) continue;
 
       // Vérifie si ce message_id est dans free_games_publications pour ce guild
-      const publication = getFreeGamePublicationByMessageIdStmt.get(guild_id, messageId);
+      const publication = await dbValue(getFreeGamePublicationByMessageId(guild_id, messageId));
       if (!publication) {
         await message.delete().catch(() => null);
       }
@@ -1612,6 +1622,14 @@ async function cleanupOrphanFreeGameMessages(): Promise<void> {
 // =========================
 client.once(Events.ClientReady, async (readyClient) => {
   console.log(`✅ Connecté en tant que ${readyClient.user.tag}`);
+
+  try {
+    await dbValue(initDb());
+    console.log("✅ Base PostgreSQL initialisée");
+  } catch (error) {
+    console.error("❌ Erreur initialisation PostgreSQL :", error);
+    process.exit(1);
+  }
 
   try {
     // Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),   : pour tester sur un seul serveur 
@@ -1757,7 +1775,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       if (focusedOption.name === "category" || focusedOption.name === "name") {
         const guildId = interaction.guildId!;
-        const categories = getReactionRoleCategoriesStmt.all(guildId) as ReactionRoleCategoryRow[];
+        const categories = await dbValue(getReactionRoleCategories(guildId)) as ReactionRoleCategoryRow[];
 
         const filtered = categories.filter((c) =>
           c.name.toLowerCase().startsWith(focusedOption.value.toLowerCase())
@@ -1782,7 +1800,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       //sur toutes les commandes autres que "allow-setup-verification"
       if (
         interaction.commandName !== "allow-setup-verification" &&
-        !isAuthorizedServer(interaction)
+        !(await isAuthorizedServer(interaction))
       ) {
         await replyEphemeral(interaction, msgIn.NotAuthorizedServer);
         return;
@@ -1804,7 +1822,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         const nowIso = new Date().toISOString();
 
-        upsertGuildVerificationSettingsStmt.run(
+        await dbValue(upsertGuildVerificationSettings(
           interaction.guild!.id,
           verifiedRoleId.id,
           staffCategoryId,
@@ -1812,7 +1830,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           interaction.user.id,
           nowIso,
           verificationTimeoutHours
-        );
+        ));
 
         if (!interaction.channel || interaction.channel.type !== ChannelType.GuildText) {
           await interaction.reply({
@@ -1848,9 +1866,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         const targetUserId = interaction.options.getString("user_id", true);
 
-        const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
+        const blacklistedEverywhere = await dbValue(getBlacklistedUsersEverywhere(
           targetUserId
-        ) as BlacklistedUserRow[];
+        )) as BlacklistedUserRow[];
         const foundGuilds = await findUserGuilds(targetUserId);
 
         const blacklistLines = await Promise.all(
@@ -1950,9 +1968,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const guild = commandInteraction.guild!;
         const targetUserId = commandInteraction.options.getString("user_id", true);
 
-        const guildSettings = getGuildVerificationSettingsStmt.get(
+        const guildSettings = await dbValue(getGuildVerificationSettings(
           guild.id
-        ) as GuildVerificationSettingsRow | undefined;
+        )) as GuildVerificationSettingsRow | undefined;
 
         if (!guildSettings) {
           await commandInteraction.reply({
@@ -1977,13 +1995,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
 
         // 1) Supprimer de pending_verification_submissions
-        deletePendingVerificationSubmissionStmt.run(guild.id, targetUserId);
+        await dbValue(deletePendingVerificationSubmission(guild.id, targetUserId));
 
         // 2) Ajouter dans verified_users seulement si absent
-        const existingVerification = getVerifiedUserStmt.get(
+        const existingVerification = await dbValue(getVerifiedUser(
           guild.id,
           targetUserId
-        ) as VerifiedUserRow | undefined;
+        )) as VerifiedUserRow | undefined;
 
         const targetMember = await guild.members.fetch(targetUserId).catch(() => null);
 
@@ -1997,13 +2015,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
 
         if (!existingVerification) {
-          insertVerifiedUserStmt.run(
+          await dbValue(insertVerifiedUser(
             guild.id,
             targetUserId,
             username,
             new Date().toISOString(),
             `${commandInteraction.user.tag} (${commandInteraction.user.id})`
-          );
+          ));
         }
 
         // 3) Ajouter le rôle si le membre est présent sur le serveur
@@ -2038,9 +2056,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const guildSettings = await getGuildVerificationSettingsOrReply(interaction, msgIn);
         if (!guildSettings) return;
 
-        const questions = getGuildVerificationQuestionsStmt.all(
+        const questions = await dbValue(getGuildVerificationQuestions(
           interaction.guild!.id
-        ) as GuildVerificationQuestionRow[];
+        )) as GuildVerificationQuestionRow[];
 
         if (questions.length >= 5) {
           await replyEphemeral(interaction, msgIn.YouCannotConfigureMoreThanFiveQuestions);
@@ -2059,14 +2077,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const nextOrder = questions.length + 1;
         const questionKey = `question_${Date.now()}`;
 
-        insertGuildVerificationQuestionStmt.run(
+        await dbValue(insertGuildVerificationQuestion(
           interaction.guild!.id,
           nextOrder,
           questionKey,
           label,
           type,
-          required ? 1 : 0
-        );
+          required
+        ));
 
         await replyEphemeral(interaction, msgIn.QuestionAddedAtIndex(nextOrder));
         return;
@@ -2092,10 +2110,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        const question = getGuildVerificationQuestionByIndexStmt.get(
+        const question = await dbValue(getGuildVerificationQuestionByIndex(
           interaction.guild!.id,
           index - 1
-        ) as GuildVerificationQuestionRow | undefined;
+        )) as GuildVerificationQuestionRow | undefined;
 
         if (!question) {
           await interaction.reply({
@@ -2105,12 +2123,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        updateGuildVerificationQuestionStmt.run(
+        await dbValue(updateGuildVerificationQuestion(
           newLabel ?? question.question_label,
           newType ?? question.question_type,
-          newRequired === null ? question.required : newRequired ? 1 : 0,
+          newRequired === null ? question.required : newRequired,
           question.id
-        );
+        ));
 
         await interaction.reply({
           content: msgIn.questionUpdatedSuccessfully(index),
@@ -2131,10 +2149,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         const index = interaction.options.getInteger("index", true);
 
-        const question = getGuildVerificationQuestionByIndexStmt.get(
+        const question = await dbValue(getGuildVerificationQuestionByIndex(
           interaction.guild!.id,
           index - 1
-        ) as GuildVerificationQuestionRow | undefined;
+        )) as GuildVerificationQuestionRow | undefined;
 
         if (!question) {
           await interaction.reply({
@@ -2144,14 +2162,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        deleteGuildVerificationQuestionByIdStmt.run(question.id);
+        await dbValue(deleteGuildVerificationQuestionById(question.id));
 
-        const remainingQuestions = getGuildVerificationQuestionsStmt.all(
+        const remainingQuestions = await dbValue(getGuildVerificationQuestions(
           interaction.guild!.id
-        ) as GuildVerificationQuestionRow[];
+        )) as GuildVerificationQuestionRow[];
 
         for (let i = 0; i < remainingQuestions.length; i++) {
-          reorderGuildVerificationQuestionsStmt.run(i + 1, remainingQuestions[i].id);
+          await dbValue(reorderGuildVerificationQuestion(i + 1, remainingQuestions[i].id));
         }
 
         await interaction.reply({
@@ -2241,17 +2259,17 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         const targetUserId = interaction.options.getString("user_id", true);
 
-        const blacklistedRecord = getBlacklistedUserStmt.get(
+        const blacklistedRecord = await dbValue(getBlacklistedUser(
           interaction.guild!.id,
           targetUserId
-        ) as BlacklistedUserRow | undefined;
+        )) as BlacklistedUserRow | undefined;
 
         if (!blacklistedRecord) {
           await replyEphemeral(interaction, msgIn.userNotBlacklisted(targetUserId));
           return;
         }
 
-        deleteBlacklistedUserStmt.run(interaction.guild!.id, targetUserId);
+        await dbValue(deleteBlacklistedUser(interaction.guild!.id, targetUserId));
 
         await replyEphemeral(interaction, msgIn.userRemovedFromBlacklist(targetUserId));
         return;
@@ -2274,7 +2292,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const messageThreshold = interaction.options.getInteger("number", false) ?? 6;
         const windowSeconds = interaction.options.getInteger("duration", false) ?? 20;
 
-        const existingSpamSettings = getGuildSpamSettingsStmt.get(interaction.guild!.id) as
+        const existingSpamSettings = await dbValue(getGuildSpamSettings(interaction.guild!.id)) as
           | GuildSpamSettingsRow
           | undefined;
 
@@ -2292,16 +2310,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        upsertGuildSpamSettingsStmt.run(
+        await dbValue(upsertGuildSpamSettings(
           interaction.guild!.id,
-          enabled ? 1 : 0,
+          enabled,
           alertChannel?.id ?? null,
           staffRole?.id ?? null,
           messageThreshold,
           windowSeconds,
           interaction.user.id,
           new Date().toISOString()
-        );
+        ));
 
         await interaction.reply({
           content: enabled
@@ -2315,9 +2333,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
 
       if (interaction.commandName === "view-settings") {
-        const settings = getGuildVerificationSettingsStmt.get(
+        const settings = await dbValue(getGuildVerificationSettings(
           interaction.guild!.id
-        ) as GuildVerificationSettingsRow | undefined;
+        )) as GuildVerificationSettingsRow | undefined;
 
         if (!settings) {
           await interaction.reply({
@@ -2329,8 +2347,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         const verifiedRole = interaction.guild!.roles.cache.get(settings.verified_role_id);
         const staffRole = interaction.guild!.roles.cache.get(settings.staff_role_id);
-        const SettingsMsgDeletedFromRoles = getGuildRoleMessageDeleteSettingsStmt.get(interaction.guild!.id) as GuildRoleMessageDeleteSettingsRow | undefined;
-        const notificationSettings = getNewComerNotificationStmt.get(interaction.guild.id) as NewComerNotificationRow | undefined;
+        const SettingsMsgDeletedFromRoles = await dbValue(getGuildRoleMessageDeleteSettings(interaction.guild!.id)) as GuildRoleMessageDeleteSettingsRow | undefined;
+        const notificationSettings = await dbValue(getNewComerNotification(interaction.guild.id)) as NewComerNotificationRow | undefined;
 
         const verifiedRoleDisplay = verifiedRole
           ? `<@&${settings.verified_role_id}>`
@@ -2341,9 +2359,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
           : msgIn.RoleIntrouvable(settings.staff_role_id);
 
         const freeGamesSettings =
-          getFreeGamesSettingsStmt.get(
+          await dbValue(getFreeGamesSettings(
             interaction.guild.id
-          ) as any | undefined;
+          )) as any | undefined;
 
         const freeGamesChannel =
           freeGamesSettings?.channel_id
@@ -2355,9 +2373,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
             : msgIn.viewSettingsBlacklistNotificationChannel("-");
 
         const questions =
-          getGuildVerificationQuestionsStmt.all(
+          await dbValue(getGuildVerificationQuestions(
             interaction.guild.id
-          ) as GuildVerificationQuestionRow[];
+          )) as GuildVerificationQuestionRow[];
 
         const questionsText =
           questions.length === 0
@@ -2367,14 +2385,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
               .map(
                 (q, index) =>
                   `**${index + 1}.** ${q.question_label}
-      ${msgIn.typeLabel}: \`${formatQuestionType(q.question_type, msgIn)}\` | ${msgIn.requiredLabel}: \`${q.required === 1 ? msgIn.yes : msgIn.no}\``
+      ${msgIn.typeLabel}: \`${formatQuestionType(q.question_type, msgIn)}\` | ${msgIn.requiredLabel}: \`${q.required? msgIn.yes : msgIn.no}\``
               )
               .join("\n\n");
 
         let roleMsgDeleteText = "";
 
         if (SettingsMsgDeletedFromRoles) {
-          const enabled = SettingsMsgDeletedFromRoles.enabled === 1;
+          const enabled = SettingsMsgDeletedFromRoles.enabled;
 
           const roleIds = [
             SettingsMsgDeletedFromRoles.role_id1,
@@ -2435,7 +2453,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return interaction.reply({ content: msgIn.welcomeMessageNotFound, flags: MessageFlags.Ephemeral });
         }
 
-        upsertGuildWelcomeMessageStmt.run(interaction.guildId, fetched.content, new Date().toISOString());
+        await dbValue(upsertGuildWelcomeMessage(interaction.guildId, fetched.content, new Date().toISOString()));
         return interaction.reply({ content: msgIn.welcomeMessageSaved, flags: MessageFlags.Ephemeral });
       }
 
@@ -2450,7 +2468,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        deleteGuildWelcomeMessageStmt.run(interaction.guild.id);
+        await dbValue(deleteGuildWelcomeMessage(interaction.guild.id));
 
         await interaction.reply({
           content: msgIn.welcomeMessageDeleted,
@@ -2471,7 +2489,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        const welcomeRow = getGuildWelcomeMessageStmt.get(interaction.guild.id) as GuildWelcomeMessageRow | undefined;
+        const welcomeRow = await dbValue(getGuildWelcomeMessage(interaction.guild.id)) as GuildWelcomeMessageRow | undefined;
         if (!welcomeRow) {
           return interaction.reply({ content: msgIn.welcomeMessageNoneConfigured, flags: MessageFlags.Ephemeral });
         }
@@ -2553,28 +2571,28 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const fromEpicGames = interaction.options.getBoolean("from_epic_games") ?? true;
 
         if (!channel) {
-          upsertFreeGamesSettingsStmt.run(
+          await dbValue(upsertFreeGamesSettings(
             interaction.guild.id,
             "",    // channel_id vide
-            0,     // enabled = false
-            fromSteam ? 1 : 0,
-            fromEpicGames ? 1 : 0,
-            0,     // itchio
-            0      // gog
-          );
+            false,     // enabled = false
+            fromSteam,
+            fromEpicGames,
+            false,     // itchio
+            false      // gog
+          ));
           await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsDeleted);
           return;
         }
 
-        upsertFreeGamesSettingsStmt.run(
+        await dbValue(upsertFreeGamesSettings(
           interaction.guild.id,
           channel.id,
-          1,     // enabled = true
-          fromSteam ? 1 : 0,
-          fromEpicGames ? 1 : 0,
-          0,     // itchio
-          0      // gog
-        );
+          true,     // enabled = true
+          fromSteam,
+          fromEpicGames,
+          false,     // itchio
+          false      // gog
+        ));
 
         await replyEphemeral(interaction, msgIn.freeGamesManualPublishSettingsSaved);
 
@@ -2641,9 +2659,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         const roleIds = roles.map((role) => role.id);
 
-        upsertGuildRoleMessageDeleteSettingsStmt.run(
+        await dbValue(upsertGuildRoleMessageDeleteSettings(
           interaction.guild!.id,
-          enabled ? 1 : 0,
+          enabled,
           roleIds[0] ?? null,
           roleIds[1] ?? null,
           roleIds[2] ?? null,
@@ -2651,7 +2669,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           roleIds[4] ?? null,
           interaction.user.id,
           new Date().toISOString()
-        );
+        ));
 
         const rolesDisplay =
           roleIds.length > 0
@@ -2674,12 +2692,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const guildId = interaction.guildId!;
 
         if (action === "create") {
-          const existing = getReactionRoleCategoryStmt.get(guildId, name);
+          const existing = await dbValue(getReactionRoleCategory(guildId, name));
           if (existing) {
             await interaction.reply({ content: msgIn.reactionRoleCategoryAlreadyExists(name), ephemeral: true });
             return;
           }
-          insertReactionRoleCategoryStmt.run(guildId, name);
+          await dbValue(insertReactionRoleCategory(guildId, name));
           await interaction.reply({ content: msgIn.reactionRoleCategoryCreated(name), ephemeral: true });
 
         } else if (action === "update") {
@@ -2688,22 +2706,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
             await interaction.reply({ content: msgIn.reactionRoleNewNameRequired, ephemeral: true });
             return;
           }
-          const result = updateReactionRoleCategoryStmt.run(newName, guildId, name);
-          if (result.changes === 0) {
+          const categoryToUpdate = await dbValue(getReactionRoleCategory(guildId, name)) as ReactionRoleCategoryRow | undefined;
+          if (!categoryToUpdate) {
             await interaction.reply({ content: msgIn.reactionRoleCategoryNotFound(name), ephemeral: true });
             return;
           }
+          await dbValue(updateReactionRoleCategory(newName, guildId, name));
           await interaction.reply({ content: msgIn.reactionRoleCategoryRenamed(name, newName), ephemeral: true });
 
         } else if (action === "delete") {
-          const category = getReactionRoleCategoryStmt.get(guildId, name) as ReactionRoleCategoryRow | undefined;
+          const category = await dbValue(getReactionRoleCategory(guildId, name)) as ReactionRoleCategoryRow | undefined;
           if (!category) {
             await interaction.reply({ content: `Catégorie **${name}** introuvable.`, ephemeral: true });
             return;
           }
 
           // Supprimer le message de panel si existant
-          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+          const panel = await dbValue(getReactionRolePanelByCategory(category.id)) as ReactionRolePanelRow | undefined;
           if (panel) {
             try {
               const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
@@ -2713,7 +2732,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           }
 
           // Supprime la catégorie (CASCADE supprime entries + panel en DB)
-          deleteReactionRoleCategoryStmt.run(guildId, name);
+          await dbValue(deleteReactionRoleCategory(guildId, name));
           await interaction.reply({ content: msgIn.reactionRoleCategoryDeleted(name), ephemeral: true });
         }
       }
@@ -2724,7 +2743,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const role = interaction.options.getRole("role", true);
         const guildId = interaction.guildId!;
 
-        const category = getReactionRoleCategoryStmt.get(guildId, categoryName) as ReactionRoleCategoryRow | undefined;
+        const category = await dbValue(getReactionRoleCategory(guildId, categoryName)) as ReactionRoleCategoryRow | undefined;
         if (!category) {
           await interaction.reply({ content: msgIn.reactionRoleCategoryNotFound(categoryName), ephemeral: true });
           return;
@@ -2738,18 +2757,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
             return;
           }
           // Guard doublon
-          const existing = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+          const existing = await dbValue(getReactionRoleEntries(category.id)) as ReactionRoleEntryRow[];
           if (existing.some(e => e.role_id === role.id)) {
             await interaction.reply({ content: msgIn.reactionRoleAlreadyInCategory(role.name, categoryName), ephemeral: true });
             return;
           }
 
-          insertReactionRoleEntryStmt.run(category.id, role.id, description, emoji);
+          await dbValue(insertReactionRoleEntry(category.id, role.id, description, emoji));
 
           // Mettre à jour le panel existant si publié
-          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+          const panel = await dbValue(getReactionRolePanelByCategory(category.id)) as ReactionRolePanelRow | undefined;
           if (panel) {
-            const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+            const entries = await dbValue(getReactionRoleEntries(category.id)) as ReactionRoleEntryRow[];
             const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
             if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel, msgServer);
           }
@@ -2760,12 +2779,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
           const description = interaction.options.getString("description");
           const emoji = interaction.options.getString("emoji");
           const newRole = interaction.options.getRole("new_role");
-          updateReactionRoleEntryStmt.run(description ?? null, emoji ?? null, newRole?.id ?? null, category.id, role.id);
+          await dbValue(updateReactionRoleEntry(description ?? null, emoji ?? null, newRole?.id ?? null, category.id, role.id));
 
           // Mettre à jour le panel si publié
-          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+          const panel = await dbValue(getReactionRolePanelByCategory(category.id)) as ReactionRolePanelRow | undefined;
           if (panel) {
-            const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+            const entries = await dbValue(getReactionRoleEntries(category.id)) as ReactionRoleEntryRow[];
             const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
             if (channel) await publishOrUpdatePanel(interaction.guild!, category, entries, channel, msgServer);
           }
@@ -2773,12 +2792,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
           await interaction.reply({ content: msgIn.reactionRoleUpdated(role.name, categoryName), ephemeral: true });
 
         } else if (action === "delete") {
-          deleteReactionRoleEntryStmt.run(category.id, role.id);
+          await dbValue(deleteReactionRoleEntry(category.id, role.id));
 
           // Mettre à jour le panel si publié
-          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+          const panel = await dbValue(getReactionRolePanelByCategory(category.id)) as ReactionRolePanelRow | undefined;
           if (panel) {
-            const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+            const entries = await dbValue(getReactionRoleEntries(category.id)) as ReactionRoleEntryRow[];
             const channel = await interaction.guild!.channels.fetch(panel.channel_id) as TextChannel | null;
             if (channel) {
               if (entries.length === 0) {
@@ -2787,7 +2806,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                   const msg = await channel.messages.fetch(panel.message_id);
                   await msg.delete();
                 } catch { }
-                deleteReactionRolePanelStmt.run(category.id); // à importer depuis sql.ts
+                await dbValue(deleteReactionRolePanel(category.id)); // à importer depuis sql.ts
               } else {
                 await publishOrUpdatePanel(interaction.guild!, category, entries, channel, msgServer);
               }
@@ -2803,13 +2822,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const channel = interaction.options.getChannel("channel", true) as TextChannel;
         const guildId = interaction.guildId!;
 
-        const category = getReactionRoleCategoryStmt.get(guildId, categoryName) as ReactionRoleCategoryRow | undefined;
+        const category = await dbValue(getReactionRoleCategory(guildId, categoryName)) as ReactionRoleCategoryRow | undefined;
         if (!category) {
           await interaction.reply({ content: msgIn.reactionRoleCategoryNotFound(categoryName), ephemeral: true });
           return;
         }
 
-        const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
+        const entries = await dbValue(getReactionRoleEntries(category.id)) as ReactionRoleEntryRow[];
         await interaction.deferReply({ ephemeral: true });
 
         await publishOrUpdatePanel(interaction.guild!, category, entries, channel, msgServer);
@@ -2818,7 +2837,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       if (interaction.commandName === "role-category-list") {
         const guildId = interaction.guildId!;
-        const categories = getReactionRoleCategoriesStmt.all(guildId) as ReactionRoleCategoryRow[];
+        const categories = await dbValue(getReactionRoleCategories(guildId)) as ReactionRoleCategoryRow[];
 
         if (categories.length === 0) {
           await interaction.reply({ content: "Aucune catégorie configurée sur ce serveur.", ephemeral: true });
@@ -2828,8 +2847,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const embed = new EmbedBuilder().setTitle("Catégories de reaction roles");
 
         for (const category of categories) {
-          const entries = getReactionRoleEntriesStmt.all(category.id) as ReactionRoleEntryRow[];
-          const panel = getReactionRolePanelByCategoryStmt.get(category.id) as ReactionRolePanelRow | undefined;
+          const entries = await dbValue(getReactionRoleEntries(category.id)) as ReactionRoleEntryRow[];
+          const panel = await dbValue(getReactionRolePanelByCategory(category.id)) as ReactionRolePanelRow | undefined;
 
           const rolesText = entries.length > 0
             ? entries.map((e) => `${e.emoji} <@&${e.role_id}> — ${e.description}`).join("\n")
@@ -2868,7 +2887,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
-        upsertNewComerNotificationStmt.run(interaction.guild.id, channel.id);
+        await dbValue(upsertNewComerNotification(interaction.guild.id, channel.id));
 
         await interaction.reply({
           content: msgIn.blacklistJoinNotificationsEnabled(channel.id),
@@ -2890,9 +2909,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       const member = await interaction.guild.members.fetch(interaction.user.id);
 
-      const questions = getGuildVerificationQuestionsStmt.all(
+      const questions = await dbValue(getGuildVerificationQuestions(
         interaction.guild.id
-      ) as GuildVerificationQuestionRow[];
+      )) as GuildVerificationQuestionRow[];
 
       if (questions.length === 0) {
         await interaction.reply({
@@ -2905,17 +2924,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
       const accountAgeText = formatAccountAge(member.user.createdAt, msgServer);
       const createdTimestamp = Math.floor(member.user.createdAt.getTime() / 1000);
 
-      const guildSettings = getGuildVerificationSettingsStmt.get(interaction.guild.id) as
-        | {
-          guild_id: string;
-          verified_role_id: string;
-          panel_channel_id: string;
-          staff_category_id: string;
-          staff_role_id: string;
-          created_by: string;
-          updated_at: string;
-        }
-        | undefined;
+      const guildSettings = await dbValue(
+        getGuildVerificationSettings(interaction.guild.id)
+      );
 
       if (!guildSettings) {
         await interaction.reply({
@@ -2993,7 +3004,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         if (question.question_type === "file_image") {
           const files = interaction.fields.getUploadedFiles(
             question.question_key,
-            question.required === 1
+            question.required
           );
 
           const file = files?.first();
@@ -3050,7 +3061,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 client.on(Events.GuildMemberAdd, async (member) => {
   try {
     //est-ce que le serveur est blacklisté? 
-    const guildBanned = getBannedGuildStmt.get(member.guild.id);
+    const guildBanned = await dbValue(getBannedGuild(member.guild.id));
 
     //si blacklisté, on ne fait rien
     if (guildBanned) return;
@@ -3058,10 +3069,10 @@ client.on(Events.GuildMemberAdd, async (member) => {
     // =========================
     // 1️⃣ BLACKLIST (PRIORITAIRE)
     // =========================
-    const blacklistedUser = getBlacklistedUserStmt.get(
+    const blacklistedUser = await dbValue(getBlacklistedUser(
       member.guild.id,
       member.id
-    ) as BlacklistedUserRow | undefined;
+    )) as BlacklistedUserRow | undefined;
 
     if (blacklistedUser) {
       const locale = member.guild.preferredLocale;
@@ -3083,7 +3094,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     // =========================
     // 2️⃣ WELCOME DM
     // =========================
-    const welcomeRow = getGuildWelcomeMessageStmt.get(member.guild.id) as GuildWelcomeMessageRow | undefined;
+    const welcomeRow = await dbValue(getGuildWelcomeMessage(member.guild.id)) as GuildWelcomeMessageRow | undefined;
     if (welcomeRow) {
       const msg = welcomeRow.dm_message.replace("{{mention}}", `<@${member.id}>`);
       try {
@@ -3096,7 +3107,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     // =========================
     // 2️⃣ TIMEOUT VERIFICATION
     // =========================
-    const guildSettings = getGuildVerificationSettingsStmt.get(member.guild.id) as
+    const guildSettings = await dbValue(getGuildVerificationSettings(member.guild.id)) as
       | GuildVerificationSettingsRow
       | undefined;
 
@@ -3114,12 +3125,12 @@ client.on(Events.GuildMemberAdd, async (member) => {
       guildSettings.verification_timeout_hours * 60 * 60 * 1000
     );
 
-    insertPendingVerificationSubmissionStmt.run(
+    await dbValue(insertPendingVerificationSubmission(
       member.guild.id,
       member.id,
       joinedAt.toISOString(),
       expiresAt.toISOString()
-    );
+    ));
 
   } catch (error) {
     console.error(
@@ -3136,15 +3147,15 @@ client.on(Events.GuildMemberAdd, async (member) => {
   const msgServer = getMessagesServer(locale);
 
   try {
-    const notificationSettings = getNewComerNotificationStmt.get(
+    const notificationSettings = await dbValue(getNewComerNotification(
       member.guild.id
-    ) as NewComerNotificationRow | undefined;
+    )) as NewComerNotificationRow | undefined;
 
     if (!notificationSettings) return;
 
-    const blacklistedEverywhere = getBlacklistedUsersEverywhereStmt.all(
+    const blacklistedEverywhere = await dbValue(getBlacklistedUsersEverywhere(
       member.id
-    ) as BlacklistedUserRow[];
+    )) as BlacklistedUserRow[];
 
     if (blacklistedEverywhere.length === 0) return;
 
@@ -3172,10 +3183,10 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
 client.on(Events.GuildMemberRemove, async (member) => {
   try {
-    deletePendingVerificationSubmissionStmt.run(
+    await dbValue(deletePendingVerificationSubmission(
       member.guild.id,
       member.id
-    );
+    ));
   } catch (error) {
     console.error(
       `Error while cleaning pending verification for ${member.id}:`,
@@ -3198,10 +3209,10 @@ client.on(Events.MessageCreate, async (message) => {
   // Le propriétaire du serveur est exempté
   if (message.author.id === message.guild.ownerId) return;
 
-  const settings = getGuildRoleMessageDeleteSettingsStmt.get(
+  const settings = await dbValue(getGuildRoleMessageDeleteSettings(
     message.guild.id
-  ) as {
-    enabled: number;
+  )) as {
+    enabled: boolean | number;
     role_id1: string | null;
     role_id2: string | null;
     role_id3: string | null;
@@ -3209,7 +3220,7 @@ client.on(Events.MessageCreate, async (message) => {
     role_id5: string | null;
   } | undefined;
 
-  if (!settings || settings.enabled !== 1) return;
+  if (!settings || settings.enabled !== true && settings.enabled !== 1) return;
 
   const roleIds = [
     settings.role_id1,
@@ -3258,7 +3269,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (reaction.partial) await reaction.fetch();
   if (!reaction.message.guildId) return;
 
-  const panel = getReactionRolePanelByMessageIdStmt.get(reaction.message.id) as ReactionRolePanelRow | undefined;
+  const panel = await dbValue(getReactionRolePanelByMessageId(reaction.message.id)) as ReactionRolePanelRow | undefined;
   if (!panel) return;
 
   const emoji = reaction.emoji.id
@@ -3275,7 +3286,7 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
   if (reaction.partial) await reaction.fetch();
   if (!reaction.message.guildId) return;
 
-  const panel = getReactionRolePanelByMessageIdStmt.get(reaction.message.id) as ReactionRolePanelRow | undefined;
+  const panel = await dbValue(getReactionRolePanelByMessageId(reaction.message.id)) as ReactionRolePanelRow | undefined;
   if (!panel) return;
 
   const emoji = reaction.emoji.id
@@ -3291,7 +3302,7 @@ setInterval(async () => {
   try {
     const nowIso = new Date().toISOString();
 
-    const expiredRows = getExpiredPendingVerificationSubmissionsStmt.all(nowIso) as Array<{
+    const expiredRows = await dbValue(getExpiredPendingVerificationSubmissions(nowIso)) as Array<{
       guild_id: string;
       user_id: string;
       joined_at: string;
@@ -3302,13 +3313,13 @@ setInterval(async () => {
       try {
         const guild = await client.guilds.fetch(row.guild_id).catch(() => null);
         if (!guild) {
-          deletePendingVerificationSubmissionStmt.run(row.guild_id, row.user_id);
+          await dbValue(deletePendingVerificationSubmission(row.guild_id, row.user_id));
           continue;
         }
 
         const member = await guild.members.fetch(row.user_id).catch(() => null);
         if (!member) {
-          deletePendingVerificationSubmissionStmt.run(row.guild_id, row.user_id);
+          await dbValue(deletePendingVerificationSubmission(row.guild_id, row.user_id));
           continue;
         }
 
@@ -3328,7 +3339,7 @@ setInterval(async () => {
           await member.kick(msgInternal.verificationTimeoutKickReason);
         }
 
-        deletePendingVerificationSubmissionStmt.run(row.guild_id, row.user_id);
+        await dbValue(deletePendingVerificationSubmission(row.guild_id, row.user_id));
       } catch (error) {
         console.error(
           `Error while processing expired verification for ${row.user_id} in guild ${row.guild_id}:`,

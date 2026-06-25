@@ -6,14 +6,14 @@ import { map, catchError } from "rxjs/operators";
 // Connexion
 // ---------------------------------------------------------------------------
 
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL manquant au moment de créer le Pool PostgreSQL");
+}
+
 export const db = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  // Si tu préfères les variables séparées :
-  // host:     process.env.PGHOST,
-  // port:     Number(process.env.PGPORT) || 5432,
-  // user:     process.env.PGUSER,
-  // password: process.env.PGPASSWORD,
-  // database: process.env.PGDATABASE,
+  connectionString: databaseUrl,
 });
 
 // ---------------------------------------------------------------------------

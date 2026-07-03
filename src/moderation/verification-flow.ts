@@ -43,7 +43,7 @@ export type VerificationFlowDeps = {
     reason?: string | null;
     username?: string | null;
     msgInternal: any;
-  }) => Promise<{ kicked: boolean; username: string }>;
+  }) => Promise<{ banned: boolean; username: string }>;
 
   isUsedOnAServer: (interaction: any) => boolean;
   isAdministrator: (member: any, interaction: any) => boolean;
@@ -557,7 +557,7 @@ export async function handleVerificationModals({
       flags: MessageFlags.Ephemeral,
     });
 
-    if (!result.kicked) {
+    if (!result.banned) {
       const channel = interaction.channel as TextChannel;
       await channel.send({
         content: msgIn.blacklistMemberSavedButKickFailed(targetUserId, result.username),

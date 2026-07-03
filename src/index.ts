@@ -1205,6 +1205,7 @@ async function blacklistMemberInGuild(params: {
     reason ?? null
   ));
 
+  /*
   const member = await guild.members.fetch(targetUserId).catch(() => null);
 
   if (member?.kickable) {
@@ -1213,6 +1214,17 @@ async function blacklistMemberInGuild(params: {
   }
 
   return { kicked: false, username: resolvedUsername };
+  */
+
+  try {
+    await guild.members.ban(targetUserId, {
+      reason: msgInternal.blacklistKickReason(moderatorTag, reason),
+    });
+
+    return { banned: true, username: resolvedUsername };
+  } catch {
+    return { banned: false, username: resolvedUsername };
+  }
 }
 
 //recherche dans quels serveurs le membre est présent
@@ -1945,7 +1957,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         await replyEphemeral(
           interaction,
-          result.kicked
+          result.banned
             ? msgIn.blacklistMemberSuccess(targetUserId, result.username)
             : msgIn.blacklistMemberSavedButKickFailed(targetUserId, result.username)
         );
@@ -2270,6 +2282,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         await dbValue(deleteBlacklistedUser(interaction.guild!.id, targetUserId));
 
+        try {
+          await interaction.guild!.members.unban(targetUserId, `user removed from the blacklist by ${interaction.user.tag}`);
+        } catch {
+          // L'utilisateur n'était peut-être pas banni ou le déban a échoué.
+          // On ignore pour ne pas faire échouer la commande.
+        }
+
         await replyEphemeral(interaction, msgIn.userRemovedFromBlacklist(targetUserId));
         return;
       }
@@ -2384,7 +2403,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
               .map(
                 (q, index) =>
                   `**${index + 1}.** ${q.question_label}
-      ${msgIn.typeLabel}: \`${formatQuestionType(q.question_type, msgIn)}\` | ${msgIn.requiredLabel}: \`${q.required? msgIn.yes : msgIn.no}\``
+      ${msgIn.typeLabel}: \`${formatQuestionType(q.question_type, msgIn)}\` | ${msgIn.requiredLabel}: \`${q.required ? msgIn.yes : msgIn.no}\``
               )
               .join("\n\n");
 

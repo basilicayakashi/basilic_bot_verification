@@ -3250,6 +3250,31 @@ client.on(Events.GuildMemberAdd, async (member) => {
   }
 });
 
+client.on(Events.GuildMemberAdd, async (member) => {
+  const autokickSettings = await firstValueFrom(getAutokickNewMembers(member.guild.id)) as AutokickSettingsRow | undefined;
+  const autokickSettings_days = autokickSettings?.days ?? 0;
+  const UnJourEnMs = 24 * 60 * 60 * 1000;
+
+  //no effect
+  if (autokickSettings_days < 1) return;
+
+  const createdAtMs = member.user.createdAt?.getTime();
+  if (!createdAtMs) return;
+
+  const cutoffMs = Date.now() - autokickSettings_days * UnJourEnMs;
+
+  if (createdAtMs >= cutoffMs) {
+    if (!member.guild.members.me?.permissions.has(PermissionFlagsBits.KickMembers)) {
+      return;
+    }
+
+    await member.kick(
+      `Auto-kick: account created within the last ${autokickSettings_days} days`
+    );
+  }
+
+});
+
 client.on(Events.GuildMemberRemove, async (member) => {
   try {
     await dbValue(deletePendingVerificationSubmission(

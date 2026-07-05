@@ -1,4 +1,4 @@
-import { Pool, QueryResult, QueryResultRow  } from "pg";
+import { Pool, QueryResult, QueryResultRow } from "pg";
 import { Observable, from, throwError } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 
@@ -234,6 +234,11 @@ export function initDb(): Observable<void> {
     // Serveurs bannis
     `CREATE TABLE IF NOT EXISTS banned_guilds (
       guild_id TEXT PRIMARY KEY
+    )`,
+
+    `CREATE TABLE IF NOT EXISTS AUTOKICK_SETTINGS (
+      guild_id TEXT PRIMARY KEY,
+      days INTEGER NOT NULL
     )`,
   ];
 
@@ -944,6 +949,27 @@ export function getBannedGuild(guildId: string): Observable<boolean> {
 }
 
 // ---------------------------------------------------------------------------
+// autokick
+
+export function upsertAutokickNewMembers(guildId: string, days: number): Observable<void> {
+  return execute(
+    `INSERT INTO AUTOKICK_SETTINGS (guild_id, days)
+     VALUES ($1, $2)
+     ON CONFLICT (guild_id) DO UPDATE SET days = EXCLUDED.days`,
+    [guildId, days]
+  );
+}
+
+export function getAutokickNewMembers(guildId: string): Observable<AutokickSettingsRow | null> {
+  return queryOne<AutokickSettingsRow>(
+    "SELECT * FROM AUTOKICK_SETTINGS WHERE guild_id = $1",
+    [guildId]
+  );
+}
+
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
@@ -1105,4 +1131,9 @@ export type ReactionRolePanelRow = {
 export type NewComerNotificationRow = {
   guild_id: string;
   channel_id: string;
+};
+
+export type AutokickSettingsRow = {
+  guild_id: string;
+  days: number;
 };

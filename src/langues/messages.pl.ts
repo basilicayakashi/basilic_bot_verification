@@ -690,7 +690,8 @@ Wyświetla wszystkie kategorie na serwerze, role, które zawierają, oraz inform
     includeSteam: boolean,
     includeEpicGames: boolean,
     roleMsgDeleteText: string,
-    BlcklistAlertChannel: string
+    BlcklistAlertChannel: string,
+    autokickSettings_days: number
   ) => `**Aktualna konfiguracja bota**
 
 ## Weryfikacja
@@ -699,6 +700,9 @@ Wyświetla wszystkie kategorie na serwerze, role, które zawierają, oraz inform
 2) Rola moderacji: ${staffRoleDisplay}
 3) Limit czasu weryfikacji: ${verificationTimeoutHours} godz
 4) ${BlcklistAlertChannel}
+
+## Auto-kick
+${autokickSettings_days < 1 ? "Żaden członek nie będzie automatycznie wyrzucany podczas dołączania do serwera" : `Członkowie, którzy dołączą z kontem utworzonym w ciągu ostatnich ${autokickSettings_days} dni, zostaną automatycznie wyrzuceni`}
 
 ${questionsText}
 
@@ -790,6 +794,7 @@ ${roleMsgDeleteText}
   blacklistJoinNotificationsEnabled: (channelId: string) => `Powiadomienia włączone na kanale <#${channelId}>`,
   ChannelMustBeTextChannel: "Kanał musi być kanałem tekstowym",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Kanał powiadomień o użytkownikach z czarnej listy: ${channel}`,
+  AutokickSettingsUpdated: "Rejestracja zakończona",
 };
 
 const pl_out: MessagesOut = {

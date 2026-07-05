@@ -93,6 +93,9 @@ import {
   ReactionRoleCategoryRow,
   ReactionRolePanelRow,
   NewComerNotificationRow,
+  upsertAutokickNewMembers,
+  AutokickSettingsRow,
+  getAutokickNewMembers,
 } from "./database/sql.js";
 
 function dbValue<T>(observable: import("rxjs").Observable<T>): Promise<T> {
@@ -1112,6 +1115,28 @@ new SlashCommandBuilder()
         })
         .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
+    ),
+  new SlashCommandBuilder()
+    .setName("autokick-newmembers")
+    .setDescription("Kick new members whose account age is less than X days")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Kick les nouveaux membres dont le compte a moins de X jours",
+      [Locale.SpanishES]: "Expulsa a los nuevos miembros cuya antigüedad de la cuenta sea menor a X días",
+      [Locale.German]: "Kicke neue Mitglieder, deren Kontenalter weniger als X Tage beträgt",
+      [Locale.Polish]: "Wyrzuć nowych członków, których konto ma mniej niż X dni",
+    })
+    .addIntegerOption((opt) =>
+      opt
+        .setName("days")
+        .setDescription("Minimum number of days to avoid being kicked")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Nombre de jours minimum pour ne pas être kick",
+          [Locale.SpanishES]: "Número mínimo de días para no ser expulsado",
+          [Locale.German]: "Mindestanzahl an Tagen, um nicht gekickt zu werden",
+          [Locale.Polish]: "Minimalna liczba dni, aby nie zostać wyrzuconym",
+        })
+        .setRequired(true)
+        .setMinValue(0)
     ),
 ].map((command) => command.toJSON());
 
@@ -2386,6 +2411,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
             ? `<#${freeGamesSettings.channel_id}>`
             : "—";
 
+        const autokickSettings = await firstValueFrom(getAutokickNewMembers(interaction.guild.id)) as AutokickSettingsRow | undefined;
+        const autokickSettings_days = autokickSettings?.days ?? 0;
+
         const blacklistChannel =
           notificationSettings ? msgIn.viewSettingsBlacklistNotificationChannel(`<#${notificationSettings.channel_id}>`)
             : msgIn.viewSettingsBlacklistNotificationChannel("-");
@@ -2446,7 +2474,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
             freeGamesSettings?.include_steam === 1,
             freeGamesSettings?.include_epicgames === 1,
             roleMsgDeleteText,
-            blacklistChannel),
+            blacklistChannel,
+            autokickSettings_days),
           flags: MessageFlags.Ephemeral,
         });
 
@@ -2912,6 +2941,28 @@ client.on(Events.InteractionCreate, async (interaction) => {
           flags: MessageFlags.Ephemeral,
         });
 
+        return;
+      }
+
+      if (interaction.commandName === "autokick-newmembers") {
+        if (!isUsedOnAServer(interaction)) {
+          await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
+          return;
+        }
+
+        const member = await interaction.guild.members.fetch(interaction.user.id);
+
+        if (!isAdministrator(member, interaction)) {
+          await replyEphemeral(interaction, msgIn.onlyStaffCanUseCommand);
+          return;
+        }
+
+        const guildId = interaction.guildId!;
+        const days = interaction.options.getInteger("days", true);
+
+        await dbValue(upsertAutokickNewMembers(guildId, days));
+
+        await replyEphemeral(interaction, msgIn.AutokickSettingsUpdated);
         return;
       }
     }

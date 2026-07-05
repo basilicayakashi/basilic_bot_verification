@@ -682,7 +682,8 @@ Displays all categories on the server, the roles they contain, and whether their
     includeSteam: boolean,
     includeEpicGames: boolean,
     roleMsgDeleteText: string,
-    BlcklistAlertChannel: string
+    BlcklistAlertChannel: string,
+    autokickSettings_days: number
   ) => `**Current bot configuration**
 
 ## Verification
@@ -691,6 +692,9 @@ Displays all categories on the server, the roles they contain, and whether their
 2) Moderation role: ${staffRoleDisplay}
 3) Verification timeout: ${verificationTimeoutHours} hour(s)
 4) ${BlcklistAlertChannel}
+
+## Auto-kick
+${autokickSettings_days < 1 ? "No members will be auto-kicked when joining the server" : `Members who join with an account created within the last ${autokickSettings_days} days will be auto-kicked`}
 
 ${questionsText}
 
@@ -782,6 +786,7 @@ ${roleMsgDeleteText}
   blacklistJoinNotificationsEnabled: (channelId: string) => `Notifications enabled in <#${channelId}>`,
   ChannelMustBeTextChannel: "The channel must be a text channel",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Blacklisted member notification channel: ${channel}`,
+  AutokickSettingsUpdated: "Registration Complete",
 };
 
 const en_out: MessagesOut = {

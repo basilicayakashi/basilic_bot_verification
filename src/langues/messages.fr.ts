@@ -686,7 +686,8 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
     includeSteam: boolean,
     includeEpicGames: boolean,
     roleMsgDeleteText: string,
-    BlcklistAlertChannel: string
+    BlcklistAlertChannel: string,
+    autokickSettings_days: number
   ) => `**Configuration actuelle du bot**
 
 ## Vérification
@@ -695,6 +696,9 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
 2) Rôle de modération : ${staffRoleDisplay}
 3) Délai de vérification : ${verificationTimeoutHours} heure(s)
 4) ${BlcklistAlertChannel}
+
+## Auto-kick
+${autokickSettings_days < 1 ? "Pas de membre qui sera auto-kick en rejoignant le serveur" : `Les membres qui rejoingnent ayant crées leur compte dans les ${autokickSettings_days} derniers jours seront auto kick`}
 
 ${questionsText}
 
@@ -784,8 +788,9 @@ ${roleMsgDeleteText}
   welcomeMessageNoneConfigured: "❌ Aucun message de bienvenue configuré sur ce serveur",
   welcomeMessageNotFound: "❌ Message introuvable. Vérifie que l'ID est correct et que le bot a accès au salon",
   blacklistJoinNotificationsEnabled: (channelId: string) => `Notifications activées dans <#${channelId}>`,
-  ChannelMustBeTextChannel : "Le salon doit être un salon textuel",
+  ChannelMustBeTextChannel: "Le salon doit être un salon textuel",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Salon de notification des membres blacklistés : ${channel}`,
+  AutokickSettingsUpdated: "Enregistrement effectué",
 };
 
 const fr_out: MessagesOut = {
@@ -878,7 +883,7 @@ const fr_server: MessagesServer = {
   reason: "Raison",
   reactionRolePanelTitle: (category: string) => `Rôles — ${category}`,
   reactionRolePanelEmpty: "Aucun rôle configuré pour cette catégorie",
-  blacklistServerMessage: (guildName: string, timestamp: string, blacklisted_by: string, reason: string) =>  `• Serveur : ${guildName}
+  blacklistServerMessage: (guildName: string, timestamp: string, blacklisted_by: string, reason: string) => `• Serveur : ${guildName}
   Date : ${timestamp}
   Par : ${blacklisted_by}
   Raison : ${reason}`,

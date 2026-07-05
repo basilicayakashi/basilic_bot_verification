@@ -787,6 +787,9 @@ ${roleMsgDeleteText}
   ChannelMustBeTextChannel: "El canal debe ser un canal de texto",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Canal de notificación de miembros en lista negra: ${channel}`,
   AutokickSettingsUpdated: "Registro realizado",
+  helpAutokick: `La función de auto kick supervisa la llegada de nuevos miembros al servidor.
+El comando \`/autokick-newmembers\` te permite configurar un valor entero: el número de días. Cada vez que alguien se une, el bot comprueba la antigüedad de su cuenta (la fecha de creación de la cuenta). Si la antigüedad es menor que el número de días configurado, el miembro será expulsado automáticamente.
+Si estableces 0 días, la función de auto kick está desactivada.`, 
 };
 
 const es_out: MessagesOut = {

@@ -787,6 +787,9 @@ ${roleMsgDeleteText}
   ChannelMustBeTextChannel: "The channel must be a text channel",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Blacklisted member notification channel: ${channel}`,
   AutokickSettingsUpdated: "Registration Complete",
+  helpAutokick: `The auto kick feature monitors new members joining the server.
+The \`/autokick-newmembers\` command lets you set an integer value: the number of days. Every time someone joins, the bot checks the age of their account (the account creation date). If the account age is less than the configured number of days, the member will be automatically kicked.
+If you set 0 days, the auto kick feature is disabled.`,
 };
 
 const en_out: MessagesOut = {

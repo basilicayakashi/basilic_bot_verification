@@ -186,6 +186,7 @@ export type MessagesIn = {
     ChannelMustBeTextChannel: string;
     viewSettingsBlacklistNotificationChannel: (channel: string) => string;
     AutokickSettingsUpdated: string;
+    helpAutokick: string;
 };
 
 export type MessagesOut = {

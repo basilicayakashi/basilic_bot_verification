@@ -795,6 +795,9 @@ ${roleMsgDeleteText}
   ChannelMustBeTextChannel: "Kanał musi być kanałem tekstowym",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Kanał powiadomień o użytkownikach z czarnej listy: ${channel}`,
   AutokickSettingsUpdated: "Rejestracja zakończona",
+  helpAutokick: `Funkcja automatycznego wykluczania (auto kick) monitoruje dołączanie nowych członków do serwera.
+Komenda \`/autokick-newmembers\` pozwala ustawić wartość całkowitą: liczbę dni. Za każdym razem, gdy ktoś dołączy, bot sprawdza wiek konta (datę utworzenia konta). Jeśli wiek konta jest mniejszy niż ustawiona liczba dni, członek zostanie automatycznie wyrzucony.
+Ustawienie 0 dni oznacza, że funkcja auto kick jest wyłączona.`,
 };
 
 const pl_out: MessagesOut = {

@@ -523,6 +523,7 @@ export const commands = [
           { name: "about", value: "about" },
           { name: "verification", value: "verification" },
           { name: "welcome-message", value: "welcome-message" },
+          { name: "autokick", value: "autokick" },
           { name: "spam", value: "spam" },
           { name: "reaction-roles", value: "reaction-roles" },
           { name: "free-games", value: "free-games" },
@@ -2264,6 +2265,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           const sectionMap: Record<string, string> = {
             "about": msgIn.helpAbout,
             "verification": msgIn.helpVerification,
+            "autokick": msgIn.helpAutokick,
             "welcome-message": msgIn.helpWelcomeMessage,
             "spam": msgIn.helpSpam,
             "reaction-roles": msgIn.helpReactionRoles,

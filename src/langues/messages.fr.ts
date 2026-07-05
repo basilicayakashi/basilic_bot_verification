@@ -791,6 +791,9 @@ ${roleMsgDeleteText}
   ChannelMustBeTextChannel: "Le salon doit être un salon textuel",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Salon de notification des membres blacklistés : ${channel}`,
   AutokickSettingsUpdated: "Enregistrement effectué",
+  helpAutokick : `La fonctionnalité d’auto kick surveille l’arrivée des nouveaux membres sur le serveur.
+La commande \`/autokick-newmembers\` te permet de définir un paramètre entier : le nombre de jours. À chaque nouveau membre qui rejoint, le bot vérifie l’ancienneté de son compte (sa date de création). Si cette ancienneté est inférieure au nombre de jours configuré, le membre est alors automatiquement expulsé.
+Si tu mets 0 jour, la fonctionnalité d’auto kick est désactivée`,
 };
 
 const fr_out: MessagesOut = {

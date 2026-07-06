@@ -1139,6 +1139,16 @@ new SlashCommandBuilder()
         .setRequired(true)
         .setMaxLength(2000)
     ),
+  new SlashCommandBuilder()
+    .setName("view-autokick-message")
+    .setDescription("View the configured autokick message")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Afficher le message d'expulsion configuré",
+      [Locale.German]: "Die konfigurierte Autokick-Nachricht anzeigen",
+      [Locale.SpanishES]: "Ver el mensaje de expulsión configurado",
+      [Locale.Polish]: "Wyświetl skonfigurowaną wiadomość powitalną",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 ].map((command) => command.toJSON());
 
 // =========================
@@ -2980,6 +2990,33 @@ client.on(Events.InteractionCreate, async (interaction) => {
         await replyEphemeral(interaction, msgIn.AutokickSettingsUpdated);
         return;
       }
+
+
+      if (interaction.commandName === "view-autokick-message") {
+        if (!isUsedOnAServer(interaction)) {
+          await replyEphemeral(interaction, msgIn.commandMustBeUsedInServer);
+          return;
+        }
+
+        const member = await interaction.guild!.members.fetch(interaction.user.id);
+
+        if (!isAdministrator(member, interaction)) {
+          await replyEphemeral(interaction, msgIn.onlyStaffCanUseCommand);
+          return;
+        }
+
+        const autokickSettingsRow =
+          await dbValue(getAutokickNewMembers(interaction.guildId!)) as AutokickSettingsRow | null;
+
+        if (!autokickSettingsRow) {
+          return interaction.reply({ content: "no autokick settings configured", flags: MessageFlags.Ephemeral });
+        }
+
+        const preview = autokickSettingsRow.text_to_send.replace("{{mention}}", `<@${interaction.user.id}>`);
+
+        return interaction.reply({ content: preview, flags: MessageFlags.Ephemeral });
+      }
+
     }
 
     // =========================================

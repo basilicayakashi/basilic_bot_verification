@@ -3305,6 +3305,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 client.on(Events.GuildMemberAdd, async (member) => {
   const autokickSettings = await firstValueFrom(getAutokickNewMembers(member.guild.id)) as AutokickSettingsRow | undefined;
   const autokickSettings_days = autokickSettings?.days ?? 0;
+  const autokickSettings_textToSend = autokickSettings?.text_to_send ?? "";
   const UnJourEnMs = 24 * 60 * 60 * 1000;
 
   //no effect
@@ -3316,6 +3317,12 @@ client.on(Events.GuildMemberAdd, async (member) => {
   const cutoffMs = Date.now() - autokickSettings_days * UnJourEnMs;
 
   if (createdAtMs >= cutoffMs) {
+    // try to DM first
+    if (autokickSettings_textToSend) {
+      const preview = autokickSettings_textToSend.replace("{{mention}}", `<@${member.id}>`);
+      await member.send(preview).catch(() => null); // if DMs are blocked, ignore
+    }
+
     if (!member.guild.members.me?.permissions.has(PermissionFlagsBits.KickMembers)) {
       return;
     }

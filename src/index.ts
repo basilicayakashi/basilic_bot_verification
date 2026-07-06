@@ -1047,19 +1047,6 @@ new SlashCommandBuilder()
       [Locale.Polish]: "Ustaw wiadomość powitalną wysyłaną w DM do nowych członków",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addChannelOption((option) =>
-      option
-        .setName("channel")
-        .setDescription("Channel containing the message")
-        .setDescriptionLocalizations({
-          [Locale.French]: "Salon qui contient le message",
-          [Locale.German]: "Kanal mit der Nachricht",
-          [Locale.SpanishES]: "Canal que contiene el mensaje",
-          [Locale.Polish]: "Kanał zawierający wiadomość",
-        })
-        .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
-    )
     .addStringOption((opt) =>
       opt
         .setName("message_id")
@@ -1138,6 +1125,19 @@ new SlashCommandBuilder()
         })
         .setRequired(true)
         .setMinValue(0)
+    )
+    .addStringOption((opt) =>
+      opt
+        .setName("message_id")
+        .setDescription("ID of the message to fetch and send to newly joined members with recent accounts")
+        .setDescriptionLocalizations({
+          [Locale.French]: "ID du message à récupérer et envoyer aux nouveaux membres récemment inscrits",
+          [Locale.German]: "“ID der Nachricht, die abgerufen und an neu angemeldete Mitglieder gesendet wird",
+          [Locale.SpanishES]: "ID del mensaje a recuperar y enviar a los nuevos miembros inscritos recientemente",
+          [Locale.Polish]: "ID wiadomości do pobrania i wysłania nowym członkom z niedawno utworzonym kontem",
+        })
+        .setRequired(true)
+        .setMaxLength(2000)
     ),
 ].map((command) => command.toJSON());
 
@@ -2485,17 +2485,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
 
       if (interaction.commandName === "set-welcome-message") {
+
         const member = await interaction.guild.members.fetch(interaction.user.id);
         if (!isAdministrator(member, interaction)) {
           return interaction.reply({ content: msgIn.onlyStaffCanUseCommand, flags: MessageFlags.Ephemeral });
         }
 
-        const channel = interaction.options.getChannel("channel", true);
-        const messageId = interaction.options.getString("message_id", true);
-
-        if (!("messages" in channel)) {
+        const channel = interaction.channel;
+        if (!channel || !("messages" in channel)) {
           return interaction.reply({ content: msgIn.welcomeMessageNotFound, flags: MessageFlags.Ephemeral });
         }
+
+        const messageId = interaction.options.getString("message_id", true);
 
         const fetched = await channel.messages.fetch(messageId).catch(() => null);
         if (!fetched) {
@@ -2959,10 +2960,22 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         }
 
+        const channel = interaction.channel;
+        if (!channel || !("messages" in channel)) {
+          return interaction.reply({ content: msgIn.welcomeMessageNotFound, flags: MessageFlags.Ephemeral });
+        }
+
+        const message_id = interaction.options.getString("message_id", true);
+
+        const fetched = await channel.messages.fetch(message_id).catch(() => null);
+        if (!fetched) {
+          return interaction.reply({ content: msgIn.welcomeMessageNotFound, flags: MessageFlags.Ephemeral });
+        }
+
         const guildId = interaction.guildId!;
         const days = interaction.options.getInteger("days", true);
 
-        await dbValue(upsertAutokickNewMembers(guildId, days));
+        await dbValue(upsertAutokickNewMembers(guildId, days, fetched.content));
 
         await replyEphemeral(interaction, msgIn.AutokickSettingsUpdated);
         return;

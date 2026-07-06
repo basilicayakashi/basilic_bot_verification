@@ -238,7 +238,8 @@ export function initDb(): Observable<void> {
 
     `CREATE TABLE IF NOT EXISTS AUTOKICK_SETTINGS (
       guild_id TEXT PRIMARY KEY,
-      days INTEGER NOT NULL
+      days INTEGER NOT NULL,
+      text_to_send TEXT,
     )`,
   ];
 
@@ -951,12 +952,12 @@ export function getBannedGuild(guildId: string): Observable<boolean> {
 // ---------------------------------------------------------------------------
 // autokick
 
-export function upsertAutokickNewMembers(guildId: string, days: number): Observable<void> {
+export function upsertAutokickNewMembers(guildId: string, days: number, text_to_send: string): Observable<void> {
   return execute(
-    `INSERT INTO AUTOKICK_SETTINGS (guild_id, days)
-     VALUES ($1, $2)
-     ON CONFLICT (guild_id) DO UPDATE SET days = EXCLUDED.days`,
-    [guildId, days]
+    `INSERT INTO AUTOKICK_SETTINGS (guild_id, days, text_to_send)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (guild_id) DO UPDATE SET days = EXCLUDED.days, text_to_send = EXCLUDED.text_to_send`,
+    [guildId, days, text_to_send]
   );
 }
 
@@ -1136,4 +1137,5 @@ export type NewComerNotificationRow = {
 export type AutokickSettingsRow = {
   guild_id: string;
   days: number;
+  text_to_send: string;
 };

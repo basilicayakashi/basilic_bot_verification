@@ -239,7 +239,7 @@ export function initDb(): Observable<void> {
     `CREATE TABLE IF NOT EXISTS AUTOKICK_SETTINGS (
       guild_id TEXT PRIMARY KEY,
       days INTEGER NOT NULL,
-      text_to_send TEXT,
+      text_to_send TEXT
     )`,
   ];
 

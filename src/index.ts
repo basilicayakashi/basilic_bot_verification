@@ -3574,4 +3574,5 @@ setInterval(async () => {
   }
 }, 60_000);
 
+register(client);
 client.login(TOKEN);

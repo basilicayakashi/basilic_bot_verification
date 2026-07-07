@@ -1699,7 +1699,11 @@ async function renderBarsOnAvatar(avatarBuffer: Buffer) {
 export function register(client: Client) {
   client.on(Events.MessageCreate, async (message: Message) => {
     if (!message.guild) return;
-    if (!message.content.toLowerCase().startsWith("!basi injail ")) return;
+
+    const v_message = message.content.toLowerCase();
+    const v_injail = v_message.startsWith("!basi jail ");
+    const v_inhornyjail = v_message.startsWith("!basi hornyjail ");
+    if (!v_injail && !v_inhornyjail) return;
 
     const parts = message.content.trim().split(/\s+/);
     const id = parts[2];
@@ -1707,27 +1711,35 @@ export function register(client: Client) {
 
     const member = await message.guild.members.fetch(id).catch(() => null);
     if (!member) {
-      await message.reply("Membre introuvable.");
+      //await message.reply("Membre introuvable.");
       return;
     }
+
+    await message.delete().catch(() => { });
 
     const canNick = message.guild.members.me?.permissions.has(
       PermissionsBitField.Flags.ManageNicknames
     );
-    if (!canNick) {
-      await message.reply("Je n’ai pas la permission pour changer le pseudo.");
-      return;
+
+    if (canNick) {
+      if (v_injail) {
+        await member.setNickname("🔒 I'm in jail").catch(() => { });
+      }
+      else{
+        await member.setNickname("🔒 I'm in horny jail").catch(() => { });
+      }
+
     }
-
-    await member.setNickname("🎭 En mode animation").catch(() => { });
-
     const avatarUrl = member.displayAvatarURL({ extension: "png", size: 512 });
     const avatarRes = await fetch(avatarUrl);
     const avatarBuffer = Buffer.from(await avatarRes.arrayBuffer());
 
     const outBuffer = await renderBarsOnAvatar(avatarBuffer);
 
+    const v_message_afficher = v_injail ? `${member} is now in jail!` : `${member} is now in horny jail!`;
+
     await (message.channel as any).send({
+      content : v_message_afficher,
       files: [{ attachment: outBuffer, name: "avatar-basi.png" }],
     });
   });

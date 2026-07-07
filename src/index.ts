@@ -1736,7 +1736,8 @@ export function register(client: Client) {
 
     const outBuffer = await renderBarsOnAvatar(avatarBuffer);
 
-    const v_message_afficher = v_injail ? `${member} is now in jail!` : `${member} is now in horny jail!`;
+    //const v_message_afficher = v_injail ? `${member} is now in jail!` : `${member} is now in horny jail!`;
+    const v_message_afficher = `${member}`;
 
     await (message.channel as any).send({
       content : v_message_afficher,

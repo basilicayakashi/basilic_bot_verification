@@ -22,7 +22,11 @@ import {
   Locale,
   ChatInputCommandInteraction,
   EmbedBuilder,
+  PermissionsBitField,
+  Message,
 } from "discord.js";
+
+import sharp from "sharp";
 
 import { SpamAlertService } from "./moderation/spam-alert.js";
 
@@ -1663,6 +1667,71 @@ async function cleanupOrphanFreeGameMessages(): Promise<void> {
   }
 }
 
+async function renderBarsOnAvatar(avatarBuffer: Buffer) {
+  // Effet graphique simple : barreaux stylés (générique)
+  const img = sharp(avatarBuffer).resize(512, 512).ensureAlpha();
+  const base = await img.toBuffer();
+
+  const barsSvg = `
+  <svg width="512" height="512">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#555"/>
+        <stop offset="1" stop-color="#111"/>
+      </linearGradient>
+    </defs>
+    <rect width="512" height="512" fill="transparent"/>
+    ${Array.from({ length: 10 }).map((_, i) => {
+    const x = 30 + i * 45;
+    return `<rect x="${x}" y="40" width="10" height="432" rx="3" fill="url(#g)" opacity="0.75"/>`;
+  }).join("")}
+    <rect x="40" y="40" width="432" height="432" fill="none" stroke="#111" stroke-width="6" opacity="0.5"/>
+  </svg>`;
+
+  const composited = await sharp(base)
+    .composite([{ input: Buffer.from(barsSvg), blend: "over", gravity: "center" }])
+    .png()
+    .toBuffer();
+
+  return composited;
+}
+
+export function register(client: Client) {
+  client.on(Events.MessageCreate, async (message: Message) => {
+    if (!message.guild) return;
+    if (!message.content.toLowerCase().startsWith("!basi injail ")) return;
+
+    const parts = message.content.trim().split(/\s+/);
+    const id = parts[2];
+    if (!id) return;
+
+    const member = await message.guild.members.fetch(id).catch(() => null);
+    if (!member) {
+      await message.reply("Membre introuvable.");
+      return;
+    }
+
+    const canNick = message.guild.members.me?.permissions.has(
+      PermissionsBitField.Flags.ManageNicknames
+    );
+    if (!canNick) {
+      await message.reply("Je n’ai pas la permission pour changer le pseudo.");
+      return;
+    }
+
+    await member.setNickname("🎭 En mode animation").catch(() => { });
+
+    const avatarUrl = member.displayAvatarURL({ extension: "png", size: 512 });
+    const avatarRes = await fetch(avatarUrl);
+    const avatarBuffer = Buffer.from(await avatarRes.arrayBuffer());
+
+    const outBuffer = await renderBarsOnAvatar(avatarBuffer);
+
+    await (message.channel as any).send({
+      files: [{ attachment: outBuffer, name: "avatar-basi.png" }],
+    });
+  });
+}
 
 // =========================
 // READY

@@ -20,12 +20,14 @@
     "dotenv": "^17.3.1",
     "free-games-shared": "github:basilicayakashi/free-games-shared",
     "pg": "^8.22.0",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.20.0",
+    "@types/sharp": "^0.31.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

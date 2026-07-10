@@ -924,6 +924,15 @@ const de_server: MessagesServer = {
     memberNotFound: 'Mitglied nicht gefunden',
     targetDmClosed: 'Dieses Mitglied hat seine Direktnachrichten deaktiviert, die Anfrage konnte nicht gesendet werden',
     requestSentConfirmation: 'Deine Anfrage wurde per Direktnachricht gesendet',
+    roleMaster: 'Master',
+    rolePet: 'Pet',
+    noRoleDeclared: 'Kein(e) Rolle angegeben',
+    noneLabel: 'Keine',
+    profileSummary: (userId, roles, masters, pets) =>
+      `**Profil von <@${userId}>**
+    Angegebene(s) Rolle(n): ${roles}
+    Master(s): ${masters}
+    Pet(s): ${pets}`,
 
   }
 };

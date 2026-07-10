@@ -957,6 +957,14 @@ const en_server: MessagesServer = {
 
     targetDmClosed: 'This member has their DMs closed, the request could not be sent',
     requestSentConfirmation: 'Your request has been sent by direct message',
+    roleMaster: 'Master',
+    rolePet: 'Pet',
+    noRoleDeclared: 'No role declared',
+    noneLabel: 'None',
+    profileSummary: (userId, roles, masters, pets) =>  `**Profile of <@${userId}>**
+    Declared role(s): ${roles}
+    Master(s): ${masters}
+    Pet(s): ${pets}`,
   }
 };
 

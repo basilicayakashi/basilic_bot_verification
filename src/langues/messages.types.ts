@@ -303,9 +303,14 @@ export type MessagesServer = {
         requestAccepted: (requesterId: string, targetId: string) => string;
         requestDeclined: (requesterId: string, targetId: string) => string;
 
-        memberNotFound : string;
-        targetDmClosed : string;
+        memberNotFound: string;
+        targetDmClosed: string;
         requestSentConfirmation: string;
+        roleMaster: string;
+        rolePet: string;
+        noRoleDeclared: string;
+        noneLabel: string;
+        profileSummary: (userId: string, roles: string, masters: string, pets: string) => string;
     }
 };
 

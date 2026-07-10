@@ -923,6 +923,16 @@ const es_server: MessagesServer = {
     memberNotFound: 'No se encontró el miembro',
     targetDmClosed: 'Este miembro tiene los mensajes privados desactivados, no se pudo enviar la solicitud',
     requestSentConfirmation: 'Tu solicitud se ha enviado por mensaje privado',
+    roleMaster: 'Maestro',
+    rolePet: 'Mascota',
+    noRoleDeclared: 'No se ha declarado ningún rol',
+    noneLabel: 'Ninguno',
+    profileSummary: (userId, roles, masters, pets) =>
+      `**Ficha de <@${userId}>**
+    Rol(es) declarado(s): ${roles}
+    Maestro(s): ${masters}
+    Mascota(s): ${pets}`,
+
   }
 };
 

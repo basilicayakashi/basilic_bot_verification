@@ -103,7 +103,12 @@ import {
   purgeMasterPetRoleUser
 } from "./database/sql.js";
 
-import { masterPetCommands, isMasterPetButton, handleMasterPetButton, handleMasterPetAutocomplete } from './master-pet/master-pet.js';
+import {
+  masterPetCommands,
+  isMasterPetButton,
+  handleMasterPetButton,
+  handleMasterPetAutocomplete,
+} from './master-pet/master-pet.js';
 
 
 function dbValue<T>(observable: import("rxjs").Observable<T>): Promise<T> {
@@ -1902,8 +1907,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
     // =========================================
     if (interaction.isAutocomplete()) {
 
-      // ✅ AJOUT : autocomplete master/pet
-      if (interaction.commandName === "request-pet" || interaction.commandName === "request-master") {
+      if (
+        interaction.commandName === "request-pet" ||
+        interaction.commandName === "request-master" ||
+        interaction.commandName === "master-pet-profile"
+      ) {
         await handleMasterPetAutocomplete(interaction);
         return;
       }

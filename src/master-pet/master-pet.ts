@@ -9,6 +9,7 @@ import {
   AutocompleteInteraction,
   BaseInteraction,
   CacheType,
+  Locale,
 } from 'discord.js';
 import { firstValueFrom } from 'rxjs';
 
@@ -26,6 +27,10 @@ import {
   purgeMasterPetRoleUser,
   listDeclaredMasterPetUsers,
   hasDeclaredMasterPetRole,
+  getDeclaredMasterPetRolesForUser,
+  getMastersOfUser,
+  getPetsOfUser,
+  listAllDeclaredMasterPetUsers,
 } from '../database/sql.js';
 
 import { getMessagesServer } from "../langues/index.js";
@@ -147,6 +152,69 @@ async function executeUnlink(interaction: ChatInputCommandInteraction) {
   return interaction.reply({ content: msgServer.masterPet.unlinkSuccess(target.id), ephemeral: true });
 }
 
+async function executeProfile(interaction: ChatInputCommandInteraction) {
+  const guildId = interaction.guildId!;
+  const targetId = interaction.options.getString('membre', true);
+  const msgServer = isUsedOnAServer(interaction)
+    ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
+    : getMessagesServer("en");
+
+  const targetMember = await interaction.guild!.members.fetch(targetId).catch(() => null);
+  if (!targetMember) {
+    return interaction.reply({ content: msgServer.masterPet.memberNotFound, ephemeral: true });
+  }
+
+  const [roles, masterIds, petIds] = await Promise.all([
+    firstValueFrom(getDeclaredMasterPetRolesForUser(guildId, targetId)),
+    firstValueFrom(getMastersOfUser(guildId, targetId)),
+    firstValueFrom(getPetsOfUser(guildId, targetId)),
+  ]);
+
+  const rolesText = roles.length > 0
+    ? roles.map(r => r === 'master' ? msgServer.masterPet.roleMaster : msgServer.masterPet.rolePet).join(', ')
+    : msgServer.masterPet.noRoleDeclared;
+
+  const mastersText = masterIds.length > 0
+    ? masterIds.map(id => `<@${id}>`).join(', ')
+    : msgServer.masterPet.noneLabel;
+
+  const petsText = petIds.length > 0
+    ? petIds.map(id => `<@${id}>`).join(', ')
+    : msgServer.masterPet.noneLabel;
+
+  return interaction.reply({
+    content: msgServer.masterPet.profileSummary(targetId, rolesText, mastersText, petsText),
+    ephemeral: true,
+  });
+}
+
+const masterPetProfile = {
+  data: new SlashCommandBuilder()
+    .setName('master-pet-profile')
+    .setDescription("Display the master/pet profile of a member")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Affiche la fiche master/pet d'un membre",
+      [Locale.German]: "Zeige das Master-/Pet-Profil eines Mitglieds",
+      [Locale.SpanishES]: "Muestra el perfil master/mascota de un miembro",
+      [Locale.Polish]: "Wyświetl profil master/pet członka",
+    })
+    .addStringOption(opt =>
+      opt.setName('membre')
+        .setDescription("The member to view (must have declared a master/pet role)")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Le membre à consulter (doit avoir déclaré un rôle master/pet)",
+          [Locale.SpanishES]: "El miembro a consultar (debe haber declarado un rol master/mascota)",
+          [Locale.German]: "Das zu konsultierende Mitglied (muss eine Master-/Pet-Rolle deklariert haben)",
+          [Locale.Polish]: "Członek do sprawdzenia (musi mieć zadeklarowaną rolę master/pet)",
+        })
+        .setRequired(true)
+        .setAutocomplete(true)
+    ),
+  execute: executeProfile,
+};
+
+
+
 // ============================================================
 // DÉFINITIONS DES COMMANDES (data + execute)
 // ============================================================
@@ -154,38 +222,74 @@ async function executeUnlink(interaction: ChatInputCommandInteraction) {
 const declareMaster = {
   data: new SlashCommandBuilder()
     .setName('declare-master')
-    .setDescription('Se déclarer comme master sur ce serveur'),
+    .setDescription("Declare yourself as a master on this server")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Se déclarer comme master sur ce serveur",
+      [Locale.SpanishES]: "Declararte como maestro en este servidor",
+      [Locale.German]: "Melde dich auf diesem Server als Master an",
+      [Locale.Polish]: "Zgłoś się jako master na tym serwerze",
+    }),
   execute: (i: ChatInputCommandInteraction) => executeDeclare(i, 'master'),
 };
 
 const declarePet = {
   data: new SlashCommandBuilder()
     .setName('declare-pet')
-    .setDescription('Se déclarer comme pet sur ce serveur'),
+    .setDescription("Declare yourself as a pet on this server")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Se déclarer comme pet sur ce serveur",
+      [Locale.SpanishES]: "Declararte como mascota en este servidor",
+      [Locale.German]: "Melde dich auf diesem Server als Pet an",
+      [Locale.Polish]: "Zgłoś się jako pet na tym serwerze",
+    }),
   execute: (i: ChatInputCommandInteraction) => executeDeclare(i, 'pet'),
 };
 
 const undeclareMaster = {
   data: new SlashCommandBuilder()
     .setName('undeclare-master')
-    .setDescription('Ne plus être déclaré comme master'),
+    .setDescription("Remove your master declaration on this server")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Supprimer votre déclaration de master sur ce serveur",
+      [Locale.SpanishES]: "Eliminar tu declaración de maestro en este servidor",
+      [Locale.German]: "Entferne deine Master-Anmeldung auf diesem Server",
+      [Locale.Polish]: "Usuń swoją deklarację jako master na tym serwerze",
+    }),
   execute: (i: ChatInputCommandInteraction) => executeUndeclare(i, 'master'),
 };
 
 const undeclarePet = {
   data: new SlashCommandBuilder()
     .setName('undeclare-pet')
-    .setDescription('Ne plus être déclaré comme pet'),
+    .setDescription("Remove your pet declaration on this server")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Supprimer votre déclaration de pet sur ce serveur",
+      [Locale.SpanishES]: "Eliminar tu declaración de mascota en este servidor",
+      [Locale.German]: "Entferne deine Pet-Anmeldung auf diesem Server",
+      [Locale.Polish]: "Usuń swoją deklarację jako pet na tym serwerze",
+    }),
   execute: (i: ChatInputCommandInteraction) => executeUndeclare(i, 'pet'),
 };
 
 const requestPet = {
   data: new SlashCommandBuilder()
     .setName('request-pet')
-    .setDescription('Propose à un membre de devenir votre pet')
+    .setDescription("Propose a member to become your pet")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Proposer à un membre de devenir votre pet",
+      [Locale.SpanishES]: "Proponer a un miembro que se convierta en tu mascota",
+      [Locale.German]: "Vorschlagen, dass ein Mitglied zu deinem Pet wird",
+      [Locale.Polish]: "Zaproponuj członkowi, że zostanie twoim psem",
+    })
     .addStringOption(opt =>
       opt.setName('membre')
-        .setDescription('Le membre visé (doit être dans le serveur)')
+        .setDescription('The member targeted (must be in the server)')
+        .setDescriptionLocalizations({
+          [Locale.French]: "Le membre ciblé (doit être sur le serveur)",
+          [Locale.SpanishES]: "El miembro objetivo (debe estar en el servidor)",
+          [Locale.German]: "Der Zielmitglied (muss auf dem Server sein)",
+          [Locale.Polish]: "Celowy członek (musi być na serwerze)",
+        })
         .setRequired(true)
         .setAutocomplete(true)
     ),
@@ -195,10 +299,22 @@ const requestPet = {
 const requestMaster = {
   data: new SlashCommandBuilder()
     .setName('request-master')
-    .setDescription('Propose à un membre de devenir votre master')
+    .setDescription("Propose a member to become your master")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Proposer à un membre de devenir votre master",
+      [Locale.SpanishES]: "Proponer a un miembro que se convierta en tu maestro",
+      [Locale.German]: "Vorschlagen, dass ein Mitglied zu deinem Master wird",
+      [Locale.Polish]: "Zaproponuj członkowi, że zostanie twoim mistrzem",
+    })
     .addStringOption(opt =>
       opt.setName('membre')
-        .setDescription('Le membre visé (doit être dans le serveur)')
+        .setDescription("The member targeted (must be in the server)")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Le membre ciblé (doit être sur le serveur)",
+          [Locale.SpanishES]: "El miembro objetivo (debe estar en el servidor)",
+          [Locale.German]: "Der Zielmitglied (muss auf dem Server sein)",
+          [Locale.Polish]: "Celowy członek (musi być na serwerze)",
+        })
         .setRequired(true)
         .setAutocomplete(true)
     ),
@@ -208,8 +324,23 @@ const requestMaster = {
 const unlink = {
   data: new SlashCommandBuilder()
     .setName('unlink')
-    .setDescription('Supprime votre lien master/pet avec un membre')
-    .addUserOption(opt => opt.setName('membre').setDescription('Le membre visé').setRequired(true)),
+    .setDescription("Remove your master/pet link with a member")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Supprime votre lien master/pet avec un membre",
+      [Locale.SpanishES]: "Elimina tu enlace master/pet con un miembro",
+      [Locale.German]: "Entfernt deinen Master/Pet-Link mit einem Mitglied",
+      [Locale.Polish]: "Usuwa twój link mistrz/pies z członkiem",
+    })
+    .addUserOption(opt => opt
+      .setName('membre')
+      .setDescription('The member targeted')
+      .setDescriptionLocalizations({
+        [Locale.French]: "Le membre ciblé",
+        [Locale.SpanishES]: "El miembro objetivo",
+        [Locale.German]: "Das Zielmitglied",
+        [Locale.Polish]: "Celowy członek",
+      })
+      .setRequired(true)),
   execute: executeUnlink,
 };
 
@@ -221,6 +352,7 @@ export const masterPetCommands = [
   requestPet,
   requestMaster,
   unlink,
+  masterPetProfile,
 ];
 
 // ============================================================
@@ -267,11 +399,16 @@ export async function handleMasterPetAutocomplete(interaction: AutocompleteInter
   const focused = interaction.options.getFocused().toLowerCase();
   const commandName = interaction.commandName;
 
-  // Pour request-pet, on liste les non-pets potentiels ; pour request-master, les masters existants.
-  // Ici, exemple pour proposer les membres déjà déclarés dans le rôle "cible" attendu.
-  const roleToList: RoleType = commandName === 'request-pet' ? 'pet' : 'master';
+  let userIds: string[];
 
-  const userIds = await firstValueFrom(listDeclaredMasterPetUsers(guildId, roleToList));
+  if (commandName === 'master-pet-profile') {
+    // profil : n'importe quel membre ayant déclaré master OU pet
+    userIds = await firstValueFrom(listAllDeclaredMasterPetUsers(guildId));
+  } else {
+    // request-pet / request-master : filtre par rôle cible attendu
+    const roleToList: RoleType = commandName === 'request-pet' ? 'pet' : 'master';
+    userIds = await firstValueFrom(listDeclaredMasterPetUsers(guildId, roleToList));
+  }
 
   const guild = interaction.guild!;
   const choices: { name: string; value: string }[] = [];
@@ -283,5 +420,5 @@ export async function handleMasterPetAutocomplete(interaction: AutocompleteInter
     choices.push({ name: member.displayName, value: userId });
   }
 
-  await interaction.respond(choices.slice(0, 25)); // Discord limite à 25 résultats
+  await interaction.respond(choices.slice(0, 25));
 }

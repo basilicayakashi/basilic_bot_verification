@@ -961,6 +961,14 @@ const fr_server: MessagesServer = {
 
     targetDmClosed: 'Ce membre a ses messages privés fermés, la demande n\'a pas pu être envoyée.',
     requestSentConfirmation: 'Ta demande a bien été envoyée en message privé.',
+    roleMaster: 'Master',
+    rolePet: 'Pet',
+    noRoleDeclared: 'Aucun rôle déclaré',
+    noneLabel: 'Aucun',
+    profileSummary: (userId, roles, masters, pets) => `**Fiche de <@${userId}>**
+    Rôle(s) déclaré(s) : ${roles}
+    Master(s) : ${masters}
+    Pet(s) : ${pets}`,
   }
 };
 

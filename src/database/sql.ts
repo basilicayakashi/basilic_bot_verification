@@ -1098,6 +1098,34 @@ export function listDeclaredMasterPetUsers(guildId: string, role: RoleType): Obs
   ).pipe(map(rows => rows.map(r => r.user_id)));
 }
 
+export function listAllDeclaredMasterPetUsers(guildId: string): Observable<string[]> {
+  return query<{ user_id: string }>(
+    `SELECT DISTINCT user_id FROM master_pet_declarations WHERE guild_id = $1`,
+    [guildId]
+  ).pipe(map(rows => rows.map(r => r.user_id)));
+}
+
+export function getDeclaredMasterPetRolesForUser(guildId: string, userId: string): Observable<RoleType[]> {
+  return query<{ role_type: RoleType }>(
+    `SELECT role_type FROM master_pet_declarations WHERE guild_id = $1 AND user_id = $2`,
+    [guildId, userId]
+  ).pipe(map(rows => rows.map(r => r.role_type)));
+}
+
+export function getMastersOfUser(guildId: string, petId: string): Observable<string[]> {
+  return query<{ master_id: string }>(
+    `SELECT master_id FROM master_pet_links WHERE guild_id = $1 AND pet_id = $2`,
+    [guildId, petId]
+  ).pipe(map(rows => rows.map(r => r.master_id)));
+}
+
+export function getPetsOfUser(guildId: string, masterId: string): Observable<string[]> {
+  return query<{ pet_id: string }>(
+    `SELECT pet_id FROM master_pet_links WHERE guild_id = $1 AND master_id = $2`,
+    [guildId, masterId]
+  ).pipe(map(rows => rows.map(r => r.pet_id))); 
+}
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

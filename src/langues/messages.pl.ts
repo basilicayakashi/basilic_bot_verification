@@ -925,6 +925,16 @@ const pl_server: MessagesServer = {
     memberNotFound: 'Członek nie znaleziony',
     targetDmClosed: 'Ten użytkownik ma wyłączone wiadomości prywatne, nie udało się wysłać prośby',
     requestSentConfirmation: 'Twoja prośba została wysłana w wiadomości prywatnej',
+    roleMaster: 'Master',
+    rolePet: 'Pet',
+    noRoleDeclared: 'Brak zadeklarowanej roli',
+    noneLabel: 'Brak',
+    profileSummary: (userId, roles, masters, pets) =>
+      `**Profil użytkownika <@${userId}>**
+    Zadeklarowane role: ${roles}
+    Master(y): ${masters}
+    Pet(y): ${pets}`,
+
   }
 };
 

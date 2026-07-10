@@ -243,7 +243,7 @@ export function initDb(): Observable<void> {
     )`,
 
     // Déclarations (un user peut se déclarer master ET pet en même temps)
-    `CREATE TABLE IF NOT EXISTSmaster_pet_declarations (
+    `CREATE TABLE IF NOT EXISTS master_pet_declarations (
       guild_id TEXT NOT NULL,
       user_id TEXT NOT NULL,
       role_type TEXT NOT NULL CHECK (role_type IN ('master', 'pet')),
@@ -262,7 +262,7 @@ export function initDb(): Observable<void> {
     )`,
 
     // Demandes en attente
-    `CREATE TABLE IF NOT EXISTSmaster_pet_requests (
+    `CREATE TABLE IF NOT EXISTS master_pet_requests (
       id SERIAL PRIMARY KEY,
       guild_id TEXT NOT NULL,
       requester_id TEXT NOT NULL,

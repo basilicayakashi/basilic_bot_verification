@@ -304,6 +304,8 @@ export type MessagesServer = {
         requestDeclined: (requesterId: string, targetId: string) => string;
 
         memberNotFound : string;
+        targetDmClosed : string;
+        requestSentConfirmation: string;
     }
 };
 

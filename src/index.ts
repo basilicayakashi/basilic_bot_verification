@@ -100,7 +100,11 @@ import {
   upsertAutokickNewMembers,
   AutokickSettingsRow,
   getAutokickNewMembers,
+  purgeMasterPetRoleUser
 } from "./database/sql.js";
+
+import { masterPetCommands, isMasterPetButton, handleMasterPetButton, handleMasterPetAutocomplete } from './master-pet/master-pet.js';
+
 
 function dbValue<T>(observable: import("rxjs").Observable<T>): Promise<T> {
   return firstValueFrom(observable);
@@ -1142,7 +1146,9 @@ export const commands = [
       [Locale.Polish]: "Wyświetl skonfigurowaną wiadomość powitalną",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  ...masterPetCommands.map((cmd) => cmd.data),
 ].map((command) => command.toJSON());
+
 
 // =========================
 // HELPERS
@@ -1714,7 +1720,7 @@ export function register(client: Client) {
       if (v_injail) {
         await member.setNickname("🔒 I'm in jail").catch(() => { });
       }
-      else{
+      else {
         await member.setNickname("🔒 I'm in horny jail").catch(() => { });
       }
 
@@ -1729,7 +1735,7 @@ export function register(client: Client) {
     const v_message_afficher = `${member}`;
 
     await (message.channel as any).send({
-      content : v_message_afficher,
+      content: v_message_afficher,
       files: [{ attachment: outBuffer, name: "avatar-basi.png" }],
     });
   });
@@ -1835,6 +1841,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
     // =======================
     if (interaction.isButton()) {
 
+      // ✅ AJOUT : boutons master/pet
+      if (isMasterPetButton(interaction.customId)) {
+        await handleMasterPetButton(interaction);
+        return;
+      }
+
       // ===== FAUX SPAM =====
       if (interaction.customId.startsWith("spam:false_positive:")) {
 
@@ -1889,6 +1901,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
     // 1) COMMANDES SLASH
     // =========================================
     if (interaction.isAutocomplete()) {
+
+      // ✅ AJOUT : autocomplete master/pet
+      if (interaction.commandName === "request-pet" || interaction.commandName === "request-master") {
+        await handleMasterPetAutocomplete(interaction);
+        return;
+      }
+
       const focusedOption = interaction.options.getFocused(true);
 
       if (focusedOption.name === "category" || focusedOption.name === "name") {
@@ -1921,6 +1940,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
         !(await isAuthorizedServer(interaction))
       ) {
         await replyEphemeral(interaction, msgIn.NotAuthorizedServer);
+        return;
+      }
+
+      const masterPetCommand = masterPetCommands.find(
+        (cmd) => cmd.data.name === interaction.commandName
+      );
+      if (masterPetCommand) {
+        await masterPetCommand.execute(interaction);
         return;
       }
 
@@ -3412,6 +3439,9 @@ client.on(Events.GuildMemberRemove, async (member) => {
       member.guild.id,
       member.id
     ));
+
+    await dbValue(purgeMasterPetRoleUser(member.guild.id, member.id));
+
   } catch (error) {
     console.error(
       `Error while cleaning pending verification for ${member.id}:`,

@@ -85,7 +85,6 @@ async function executeRequest(
     return interaction.reply({ content: msgServer.masterPet.memberNotFound, ephemeral: true });
   }
 
-
   if (targetId === requesterId) {
     return interaction.reply({ content: msgServer.masterPet.cannotTargetSelf, ephemeral: true });
   }
@@ -116,11 +115,19 @@ async function executeRequest(
     new ButtonBuilder().setCustomId(`mp_decline_${req.id}`).setLabel(msgServer.masterPet.decline).setStyle(ButtonStyle.Danger)
   );
 
-  const content = requestType === 'master_to_pet'
+  const dmContent = requestType === 'master_to_pet'
     ? msgServer.masterPet.requestPetSent(requesterId, targetId)
     : msgServer.masterPet.requestMasterSent(requesterId, targetId);
 
-  return interaction.reply({ content, components: [row] });
+  const dmSent = await targetMember.send({ content: dmContent, components: [row] }).catch(() => null);
+
+  if (!dmSent) {
+    // ✅ le membre visé a ses DMs fermés → on annule la demande créée en base
+    await firstValueFrom(deleteMasterPetRoleRequest(req.id));
+    return interaction.reply({ content: msgServer.masterPet.targetDmClosed, ephemeral: true });
+  }
+
+  return interaction.reply({ content: msgServer.masterPet.requestSentConfirmation, ephemeral: true });
 }
 
 async function executeUnlink(interaction: ChatInputCommandInteraction) {

@@ -796,7 +796,7 @@ ${roleMsgDeleteText}
   AutokickSettingsUpdated: "Registration Complete",
   helpAutokick: `The auto kick feature monitors new members joining the server.
 The \`/autokick-newmembers\` command lets you set an integer value: the number of days. Every time someone joins, the bot checks the age of their account (the account creation date). If the account age is less than the configured number of days, the member will be automatically kicked.
-If you set 0 days, the auto kick feature is disabled.`,
+If you set 0 days, the auto kick feature is disabled`,
 };
 
 const en_out: MessagesOut = {
@@ -903,13 +903,13 @@ const en_server: MessagesServer = {
 
   masterPet: {
     alreadyDeclared: (role) =>
-      `You are already declared as a ${role}.`,
+      `You are already declared as a ${role}`,
 
     declaredSuccess: (role) =>
-      `You are now declared as a ${role}.`,
+      `You are now declared as a ${role}`,
 
     undeclaredSuccess: (role) =>
-      `You are no longer declared as a ${role}.`,
+      `You are no longer declared as a ${role}`,
 
     cannotTargetSelf:
       "You cannot target yourself.",
@@ -930,16 +930,16 @@ const en_server: MessagesServer = {
       "No master/pet relationship exists with this member.",
 
     unlinkSuccess: (targetId) =>
-      `Your relationship with <@${targetId}> has been removed.`,
+      `Your relationship with <@${targetId}> has been removed`,
 
     accept: "Accept",
     decline: "Decline",
 
     requestPetSent: (requesterId, targetId) =>
-      `<@${targetId}>, <@${requesterId}> would like you to become their pet.`,
+      `<@${targetId}>, <@${requesterId}> would like you to become their pet`,
 
     requestMasterSent: (requesterId, targetId) =>
-      `<@${targetId}>, <@${requesterId}> would like you to become their master.`,
+      `<@${targetId}>, <@${requesterId}> would like you to become their master`,
 
     requestExpired:
       "This request no longer exists.",
@@ -948,12 +948,15 @@ const en_server: MessagesServer = {
       "This request is not addressed to you.",
 
     requestAccepted: (requesterId, targetId) =>
-      `Relationship successfully created between <@${requesterId}> and <@${targetId}>.`,
+      `Relationship successfully created between <@${requesterId}> and <@${targetId}>`,
 
     requestDeclined: (requesterId, targetId) =>
-      `<@${targetId}> declined the request from <@${requesterId}>.`,
+      `<@${targetId}> declined the request from <@${requesterId}>`,
 
-    memberNotFound : 'Member not found',
+    memberNotFound: 'Member not found',
+
+    targetDmClosed: 'This member has their DMs closed, the request could not be sent',
+    requestSentConfirmation: 'Your request has been sent by direct message',
   }
 };
 

@@ -907,57 +907,60 @@ const fr_server: MessagesServer = {
 
   masterPet: {
     alreadyDeclared: (role) =>
-      `Vous êtes déjà déclaré comme ${role}.`,
+      `Vous êtes déjà déclaré comme ${role}`,
 
     declaredSuccess: (role) =>
-      `Vous êtes maintenant déclaré comme ${role}.`,
+      `Vous êtes maintenant déclaré comme ${role}`,
 
     undeclaredSuccess: (role) =>
-      `Vous n'êtes plus déclaré comme ${role}.`,
+      `Vous n'êtes plus déclaré comme ${role}`,
 
     cannotTargetSelf:
-      "Vous ne pouvez pas vous cibler vous-même.",
+      "Vous ne pouvez pas vous cibler vous-même",
 
     cannotTargetBot:
-      "Les bots ne peuvent pas participer aux relations master/pet.",
+      "Les bots ne peuvent pas participer aux relations master/pet",
 
     mustDeclareMasterFirst:
-      "Vous devez d'abord vous déclarer comme master avant d'envoyer cette demande.",
+      "Vous devez d'abord vous déclarer comme master avant d'envoyer cette demande",
 
     mustDeclarePetFirst:
-      "Vous devez d'abord vous déclarer comme pet avant d'envoyer cette demande.",
+      "Vous devez d'abord vous déclarer comme pet avant d'envoyer cette demande",
 
     alreadyLinked:
-      "Vous êtes déjà lié à ce membre.",
+      "Vous êtes déjà lié à ce membre",
 
     noLinkFound:
-      "Aucune relation master/pet n'existe avec ce membre.",
+      "Aucune relation master/pet n'existe avec ce membre",
 
     unlinkSuccess: (targetId) =>
-      `Votre relation avec <@${targetId}> a été supprimée.`,
+      `Votre relation avec <@${targetId}> a été supprimée`,
 
     accept: "Accepter",
     decline: "Refuser",
 
     requestPetSent: (requesterId, targetId) =>
-      `<@${targetId}>, <@${requesterId}> souhaite que vous deveniez son pet.`,
+      `<@${targetId}>, <@${requesterId}> souhaite que vous deveniez son pet`,
 
     requestMasterSent: (requesterId, targetId) =>
-      `<@${targetId}>, <@${requesterId}> souhaite que vous deveniez son master.`,
+      `<@${targetId}>, <@${requesterId}> souhaite que vous deveniez son master`,
 
     requestExpired:
-      "Cette demande n'existe plus.",
+      "Cette demande n'existe plus",
 
     notYourRequest:
-      "Cette demande ne vous est pas destinée.",
+      "Cette demande ne vous est pas destinée",
 
     requestAccepted: (requesterId, targetId) =>
-      `La relation entre <@${requesterId}> et <@${targetId}> a été créée avec succès.`,
+      `La relation entre <@${requesterId}> et <@${targetId}> a été créée avec succès`,
 
     requestDeclined: (requesterId, targetId) =>
-      `<@${targetId}> a refusé la demande de <@${requesterId}>.`,
+      `<@${targetId}> a refusé la demande de <@${requesterId}>`,
 
-    memberNotFound : "Membre non trouvé.",
+    memberNotFound: "Membre non trouvé",
+
+    targetDmClosed: 'Ce membre a ses messages privés fermés, la demande n\'a pas pu être envoyée.',
+    requestSentConfirmation: 'Ta demande a bien été envoyée en message privé.',
   }
 };
 

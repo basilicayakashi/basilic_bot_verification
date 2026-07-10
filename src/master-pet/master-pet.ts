@@ -296,6 +296,7 @@ const requestPet = {
   execute: (i: ChatInputCommandInteraction) => executeRequest(i, 'master', 'master_to_pet'),
 };
 
+/*
 const requestMaster = {
   data: new SlashCommandBuilder()
     .setName('request-master')
@@ -320,6 +321,7 @@ const requestMaster = {
     ),
   execute: (i: ChatInputCommandInteraction) => executeRequest(i, 'pet', 'pet_to_master'),
 };
+*/
 
 const unlink = {
   data: new SlashCommandBuilder()
@@ -350,7 +352,7 @@ export const masterPetCommands = [
   undeclareMaster,
   undeclarePet,
   requestPet,
-  requestMaster,
+  //requestMaster,
   unlink,
   masterPetProfile,
 ];

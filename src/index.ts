@@ -1703,7 +1703,9 @@ export function register(client: Client) {
     const v_message = message.content.toLowerCase();
     const v_injail = v_message.startsWith("!basi jail ");
     const v_inhornyjail = v_message.startsWith("!basi hornyjail ");
-    if (!v_injail && !v_inhornyjail) return;
+    const v_inbellyjail = v_message.startsWith("!basi bellyjail ");
+    const v_inbasijail = v_message.startsWith("!basi basijail ");
+    if (!v_injail && !v_inhornyjail && !v_inbellyjail && !v_inbasijail) return;
 
     const parts = message.content.trim().split(/\s+/);
     const id = parts[2]?.trim(); // peut récupérer le membre soit sous la forme 123456 ou bien <@123456> si utilisation de @
@@ -1727,8 +1729,14 @@ export function register(client: Client) {
       if (v_injail) {
         await member.setNickname("🔒 I'm in jail").catch(() => { });
       }
-      else {
+      else if (v_inhornyjail) {
         await member.setNickname("🔒 I'm in horny jail").catch(() => { });
+      }
+      else if (v_inbellyjail) {
+        await member.setNickname("🔒 I'm in belly jail").catch(() => { });
+      }
+      else if (v_inbasijail) {
+        await member.setNickname("👅 Basi thanks you for the meal").catch(() => { });
       }
 
     }

@@ -438,6 +438,8 @@ Most configuration commands require **Administrator** permissions.
 Write these commands like this:
 \`!basi jail <id>\` : allows you to put the member with id \`<id>\` into prison (adapt \`<id>\` to the member)
 \`!basi hornyjail <id>\` : allows you to put the member with id \`<id>\` into horny jail (adapt \`<id>\` to the member)
+\`!basi bellyjail <id>\` : allows you to put the member with id \`<id>\` into belly jail (adapt \`<id>\` to the member)
+\`!basi basijail <id>\` : allows you to put the member with id \`<id>\` into basi jail (adapt \`<id>\` to the member)
   `,
 
   helpReactionRoles: `

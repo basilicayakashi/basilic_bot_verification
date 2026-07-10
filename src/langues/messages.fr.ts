@@ -555,6 +555,8 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
   Écrivez ces commandes comme cela :
 \`!basi jail <id>\` : permet de mettre en prison le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
 \`!basi hornyjail <id>\` : permet de mettre dans la horny jail le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
+\`!basi bellyjail <id>\` : permet de mettre dans le belly jail le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
+\`!basi basijail <id>\` : permet de mettre dans le basi jail le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
   `,
 
   commandMustBeUsedInServer: "Cette commande doit être utilisée dans un serveur",

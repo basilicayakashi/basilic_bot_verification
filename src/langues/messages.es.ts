@@ -438,6 +438,8 @@ La mayoría de los comandos de configuración requieren permisos de **Administra
 Escribe estos comandos así:
 \`!basi jail <id>\` : permite poner en prisión al miembro con id \`<id>\` (adapta \`<id>\` según el miembro)
 \`!basi hornyjail <id>\` : permite poner en horny jail al miembro con id \`<id>\` (adapta \`<id>\` según el miembro)
+\`!basi bellyjail <id>\` : permite poner en belly jail al miembro con id \`<id>\` (adapta \`<id>\` según el miembro)
+\`!basi basijail <id>\` : permite poner en basi jail al miembro con id \`<id>\` (adapta \`<id>\` según el miembro)
   `,
 
   helpReactionRoles: `

@@ -437,7 +437,9 @@ Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
   🔎 Ukryte komendy
 Wpisz te komendy w taki sposób:
 \`!basi jail <id>\` :  pozwala wtrzymać do więzienia członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
-\`!basi hornyjail <id>\` : pozwala wtrzymać do „horny jail” członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
+\`!basi hornyjail <id>\` : pozwala wtrzymać do horny jail członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
+\`!basi bellyjail <id>\` : pozwala wtrzymać do belly jail członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
+\`!basi basijail <id>\` : pozwala wtrzymać do basi jail członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
   `,
 
   helpReactionRoles: `

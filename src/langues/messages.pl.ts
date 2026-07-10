@@ -433,6 +433,13 @@ Gry są automatycznie:
 Większość komend konfiguracyjnych wymaga uprawnień **Administratora**.
 `,
 
+ helpHiddenCommands: `
+  🔎 Ukryte komendy
+Wpisz te komendy w taki sposób:
+\`!basi jail <id>\` :  pozwala wtrzymać do więzienia członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
+\`!basi hornyjail <id>\` : pozwala wtrzymać do „horny jail” członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
+  `,
+
   helpReactionRoles: `
 # 🎭 Reaction Roles — Instrukcja użytkowania
 
@@ -895,6 +902,29 @@ const pl_server: MessagesServer = {
 
   ${msgLines}
   `,
+
+  masterPet: {
+    alreadyDeclared: (role) => `Jesteś już zarejestrowany jako ${role}.`,
+    declaredSuccess: (role) => `Zostałeś zarejestrowany jako ${role}.`,
+    undeclaredSuccess: (role) => `Nie jesteś już zarejestrowany jako ${role}.`,
+    cannotTargetSelf: "Nie możesz wybrać samego siebie.",
+    cannotTargetBot: "Boty nie mogą uczestniczyć w relacjach master/pet.",
+    mustDeclareMasterFirst: "Najpierw musisz zarejestrować się jako master, aby wysłać tę prośbę.",
+    mustDeclarePetFirst: "Najpierw musisz zarejestrować się jako pet, aby wysłać tę prośbę.",
+    alreadyLinked: "Masz już relację z tym użytkownikiem.",
+    noLinkFound: "Nie istnieje relacja master/pet z tym użytkownikiem.",
+    unlinkSuccess: (targetId) => `Twoja relacja z <@${targetId}> została usunięta.`,
+    accept: "Akceptuj",
+    decline: "Odrzuć",
+    requestPetSent: (requesterId, targetId) => `<@${targetId}>, <@${requesterId}> chce, abyś został jego pet.`,
+    requestMasterSent: (requesterId, targetId) => `<@${targetId}>, <@${requesterId}> chce, abyś został jego master.`,
+    requestExpired: "Ta prośba już nie istnieje.",
+    notYourRequest: "Ta prośba nie jest skierowana do Ciebie.",
+    requestAccepted: (requesterId, targetId) => `Relacja między <@${requesterId}> i <@${targetId}> została pomyślnie utworzona.`,
+    requestDeclined: (requesterId, targetId) => `<@${targetId}> odrzucił(a) prośbę od <@${requesterId}>.`,
+    memberNotFound: 'Członek nie znaleziony',
+
+  }
 };
 
 const pl_internal: MessagesInternal = {

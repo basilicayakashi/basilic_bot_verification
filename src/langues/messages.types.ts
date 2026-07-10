@@ -9,6 +9,7 @@ export type MessagesIn = {
     helpReactionRoles: string;
     helpFreeGames: string;
     helpPermissions: string;
+    helpHiddenCommands: string;
     commandMustBeUsedInServer: string;
     actionMustBeUsedInServer: string;
     commandMustBeUsedInTextChannel: string;
@@ -273,6 +274,37 @@ export type MessagesServer = {
     reactionRolePanelEmpty: string;
     blacklistServerMessage: (guildName: string, timestamp: string, blacklisted_by: string, reason: string) => string;
     blackListedMemberFound: (memberTag: string, memberId: string, msgLines: string) => string;
+
+    masterPet: {
+        alreadyDeclared: (role: string) => string;
+        declaredSuccess: (role: string) => string;
+        undeclaredSuccess: (role: string) => string;
+
+        cannotTargetSelf: string;
+        cannotTargetBot: string;
+
+        mustDeclareMasterFirst: string;
+        mustDeclarePetFirst: string;
+
+        alreadyLinked: string;
+        noLinkFound: string;
+
+        unlinkSuccess: (targetId: string) => string;
+
+        accept: string;
+        decline: string;
+
+        requestPetSent: (requesterId: string, targetId: string) => string;
+        requestMasterSent: (requesterId: string, targetId: string) => string;
+
+        requestExpired: string;
+        notYourRequest: string;
+
+        requestAccepted: (requesterId: string, targetId: string) => string;
+        requestDeclined: (requesterId: string, targetId: string) => string;
+
+        memberNotFound : string;
+    }
 };
 
 export type MessagesInternal = {

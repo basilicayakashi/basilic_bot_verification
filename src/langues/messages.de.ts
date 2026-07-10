@@ -434,6 +434,13 @@ Die Spiele werden automatisch:
 Die meisten Konfigurationsbefehle erfordern **Administrator**-Berechtigungen.
 `,
 
+ helpHiddenCommands: `
+  🔎 Versteckte Befehle
+Schreibe diese Befehle so:
+\`!basi jail <id>\` : ermöglicht es, das Mitglied mit der ID \`<id>\` ins Gefängnis zu stecken (\`<id>\` anpassen)
+\`!basi hornyjail <id>\` : ermöglicht es, das Mitglied mit der ID \`<id>\` ins horny jail zu stecken (\`<id>\` anpassen)
+  `,
+
   helpReactionRoles: `
 # 🎭 Reaction Roles — Benutzerhandbuch
 
@@ -894,6 +901,29 @@ const de_server: MessagesServer = {
 
   ${msgLines}
   `,
+
+  masterPet: {
+    alreadyDeclared: (role) => `Du bist bereits als ${role} registriert.`,
+    declaredSuccess: (role) => `Du bist jetzt als ${role} registriert.`,
+    undeclaredSuccess: (role) => `Du bist nicht mehr als ${role} registriert.`,
+    cannotTargetSelf: "Du kannst dich nicht selbst auswählen.",
+    cannotTargetBot: "Bots können keine Master/Pet-Beziehungen eingehen.",
+    mustDeclareMasterFirst: "Du musst dich zuerst als Master registrieren, bevor du diese Anfrage senden kannst.",
+    mustDeclarePetFirst: "Du musst dich zuerst als Pet registrieren, bevor du diese Anfrage senden kannst.",
+    alreadyLinked: "Du bist bereits mit diesem Mitglied verbunden.",
+    noLinkFound: "Es besteht keine Master/Pet-Beziehung mit diesem Mitglied.",
+    unlinkSuccess: (targetId) => `Deine Beziehung mit <@${targetId}> wurde entfernt.`,
+    accept: "Annehmen",
+    decline: "Ablehnen",
+    requestPetSent: (requesterId, targetId) => `<@${targetId}>, <@${requesterId}> möchte, dass du sein Pet wirst.`,
+    requestMasterSent: (requesterId, targetId) => `<@${targetId}>, <@${requesterId}> möchte, dass du sein Master wirst.`,
+    requestExpired: "Diese Anfrage existiert nicht mehr.",
+    notYourRequest: "Diese Anfrage ist nicht für dich bestimmt.",
+    requestAccepted: (requesterId, targetId) => `Die Beziehung zwischen <@${requesterId}> und <@${targetId}> wurde erfolgreich erstellt.`,
+    requestDeclined: (requesterId, targetId) => `<@${targetId}> hat die Anfrage von <@${requesterId}> abgelehnt.`,
+    memberNotFound: 'Mitglied nicht gefunden',
+
+  }
 };
 
 const de_internal: MessagesInternal = {

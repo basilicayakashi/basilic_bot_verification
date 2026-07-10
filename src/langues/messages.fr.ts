@@ -550,6 +550,13 @@ Les jeux sont automatiquement :
 La plupart des commandes de configuration nécessitent les permissions **Administrateur**.
 `,
 
+  helpHiddenCommands: `
+  🔎 Commandes cachées
+  Écrivez ces commandes comme cela :
+\`!basi jail <id>\` : permet de mettre en prison le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
+\`!basi hornyjail <id>\` : permet de mettre dans la horny jail le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
+  `,
+
   commandMustBeUsedInServer: "Cette commande doit être utilisée dans un serveur",
   actionMustBeUsedInServer: "Cette action doit être utilisée dans un serveur",
   commandMustBeUsedInTextChannel: "Cette commande doit être utilisée dans un salon textuel",
@@ -791,7 +798,7 @@ ${roleMsgDeleteText}
   ChannelMustBeTextChannel: "Le salon doit être un salon textuel",
   viewSettingsBlacklistNotificationChannel: (channel: string) => `Salon de notification des membres blacklistés : ${channel}`,
   AutokickSettingsUpdated: "Enregistrement effectué",
-  helpAutokick : `La fonctionnalité d’auto kick surveille l’arrivée des nouveaux membres sur le serveur.
+  helpAutokick: `La fonctionnalité d’auto kick surveille l’arrivée des nouveaux membres sur le serveur.
 La commande \`/autokick-newmembers\` te permet de définir un paramètre entier : le nombre de jours. À chaque nouveau membre qui rejoint, le bot vérifie l’ancienneté de son compte (sa date de création). Si cette ancienneté est inférieure au nombre de jours configuré, le membre est alors automatiquement expulsé.
 Si tu mets 0 jour, la fonctionnalité d’auto kick est désactivée`,
 };
@@ -897,6 +904,61 @@ const fr_server: MessagesServer = {
 
   ${msgLines}
   `,
+
+  masterPet: {
+    alreadyDeclared: (role) =>
+      `Vous êtes déjà déclaré comme ${role}.`,
+
+    declaredSuccess: (role) =>
+      `Vous êtes maintenant déclaré comme ${role}.`,
+
+    undeclaredSuccess: (role) =>
+      `Vous n'êtes plus déclaré comme ${role}.`,
+
+    cannotTargetSelf:
+      "Vous ne pouvez pas vous cibler vous-même.",
+
+    cannotTargetBot:
+      "Les bots ne peuvent pas participer aux relations master/pet.",
+
+    mustDeclareMasterFirst:
+      "Vous devez d'abord vous déclarer comme master avant d'envoyer cette demande.",
+
+    mustDeclarePetFirst:
+      "Vous devez d'abord vous déclarer comme pet avant d'envoyer cette demande.",
+
+    alreadyLinked:
+      "Vous êtes déjà lié à ce membre.",
+
+    noLinkFound:
+      "Aucune relation master/pet n'existe avec ce membre.",
+
+    unlinkSuccess: (targetId) =>
+      `Votre relation avec <@${targetId}> a été supprimée.`,
+
+    accept: "Accepter",
+    decline: "Refuser",
+
+    requestPetSent: (requesterId, targetId) =>
+      `<@${targetId}>, <@${requesterId}> souhaite que vous deveniez son pet.`,
+
+    requestMasterSent: (requesterId, targetId) =>
+      `<@${targetId}>, <@${requesterId}> souhaite que vous deveniez son master.`,
+
+    requestExpired:
+      "Cette demande n'existe plus.",
+
+    notYourRequest:
+      "Cette demande ne vous est pas destinée.",
+
+    requestAccepted: (requesterId, targetId) =>
+      `La relation entre <@${requesterId}> et <@${targetId}> a été créée avec succès.`,
+
+    requestDeclined: (requesterId, targetId) =>
+      `<@${targetId}> a refusé la demande de <@${requesterId}>.`,
+
+    memberNotFound : "Membre non trouvé.",
+  }
 };
 
 const fr_internal: MessagesInternal = {

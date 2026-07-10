@@ -241,6 +241,38 @@ export function initDb(): Observable<void> {
       days INTEGER NOT NULL,
       text_to_send TEXT
     )`,
+
+    // Déclarations (un user peut se déclarer master ET pet en même temps)
+    `CREATE TABLE master_pet_declarations (
+      guild_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      role_type TEXT NOT NULL CHECK (role_type IN ('master', 'pet')),
+      declared_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (guild_id, user_id, role_type)
+    )`,
+
+    // Liens confirmés master -> pet
+    `CREATE TABLE master_pet_links (
+      id SERIAL PRIMARY KEY,
+      guild_id TEXT NOT NULL,
+      master_id TEXT NOT NULL,
+      pet_id TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (guild_id, master_id, pet_id)
+    )`,
+
+    // Demandes en attente
+    `CREATE TABLE master_pet_requests (
+      id SERIAL PRIMARY KEY,
+      guild_id TEXT NOT NULL,
+      requester_id TEXT NOT NULL,
+      target_id TEXT NOT NULL,
+      request_type TEXT NOT NULL CHECK (request_type IN ('master_to_pet', 'pet_to_master')),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (guild_id, requester_id, target_id, request_type)
+    )`,
+
+
   ];
 
   return from(
@@ -969,6 +1001,102 @@ export function getAutokickNewMembers(guildId: string): Observable<AutokickSetti
 }
 
 // ---------------------------------------------------------------------------
+// master / pet relationships
+// ---------------------------------------------------------------------------
+
+export function declareMasterPetRole(guildId: string, userId: string, role: RoleType): Observable<void> {
+  return execute(
+    `INSERT INTO master_pet_declarations (guild_id, user_id, role_type)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (guild_id, user_id, role_type) DO NOTHING`,
+    [guildId, userId, role]
+  );
+}
+
+export function undeclareMasterPetRole(guildId: string, userId: string, role: RoleType): Observable<void> {
+  return execute(
+    `DELETE FROM master_pet_declarations WHERE guild_id = $1 AND user_id = $2 AND role_type = $3`,
+    [guildId, userId, role]
+  );
+}
+
+export function createMasterPetRoleRequest(
+  guildId: string, requesterId: string, targetId: string, requestType: RequestType
+): Observable<MasterPetRequest | null> {
+  return queryOne(
+    `INSERT INTO master_pet_requests (guild_id, requester_id, target_id, request_type)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (guild_id, requester_id, target_id, request_type)
+     DO UPDATE SET created_at = NOW()
+     RETURNING id, guild_id AS "guildId", requester_id AS "requesterId",
+               target_id AS "targetId", request_type AS "requestType"`,
+    [guildId, requesterId, targetId, requestType]
+  );
+}
+
+export function getMasterPetRoleRequest(id: number): Observable<MasterPetRequest | null> {
+  return queryOne(
+    `SELECT id, guild_id AS "guildId", requester_id AS "requesterId",
+            target_id AS "targetId", request_type AS "requestType"
+     FROM master_pet_requests WHERE id = $1`,
+    [id]
+  );
+}
+
+export function deleteMasterPetRoleRequest(id: number): Observable<void> {
+  return execute(`DELETE FROM master_pet_requests WHERE id = $1`, [id]);
+}
+
+export function createMasterPetRoleLink(guildId: string, masterId: string, petId: string): Observable<void> {
+  return execute(
+    `INSERT INTO master_pet_links (guild_id, master_id, pet_id)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (guild_id, master_id, pet_id) DO NOTHING`,
+    [guildId, masterId, petId]
+  );
+}
+
+export function removeMasterPetRoleLink(guildId: string, userId: string, otherId: string): Observable<void> {
+  return execute(
+    `DELETE FROM master_pet_links
+     WHERE guild_id = $1
+       AND ((master_id = $2 AND pet_id = $3) OR (master_id = $3 AND pet_id = $2))`,
+    [guildId, userId, otherId]
+  );
+}
+
+export function hasMasterPetRoleLink(guildId: string, userId: string, otherId: string): Observable<boolean> {
+  return queryOne(
+    `SELECT 1 FROM master_pet_links
+     WHERE guild_id = $1
+       AND ((master_id = $2 AND pet_id = $3) OR (master_id = $3 AND pet_id = $2))`,
+    [guildId, userId, otherId]
+  ).pipe(map(row => !!row));
+}
+
+// Vérifie si un user a déclaré un rôle donné (master OU pet) — indépendant de tout lien avec un autre membre
+export function hasDeclaredMasterPetRole(guildId: string, userId: string, role: RoleType): Observable<boolean> {
+  return queryOne(
+    `SELECT 1 FROM master_pet_declarations WHERE guild_id = $1 AND user_id = $2 AND role_type = $3`,
+    [guildId, userId, role]
+  ).pipe(map(row => !!row));
+}
+
+export function purgeMasterPetRoleUser(guildId: string, userId: string): Observable<void> {
+  return execute(
+    `DELETE FROM master_pet_declarations WHERE guild_id = $1 AND user_id = $2;
+     DELETE FROM master_pet_links WHERE guild_id = $1 AND (master_id = $2 OR pet_id = $2);
+     DELETE FROM master_pet_requests WHERE guild_id = $1 AND (requester_id = $2 OR target_id = $2);`,
+    [guildId, userId]
+  );
+}
+
+export function listDeclaredMasterPetUsers(guildId: string, role: RoleType): Observable<string[]> {
+  return query<{ user_id: string }>(
+    `SELECT user_id FROM master_pet_declarations WHERE guild_id = $1 AND role_type = $2`,
+    [guildId, role]
+  ).pipe(map(rows => rows.map(r => r.user_id)));
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1139,3 +1267,14 @@ export type AutokickSettingsRow = {
   days: number;
   text_to_send: string;
 };
+
+export type RoleType = 'master' | 'pet';
+export type RequestType = 'master_to_pet' | 'pet_to_master';
+
+export interface MasterPetRequest {
+  id: number;
+  guildId: string;
+  requesterId: string;
+  targetId: string;
+  requestType: RequestType;
+}

@@ -533,6 +533,7 @@ export const commands = [
           { name: "free-games", value: "free-games" },
           { name: "permissions", value: "permissions" },
           { name: "donation", value: "donation" },
+          { name: "hidden-commands", value: "hidden-commands" },
         )
     ),
 
@@ -712,18 +713,6 @@ export const commands = [
         })
         .setRequired(false)
     ),
-
-  /*
-new SlashCommandBuilder()
-  .setName("donation")
-  .setDescription("Support the bot development")
-  .setDescriptionLocalizations({
-    [Locale.French]: "Soutenir le développement du bot",
-    [Locale.SpanishES]: "Apoyar el desarrollo del bot",
-    [Locale.German]: "Die Entwicklung des Bots unterstützen",
-    [Locale.Polish]: "Wesprzyj rozwój bota",
-  }),
-*/
   new SlashCommandBuilder()
     .setName("role-used-msg-delete")
     .setDescription("Delete new messages mentioning a configured role")
@@ -2363,6 +2352,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             "reaction-roles": msgIn.helpReactionRoles,
             "free-games": msgIn.helpFreeGames,
             "permissions": msgIn.helpPermissions,
+            "hidden-commands": msgIn.helpHiddenCommands,
           };
 
 

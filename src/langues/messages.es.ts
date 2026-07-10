@@ -433,6 +433,13 @@ Los juegos se:
 La mayoría de los comandos de configuración requieren permisos de **Administrador**.
 `,
 
+ helpHiddenCommands: `
+  🔎 Comandos ocultos
+Escribe estos comandos así:
+\`!basi jail <id>\` : permite poner en prisión al miembro con id \`<id>\` (adapta \`<id>\` según el miembro)
+\`!basi hornyjail <id>\` : permite poner en horny jail al miembro con id \`<id>\` (adapta \`<id>\` según el miembro)
+  `,
+
   helpReactionRoles: `
 # 🎭 Reaction Roles — Guía de uso
 
@@ -789,7 +796,7 @@ ${roleMsgDeleteText}
   AutokickSettingsUpdated: "Registro realizado",
   helpAutokick: `La función de auto kick supervisa la llegada de nuevos miembros al servidor.
 El comando \`/autokick-newmembers\` te permite configurar un valor entero: el número de días. Cada vez que alguien se une, el bot comprueba la antigüedad de su cuenta (la fecha de creación de la cuenta). Si la antigüedad es menor que el número de días configurado, el miembro será expulsado automáticamente.
-Si estableces 0 días, la función de auto kick está desactivada.`, 
+Si estableces 0 días, la función de auto kick está desactivada.`,
 };
 
 const es_out: MessagesOut = {
@@ -893,6 +900,29 @@ const es_server: MessagesServer = {
 
   ${msgLines}
   `,
+
+  masterPet: {
+    alreadyDeclared: (role) => `Ya estás registrado como ${role}.`,
+    declaredSuccess: (role) => `Ahora estás registrado como ${role}.`,
+    undeclaredSuccess: (role) => `Ya no estás registrado como ${role}.`,
+    cannotTargetSelf: "No puedes seleccionarte a ti mismo.",
+    cannotTargetBot: "Los bots no pueden participar en relaciones master/pet.",
+    mustDeclareMasterFirst: "Debes registrarte primero como master antes de enviar esta solicitud.",
+    mustDeclarePetFirst: "Debes registrarte primero como pet antes de enviar esta solicitud.",
+    alreadyLinked: "Ya tienes una relación con este miembro.",
+    noLinkFound: "No existe ninguna relación master/pet con este miembro.",
+    unlinkSuccess: (targetId) => `Tu relación con <@${targetId}> ha sido eliminada.`,
+    accept: "Aceptar",
+    decline: "Rechazar",
+    requestPetSent: (requesterId, targetId) => `<@${targetId}>, <@${requesterId}> quiere que seas su pet.`,
+    requestMasterSent: (requesterId, targetId) => `<@${targetId}>, <@${requesterId}> quiere que seas su master.`,
+    requestExpired: "Esta solicitud ya no existe.",
+    notYourRequest: "Esta solicitud no está dirigida a ti.",
+    requestAccepted: (requesterId, targetId) => `La relación entre <@${requesterId}> y <@${targetId}> se ha creado correctamente.`,
+    requestDeclined: (requesterId, targetId) => `<@${targetId}> rechazó la solicitud de <@${requesterId}>.`,
+    memberNotFound : 'No se encontró el miembro.',
+  
+  }
 };
 
 const es_internal: MessagesInternal = {

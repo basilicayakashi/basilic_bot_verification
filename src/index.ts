@@ -1706,10 +1706,12 @@ export function register(client: Client) {
     if (!v_injail && !v_inhornyjail) return;
 
     const parts = message.content.trim().split(/\s+/);
-    const id = parts[2];
+    const id = parts[2]?.trim(); // peut récupérer le membre soit sous la forme 123456 ou bien <@123456> si utilisation de @
     if (!id) return;
 
-    const member = await message.guild.members.fetch(id).catch(() => null);
+    const reel_id = id.startsWith("<@") && id.endsWith(">") ? id.slice(2, -1) : id;
+
+    const member = await message.guild.members.fetch(reel_id.replace("!", "")).catch(() => null);
     if (!member) {
       //await message.reply("Membre introuvable.");
       return;

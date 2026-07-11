@@ -440,6 +440,7 @@ Write these commands like this:
 \`!basi hornyjail <id>\` : allows you to put the member with id \`<id>\` into horny jail (adapt \`<id>\` to the member)
 \`!basi bellyjail <id>\` : allows you to put the member with id \`<id>\` into belly jail (adapt \`<id>\` to the member)
 \`!basi basijail <id>\` : allows you to put the member with id \`<id>\` into basi jail (adapt \`<id>\` to the member)
+\`!basi bonk <id>\` : allows you to bonk the member with id \`<id>\` (adapt \`<id>\` to the member)
   `,
 
   helpReactionRoles: `

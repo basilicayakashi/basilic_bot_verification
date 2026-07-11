@@ -441,6 +441,7 @@ Schreibe diese Befehle so:
 \`!basi hornyjail <id>\` : ermöglicht es, das Mitglied mit der ID \`<id>\` ins horny jail zu stecken (\`<id>\` anpassen)
 \`!basi bellyjail <id>\` : ermöglicht es, das Mitglied mit der ID \`<id>\` ins belly jail zu stecken (\`<id>\` anpassen)
 \`!basi basijail <id>\` : ermöglicht es, das Mitglied mit der ID \`<id>\` ins basi jail zu stecken (\`<id>\` anpassen)
+\`!basi bonk <id>\` : ermöglicht es, das Mitglied mit der ID \`<id>\` zu bonken (\`<id>\` anpassen)
   `,
 
   helpReactionRoles: `

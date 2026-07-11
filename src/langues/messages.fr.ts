@@ -557,6 +557,7 @@ La plupart des commandes de configuration nécessitent les permissions **Adminis
 \`!basi hornyjail <id>\` : permet de mettre dans la horny jail le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
 \`!basi bellyjail <id>\` : permet de mettre dans le belly jail le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
 \`!basi basijail <id>\` : permet de mettre dans le basi jail le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
+\`!basi bonk <id>\` : permet de bonk le membre ayant pour id \`<id>\` (à adapter selon le membre concerné)
   `,
 
   commandMustBeUsedInServer: "Cette commande doit être utilisée dans un serveur",

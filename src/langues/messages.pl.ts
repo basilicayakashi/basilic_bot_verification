@@ -440,6 +440,7 @@ Wpisz te komendy w taki sposób:
 \`!basi hornyjail <id>\` : pozwala wtrzymać do horny jail członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
 \`!basi bellyjail <id>\` : pozwala wtrzymać do belly jail członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
 \`!basi basijail <id>\` : pozwala wtrzymać do basi jail członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
+\`!basi bonk <id>\` : pozwala bonkować członka o id \`<id>\` (dostosuj \`<id>\` do osoby)
   `,
 
   helpReactionRoles: `

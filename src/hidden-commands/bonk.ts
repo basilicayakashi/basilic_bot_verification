@@ -31,7 +31,8 @@ export async function register_bonk(message: Message) {
 
   const outBuffer = await renderBonkOnAvatar(avatarBuffer);
 
-  const v_message_afficher = `${member} got bonked! 🔨`;
+  //const v_message_afficher = `${member} got bonked! 🔨`;
+const v_message_afficher = `${member} got bonked!`;
 
   await (message.channel as any).send({
     content: v_message_afficher,

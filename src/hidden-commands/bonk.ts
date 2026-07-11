@@ -44,11 +44,25 @@ async function renderBonkOnAvatar(avatarBuffer: Buffer) {
   const base = await img.toBuffer();
 
   const bonkSvg = `
-  <svg width="512" height="512">
-    <text x="50%" y="18%" font-size="150" text-anchor="middle" dominant-baseline="middle">🔨</text>
-    <text x="78%" y="55%" font-size="70" text-anchor="middle" dominant-baseline="middle"
-      font-family="Impact, sans-serif" fill="#ffcc00" stroke="#111" stroke-width="3"
-      transform="rotate(-12 400 280)">BONK!</text>
+  <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <!-- Manche de la batte -->
+    <g transform="rotate(-35 380 130)">
+      <rect x="330" y="40" width="26" height="180" rx="10" fill="#8B5A2B" stroke="#4a2f14" stroke-width="4"/>
+      <!-- Tête de la batte -->
+      <ellipse cx="343" cy="30" rx="34" ry="26" fill="#a9702f" stroke="#4a2f14" stroke-width="4"/>
+    </g>
+
+    <!-- Lignes d'impact -->
+    <g stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.9">
+      <line x1="300" y1="150" x2="340" y2="120"/>
+      <line x1="310" y1="180" x2="355" y2="165"/>
+      <line x1="295" y1="210" x2="335" y2="205"/>
+    </g>
+
+    <!-- Texte BONK -->
+    <text x="60%" y="80%" font-size="60" text-anchor="middle" dominant-baseline="middle"
+      font-family="sans-serif" font-weight="bold" fill="#ffcc00" stroke="#111" stroke-width="3"
+      transform="rotate(-10 320 400)">BONK!</text>
   </svg>`;
 
   const composited = await sharp(base)

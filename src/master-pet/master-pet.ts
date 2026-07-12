@@ -343,6 +343,7 @@ async function executeRemoveSymbol(interaction: ChatInputCommandInteraction) {
   return interaction.reply({ content: msgServer.masterPet.symbolRemoved, ephemeral: true });
 }
 
+/*
 const masterSymbolSet = {
   data: new SlashCommandBuilder()
     .setName('master-symbol-set')
@@ -366,7 +367,9 @@ const masterSymbolSet = {
     ),
   execute: executeSetSymbol,
 };
+*/
 
+/*
 const masterSymbolRemove = {
   data: new SlashCommandBuilder()
     .setName('master-symbol-remove')
@@ -379,6 +382,7 @@ const masterSymbolRemove = {
     }),
   execute: executeRemoveSymbol,
 };
+*/
 
 // ============================================================
 // DÉFINITIONS DES COMMANDES (data + execute)
@@ -386,15 +390,26 @@ const masterSymbolRemove = {
 
 const declareMaster = {
   data: new SlashCommandBuilder()
-    .setName('declare-master')
+    .setName("declare-master")
     .setDescription("Declare yourself as a master on this server")
     .setDescriptionLocalizations({
       [Locale.French]: "Se déclarer comme master sur ce serveur",
       [Locale.SpanishES]: "Declararte como maestro en este servidor",
       [Locale.German]: "Melde dich auf diesem Server als Master an",
       [Locale.Polish]: "Zgłoś się jako master na tym serwerze",
-    }),
-  execute: (i: ChatInputCommandInteraction) => executeDeclare(i, 'master'),
+    })
+    .addStringOption(opt =>
+      opt.setName('symbole')
+        .setDescription("A Unicode emoji or a server emoji")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Un emoji unicode ou un emoji du serveur",
+          [Locale.SpanishES]: "Un emoji Unicode o un emoji del servidor",
+          [Locale.German]: "Ein Unicode-Emoji oder ein Server-Emoji",
+          [Locale.Polish]: "Emoji Unicode albo emoji z serwera",
+        })
+        .setRequired(true)
+    ),
+  execute: executeDeclareMaster,
 };
 
 const declarePet = {
@@ -511,6 +526,18 @@ const unlink = {
   execute: executeUnlink,
 };
 
+const masterSymbolChange = {
+  data: new SlashCommandBuilder()
+    .setName("master-symbol-change")
+    .setDescription('Change votre symbole actuel pour un nouveau (doit rester unique sur ce serveur)')
+    .addStringOption(opt =>
+      opt.setName('symbole')
+        .setDescription('Le nouveau symbole (emoji unicode ou emoji du serveur)')
+        .setRequired(true)
+    ),
+  execute: executeChangeSymbol,
+};
+
 export const masterPetCommands = [
   declareMaster,
   declarePet,
@@ -521,8 +548,9 @@ export const masterPetCommands = [
   unlink,
   masterPetProfile,
   masterPetSetReference,
-  masterSymbolSet,
-  masterSymbolRemove,
+  //masterSymbolSet,
+  //masterSymbolRemove,
+  masterSymbolChange,
 ];
 
 // ============================================================
@@ -591,4 +619,61 @@ export async function handleMasterPetAutocomplete(interaction: AutocompleteInter
   }
 
   await interaction.respond(choices.slice(0, 25));
+}
+
+async function executeDeclareMaster(interaction: ChatInputCommandInteraction) {
+  const guildId = interaction.guildId!;
+  const userId = interaction.user.id;
+  const symbol = interaction.options.getString('symbole', true).trim();
+  const msgServer = isUsedOnAServer(interaction)
+    ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
+    : getMessagesServer("en");
+
+  const already = await firstValueFrom(hasDeclaredMasterPetRole(guildId, userId, 'master'));
+  if (already) {
+    return interaction.reply({ content: msgServer.masterPet.alreadyDeclared('master'), ephemeral: true });
+  }
+
+  if (!EMOJI_REGEX.test(symbol)) {
+    return interaction.reply({ content: msgServer.masterPet.invalidSymbol, ephemeral: true });
+  }
+
+  const taken = await firstValueFrom(isMasterSymbolTaken(guildId, symbol, userId));
+  if (taken) {
+    return interaction.reply({ content: msgServer.masterPet.symbolAlreadyTaken, ephemeral: true });
+  }
+
+  await firstValueFrom(declareMasterPetRole(guildId, userId, 'master'));
+  await firstValueFrom(claimMasterSymbol(guildId, userId, symbol));
+  await refreshMasterSymbolsMessage(interaction.client, guildId);
+
+  return interaction.reply({ content: msgServer.masterPet.masterDeclaredWithSymbol(symbol), ephemeral: true });
+}
+
+async function executeChangeSymbol(interaction: ChatInputCommandInteraction) {
+  const guildId = interaction.guildId!;
+  const userId = interaction.user.id;
+  const newSymbol = interaction.options.getString('symbole', true).trim();
+  const msgServer = isUsedOnAServer(interaction)
+    ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
+    : getMessagesServer("en");
+
+  const isMaster = await firstValueFrom(hasDeclaredMasterPetRole(guildId, userId, 'master'));
+  if (!isMaster) {
+    return interaction.reply({ content: msgServer.masterPet.mustDeclareMasterFirst, ephemeral: true });
+  }
+
+  if (!EMOJI_REGEX.test(newSymbol)) {
+    return interaction.reply({ content: msgServer.masterPet.invalidSymbol, ephemeral: true });
+  }
+
+  const taken = await firstValueFrom(isMasterSymbolTaken(guildId, newSymbol, userId));
+  if (taken) {
+    return interaction.reply({ content: msgServer.masterPet.symbolAlreadyTaken, ephemeral: true });
+  }
+
+  await firstValueFrom(claimMasterSymbol(guildId, userId, newSymbol));
+  await refreshMasterSymbolsMessage(interaction.client, guildId);
+
+  return interaction.reply({ content: msgServer.masterPet.symbolChanged(newSymbol), ephemeral: true });
 }

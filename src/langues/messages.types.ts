@@ -324,6 +324,8 @@ export type MessagesServer = {
         masterSymbolsTableTitle: string;
         symbolColumnHeader: string;
         masterColumnHeader: string;
+        masterDeclaredWithSymbol: (symbol: string) => string;
+        symbolChanged: (symbol: string) => string;
     }
 };
 

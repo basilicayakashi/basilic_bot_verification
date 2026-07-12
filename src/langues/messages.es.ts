@@ -947,6 +947,8 @@ const es_server: MessagesServer = {
     masterSymbolsTableTitle: '📋 Símbolos de maestro',
     symbolColumnHeader: 'Símbolo',
     masterColumnHeader: 'Maestro',
+    masterDeclaredWithSymbol: (symbol) => `Ahora estás declarado como **maestro**, con el símbolo ${symbol}.`,
+    symbolChanged: (symbol) => `Tu símbolo se ha actualizado: ${symbol}.`,
 
   }
 };

@@ -311,6 +311,15 @@ export type MessagesServer = {
         noRoleDeclared: string;
         noneLabel: string;
         profileSummary: (userId: string, roles: string, masters: string, pets: string) => string;
+
+        invalidSymbol: string;
+        symbolAlreadyTaken: string;
+        symbolClaimed: (symbol: string) => string;
+        symbolRemoved: string;
+        invalidChannel: string;
+        referenceMessageNotFound: string;
+        referenceMessageSet: string;
+        noSymbolsClaimed: string;
     }
 };
 

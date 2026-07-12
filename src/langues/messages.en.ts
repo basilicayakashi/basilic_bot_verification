@@ -964,10 +964,20 @@ const en_server: MessagesServer = {
     rolePet: 'Pet',
     noRoleDeclared: 'No role declared',
     noneLabel: 'None',
-    profileSummary: (userId, roles, masters, pets) =>  `**Profile of <@${userId}>**
+    profileSummary: (userId, roles, masters, pets) => `**Profile of <@${userId}>**
     Declared role(s): ${roles}
     Master(s): ${masters}
     Pet(s): ${pets}`,
+
+    invalidSymbol: 'This symbol is not valid. Use a Unicode emoji or a server emoji.',
+    symbolAlreadyTaken: 'This symbol has already been claimed by another master.',
+    symbolClaimed: (symbol) => `You claimed the symbol ${symbol}.`,
+    symbolRemoved: 'Your symbol has been released.',
+    invalidChannel: 'This channel does not support message reading.',
+    referenceMessageNotFound: 'Message not found in this channel.',
+    referenceMessageSet: 'The reference message has been set successfully.',
+    noSymbolsClaimed: 'No symbols have been claimed yet.',
+
   }
 };
 

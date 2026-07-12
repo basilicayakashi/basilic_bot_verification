@@ -938,6 +938,15 @@ const pl_server: MessagesServer = {
     Master(y): ${masters}
     Pet(y): ${pets}`,
 
+    invalidSymbol: 'Ten symbol nie jest prawidłowy. Użyj emoji Unicode lub emoji z serwera.',
+    symbolAlreadyTaken: 'Ten symbol został już odebrany przez innego mastera.',
+    symbolClaimed: (symbol) => `Odebrałeś/-aś symbol ${symbol}.`,
+    symbolRemoved: 'Twój symbol został zwolniony.',
+    invalidChannel: 'Ten kanał nie obsługuje odczytu wiadomości.',
+    referenceMessageNotFound: 'Nie znaleziono wiadomości w tym kanale.',
+    referenceMessageSet: 'Wiadomość referencyjna została ustawiona pomyślnie.',
+    noSymbolsClaimed: 'Brak symboli odebranych na ten moment.',
+
   }
 };
 

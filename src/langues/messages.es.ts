@@ -936,6 +936,15 @@ const es_server: MessagesServer = {
     Maestro(s): ${masters}
     Mascota(s): ${pets}`,
 
+    invalidSymbol: 'Este símbolo no es válido. Usa un emoji Unicode o un emoji del servidor.',
+    symbolAlreadyTaken: 'Este símbolo ya lo ha reclamado otro maestro.',
+    symbolClaimed: (symbol) => `Has reclamado el símbolo ${symbol}.`,
+    symbolRemoved: 'Tu símbolo ha sido liberado.',
+    invalidChannel: 'Este canal no admite la lectura de mensajes.',
+    referenceMessageNotFound: 'No se encontró el mensaje en este canal.',
+    referenceMessageSet: 'El mensaje de referencia se ha configurado correctamente.',
+    noSymbolsClaimed: 'Todavía no se ha reclamado ningún símbolo.',
+
   }
 };
 

@@ -937,6 +937,15 @@ const de_server: MessagesServer = {
     Master(s): ${masters}
     Pet(s): ${pets}`,
 
+    invalidSymbol: 'Dieses Symbol ist nicht gültig. Verwende einen Unicode-Emoji oder einen Server-Emoji.',
+    symbolAlreadyTaken: 'Dieses Symbol wurde bereits von einem anderen Master beansprucht.',
+    symbolClaimed: (symbol) => `Du hast das Symbol ${symbol} beansprucht.`,
+    symbolRemoved: 'Dein Symbol wurde freigegeben.',
+    invalidChannel: 'Dieser Kanal unterstützt das Lesen von Nachrichten nicht.',
+    referenceMessageNotFound: 'Nachricht in diesem Kanal nicht gefunden.',
+    referenceMessageSet: 'Die Referenznachricht wurde erfolgreich festgelegt.',
+    noSymbolsClaimed: 'Noch keine Symbole beansprucht.',
+
   }
 };
 

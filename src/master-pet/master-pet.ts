@@ -10,6 +10,8 @@ import {
   BaseInteraction,
   CacheType,
   Locale,
+  Client,
+  PermissionFlagsBits,
 } from 'discord.js';
 import { firstValueFrom } from 'rxjs';
 
@@ -31,10 +33,18 @@ import {
   getMastersOfUser,
   getPetsOfUser,
   listAllDeclaredMasterPetUsers,
+  setMasterPetReferenceMessage,
+  getMasterPetReferenceMessage,
+  isMasterSymbolTaken,
+  claimMasterSymbol,
+  releaseMasterSymbol,
+  getMasterSymbolsForGuild,
 } from '../database/sql.js';
 
 import { getMessagesServer } from "../langues/index.js";
 
+// Accepte un emoji unicode simple OU un emoji personnalisé du serveur (<:nom:id> ou <a:nom:id>)
+const EMOJI_REGEX = /^(\p{Extended_Pictographic}\uFE0F?|<a?:\w{2,32}:\d{17,20}>)$/u;
 
 // ============================================================
 // COMMANDES SLASH
@@ -70,6 +80,12 @@ async function executeUndeclare(interaction: ChatInputCommandInteraction, role: 
     : getMessagesServer("en");
 
   await firstValueFrom(undeclareMasterPetRole(guildId, userId, role));
+
+  if (role === 'master') {
+    await firstValueFrom(releaseMasterSymbol(guildId, userId));
+    await refreshMasterSymbolsMessage(interaction.client, guildId);
+  }
+
   return interaction.reply({ content: msgServer.masterPet.undeclaredSuccess(role), ephemeral: true });
 }
 
@@ -213,7 +229,153 @@ const masterPetProfile = {
   execute: executeProfile,
 };
 
+export async function refreshMasterSymbolsMessage(client: Client, guildId: string) {
+  const settings = await firstValueFrom(getMasterPetReferenceMessage(guildId));
+  if (!settings) return;
 
+  const symbols = await firstValueFrom(getMasterSymbolsForGuild(guildId));
+
+  const channel = await client.channels.fetch(settings.referenceChannelId).catch(() => null);
+  if (!channel || !channel.isTextBased()) return;
+
+  const message = await channel.messages.fetch(settings.referenceMessageId).catch(() => null);
+  if (!message) return;
+
+  const guild = await client.guilds.fetch(guildId).catch(() => null);
+  const msgServer = getMessagesServer(guild?.preferredLocale ?? "en");
+
+  const content = symbols.length > 0
+    ? symbols.map(s => `${s.symbol} <@${s.userId}>`).join('\n')
+    : msgServer.masterPet.noSymbolsClaimed;
+
+  await message.edit({ content }).catch(() => null);
+}
+
+async function executeSetReferenceMessage(interaction: ChatInputCommandInteraction) {
+  const guildId = interaction.guildId!;
+  const messageId = interaction.options.getString('message_id', true).trim();
+  const msgServer = isUsedOnAServer(interaction)
+    ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
+    : getMessagesServer("en");
+
+  const channel = interaction.channel;
+  if (!channel || !channel.isTextBased()) {
+    return interaction.reply({ content: msgServer.masterPet.invalidChannel, ephemeral: true });
+  }
+
+  const message = await channel.messages.fetch(messageId).catch(() => null);
+  if (!message) {
+    return interaction.reply({ content: msgServer.masterPet.referenceMessageNotFound, ephemeral: true });
+  }
+
+  await firstValueFrom(setMasterPetReferenceMessage(guildId, channel.id, messageId));
+  await refreshMasterSymbolsMessage(interaction.client, guildId);
+
+  return interaction.reply({ content: msgServer.masterPet.referenceMessageSet, ephemeral: true });
+}
+
+const masterPetSetReference = {
+  data: new SlashCommandBuilder()
+    .setName('master-pet-set-reference')
+    .setDescription("Update the message with the masters list and their symbols")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Définit le message à tenir à jour avec la liste des masters et leurs symboles",
+      [Locale.SpanishES]: "Actualiza el mensaje con la lista de maestros y sus símbolos",
+      [Locale.German]: "Aktualisiere die Nachricht mit der Liste der Master und ihren Symbolen",
+      [Locale.Polish]: "Aktualizuj wiadomość listą masterów i ich symbolami",
+    })
+    .addStringOption(opt =>
+      opt.setName('message_id')
+        .setDescription("ID du message (dans ce salon)")
+        .setDescriptionLocalizations({
+          [Locale.French]: "ID du message (doit être dans ce salon)",
+          [Locale.SpanishES]: "ID del mensaje (debe estar en este canal)",
+          [Locale.German]: "Nachrichten-ID (muss in diesem Kanal sein)",
+          [Locale.Polish]: "ID wiadomości (musi znajdować się w tym kanale)",
+        })
+        .setRequired(true)
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  execute: executeSetReferenceMessage,
+};
+
+async function executeSetSymbol(interaction: ChatInputCommandInteraction) {
+  const guildId = interaction.guildId!;
+  const userId = interaction.user.id;
+  const symbol = interaction.options.getString('symbole', true).trim();
+  const msgServer = isUsedOnAServer(interaction)
+    ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
+    : getMessagesServer("en");
+
+  const isMaster = await firstValueFrom(hasDeclaredMasterPetRole(guildId, userId, 'master'));
+  if (!isMaster) {
+    return interaction.reply({ content: msgServer.masterPet.mustDeclareMasterFirst, ephemeral: true });
+  }
+
+  if (!EMOJI_REGEX.test(symbol)) {
+    return interaction.reply({ content: msgServer.masterPet.invalidSymbol, ephemeral: true });
+  }
+
+  const taken = await firstValueFrom(isMasterSymbolTaken(guildId, symbol, userId));
+  if (taken) {
+    return interaction.reply({ content: msgServer.masterPet.symbolAlreadyTaken, ephemeral: true });
+  }
+
+  await firstValueFrom(claimMasterSymbol(guildId, userId, symbol));
+  await refreshMasterSymbolsMessage(interaction.client, guildId);
+
+  return interaction.reply({ content: msgServer.masterPet.symbolClaimed(symbol), ephemeral: true });
+}
+
+async function executeRemoveSymbol(interaction: ChatInputCommandInteraction) {
+  const guildId = interaction.guildId!;
+  const userId = interaction.user.id;
+  const msgServer = isUsedOnAServer(interaction)
+    ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
+    : getMessagesServer("en");
+
+  await firstValueFrom(releaseMasterSymbol(guildId, userId));
+  await refreshMasterSymbolsMessage(interaction.client, guildId);
+
+  return interaction.reply({ content: msgServer.masterPet.symbolRemoved, ephemeral: true });
+}
+
+const masterSymbolSet = {
+  data: new SlashCommandBuilder()
+    .setName('master-symbol-set')
+    .setDescription("Claim a unique symbol to represent yourself as a master")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Réclame un symbole unique pour vous représenter en tant que master",
+      [Locale.SpanishES]: "Reclama un símbolo único para representarte como maestro",
+      [Locale.German]: "Beanspruche ein einzigartiges Symbol, um dich als Master zu repräsentieren",
+      [Locale.Polish]: "Zgłoś unikalny symbol, aby reprezentować siebie jako master",
+    })
+    .addStringOption(opt =>
+      opt.setName('symbole')
+        .setDescription("A Unicode emoji or a server emoji")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Un emoji unicode ou un emoji du serveur",
+          [Locale.SpanishES]: "Un emoji Unicode o un emoji del servidor",
+          [Locale.German]: "Ein Unicode-Emoji oder ein Server-Emoji",
+          [Locale.Polish]: "Emoji Unicode albo emoji z serwera",
+        })
+        .setRequired(true)
+    ),
+  execute: executeSetSymbol,
+};
+
+const masterSymbolRemove = {
+  data: new SlashCommandBuilder()
+    .setName('master-symbol-remove')
+    .setDescription("Remove your master symbol")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Libère votre symbole master",
+      [Locale.SpanishES]: "Eliminar tu símbolo de maestro",
+      [Locale.German]: "Entferne dein Master-Symbol",
+      [Locale.Polish]: "Usuń swój symbol mastera",
+    }),
+  execute: executeRemoveSymbol,
+};
 
 // ============================================================
 // DÉFINITIONS DES COMMANDES (data + execute)
@@ -355,6 +517,9 @@ export const masterPetCommands = [
   //requestMaster,
   unlink,
   masterPetProfile,
+  masterPetSetReference,
+  masterSymbolSet,
+  masterSymbolRemove,
 ];
 
 // ============================================================

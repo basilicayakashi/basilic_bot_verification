@@ -272,6 +272,21 @@ export function initDb(): Observable<void> {
       UNIQUE (guild_id, requester_id, target_id, request_type)
     )`,
 
+    // Paramétrage master / pet
+    `CREATE TABLE IF NOT EXISTS master_pet_settings (
+      guild_id TEXT PRIMARY KEY,
+      reference_channel_id TEXT NOT NULL,
+      reference_message_id TEXT NOT NULL
+    )`,
+
+    // symbole par master
+    `CREATE TABLE IF NOT EXISTS master_symbols (
+      guild_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      symbol TEXT NOT NULL,
+      PRIMARY KEY (guild_id, user_id),
+      UNIQUE (guild_id, symbol)
+    )`,
 
   ];
 
@@ -1086,7 +1101,8 @@ export function purgeMasterPetRoleUser(guildId: string, userId: string): Observa
   return execute(
     `DELETE FROM master_pet_declarations WHERE guild_id = $1 AND user_id = $2;
      DELETE FROM master_pet_links WHERE guild_id = $1 AND (master_id = $2 OR pet_id = $2);
-     DELETE FROM master_pet_requests WHERE guild_id = $1 AND (requester_id = $2 OR target_id = $2);`,
+     DELETE FROM master_pet_requests WHERE guild_id = $1 AND (requester_id = $2 OR target_id = $2);
+     DELETE FROM master_symbols WHERE guild_id = $1 AND user_id = $2;`,
     [guildId, userId]
   );
 }
@@ -1123,7 +1139,60 @@ export function getPetsOfUser(guildId: string, masterId: string): Observable<str
   return query<{ pet_id: string }>(
     `SELECT pet_id FROM master_pet_links WHERE guild_id = $1 AND master_id = $2`,
     [guildId, masterId]
-  ).pipe(map(rows => rows.map(r => r.pet_id))); 
+  ).pipe(map(rows => rows.map(r => r.pet_id)));
+}
+
+// sql.ts
+
+export function setMasterPetReferenceMessage(
+  guildId: string, channelId: string, messageId: string
+): Observable<void> {
+  return execute(
+    `INSERT INTO master_pet_settings(guild_id, reference_channel_id, reference_message_id)
+     VALUES($1, $2, $3)
+     ON CONFLICT(guild_id) DO UPDATE SET reference_channel_id = $2, reference_message_id = $3`,
+    [guildId, channelId, messageId]
+  );
+}
+
+export function getMasterPetReferenceMessage(
+  guildId: string
+): Observable<{ referenceChannelId: string; referenceMessageId: string } | null> {
+  return queryOne(
+    `SELECT reference_channel_id AS "referenceChannelId", reference_message_id AS "referenceMessageId"
+     FROM master_pet_settings WHERE guild_id = $1`,
+    [guildId]
+  );
+}
+
+export function isMasterSymbolTaken(guildId: string, symbol: string, excludeUserId: string): Observable<boolean> {
+  return queryOne(
+    `SELECT 1 FROM master_symbols WHERE guild_id = $1 AND symbol = $2 AND user_id != $3`,
+    [guildId, symbol, excludeUserId]
+  ).pipe(map(row => !!row));
+}
+
+export function claimMasterSymbol(guildId: string, userId: string, symbol: string): Observable<void> {
+  return execute(
+    `INSERT INTO master_symbols(guild_id, user_id, symbol)
+     VALUES($1, $2, $3)
+     ON CONFLICT(guild_id, user_id) DO UPDATE SET symbol = $3, claimed_at = NOW()`,
+    [guildId, userId, symbol]
+  );
+}
+
+export function releaseMasterSymbol(guildId: string, userId: string): Observable<void> {
+  return execute(
+    `DELETE FROM master_symbols WHERE guild_id = $1 AND user_id = $2`,
+    [guildId, userId]
+  );
+}
+
+export function getMasterSymbolsForGuild(guildId: string): Observable<{ userId: string; symbol: string }[]> {
+  return query<{ user_id: string; symbol: string }>(
+    `SELECT user_id, symbol FROM master_symbols WHERE guild_id = $1 ORDER BY claimed_at ASC`,
+    [guildId]
+  ).pipe(map(rows => rows.map(r => ({ userId: r.user_id, symbol: r.symbol }))));
 }
 
 // ---------------------------------------------------------------------------

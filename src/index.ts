@@ -106,6 +106,7 @@ import {
   isMasterPetButton,
   handleMasterPetButton,
   handleMasterPetAutocomplete,
+  refreshMasterSymbolsMessage,
 } from './master-pet/master-pet.js';
 
 import {
@@ -3382,6 +3383,8 @@ client.on(Events.GuildMemberRemove, async (member) => {
     ));
 
     await dbValue(purgeMasterPetRoleUser(member.guild.id, member.id));
+
+    await refreshMasterSymbolsMessage(client, member.guild.id);
 
   } catch (error) {
     console.error(

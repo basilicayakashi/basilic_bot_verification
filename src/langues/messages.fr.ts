@@ -972,6 +972,15 @@ const fr_server: MessagesServer = {
     Rôle(s) déclaré(s) : ${roles}
     Master(s) : ${masters}
     Pet(s) : ${pets}`,
+
+    invalidSymbol: 'Ce symbole n\'est pas valide. Utilise un emoji unicode ou un emoji du serveur.',
+    symbolAlreadyTaken: 'Ce symbole est déjà réclamé par un autre master.',
+    symbolClaimed: (symbol) => `Tu as réclamé le symbole ${symbol}.`,
+    symbolRemoved: 'Ton symbole a été libéré.',
+    invalidChannel: 'Ce salon ne supporte pas la lecture de messages.',
+    referenceMessageNotFound: 'Message introuvable dans ce salon.',
+    referenceMessageSet: 'Le message de référence a été configuré avec succès.',
+    noSymbolsClaimed: 'Aucun symbole réclamé pour le moment.',
   }
 };
 

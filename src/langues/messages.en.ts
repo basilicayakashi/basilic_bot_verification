@@ -977,7 +977,9 @@ const en_server: MessagesServer = {
     referenceMessageNotFound: 'Message not found in this channel.',
     referenceMessageSet: 'The reference message has been set successfully.',
     noSymbolsClaimed: 'No symbols have been claimed yet.',
-
+    masterSymbolsTableTitle: '📋 Master symbols',
+    symbolColumnHeader: 'Symbol',
+    masterColumnHeader: 'Master',
   }
 };
 

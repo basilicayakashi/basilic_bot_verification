@@ -320,6 +320,10 @@ export type MessagesServer = {
         referenceMessageNotFound: string;
         referenceMessageSet: string;
         noSymbolsClaimed: string;
+
+        masterSymbolsTableTitle: string;
+        symbolColumnHeader: string;
+        masterColumnHeader: string;
     }
 };
 

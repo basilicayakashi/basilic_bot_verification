@@ -944,6 +944,9 @@ const es_server: MessagesServer = {
     referenceMessageNotFound: 'No se encontró el mensaje en este canal.',
     referenceMessageSet: 'El mensaje de referencia se ha configurado correctamente.',
     noSymbolsClaimed: 'Todavía no se ha reclamado ningún símbolo.',
+    masterSymbolsTableTitle: '📋 Símbolos de maestro',
+    symbolColumnHeader: 'Símbolo',
+    masterColumnHeader: 'Maestro',
 
   }
 };

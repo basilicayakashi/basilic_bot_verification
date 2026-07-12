@@ -946,6 +946,9 @@ const pl_server: MessagesServer = {
     referenceMessageNotFound: 'Nie znaleziono wiadomości w tym kanale.',
     referenceMessageSet: 'Wiadomość referencyjna została ustawiona pomyślnie.',
     noSymbolsClaimed: 'Brak symboli odebranych na ten moment.',
+    masterSymbolsTableTitle: '📋 Symbole masterów',
+    symbolColumnHeader: 'Symbol',
+    masterColumnHeader: 'Master',
 
   }
 };

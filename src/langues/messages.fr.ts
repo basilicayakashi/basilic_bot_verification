@@ -981,6 +981,10 @@ const fr_server: MessagesServer = {
     referenceMessageNotFound: 'Message introuvable dans ce salon.',
     referenceMessageSet: 'Le message de référence a été configuré avec succès.',
     noSymbolsClaimed: 'Aucun symbole réclamé pour le moment.',
+
+    masterSymbolsTableTitle: '📋 Symboles des masters',
+    symbolColumnHeader: 'Symbole',
+    masterColumnHeader: 'Master',
   }
 };
 

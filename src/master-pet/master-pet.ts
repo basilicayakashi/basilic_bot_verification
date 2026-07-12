@@ -12,6 +12,7 @@ import {
   Locale,
   Client,
   PermissionFlagsBits,
+  EmbedBuilder,
 } from 'discord.js';
 import { firstValueFrom } from 'rxjs';
 
@@ -244,11 +245,28 @@ export async function refreshMasterSymbolsMessage(client: Client, guildId: strin
   const guild = await client.guilds.fetch(guildId).catch(() => null);
   const msgServer = getMessagesServer(guild?.preferredLocale ?? "en");
 
-  const content = symbols.length > 0
-    ? symbols.map(s => `${s.symbol} <@${s.userId}>`).join('\n')
-    : msgServer.masterPet.noSymbolsClaimed;
+  const embed = new EmbedBuilder()
+    .setTitle(msgServer.masterPet.masterSymbolsTableTitle)
+    .setColor(0xFFCC00);
 
-  await message.edit({ content }).catch(() => null);
+  if (symbols.length === 0) {
+    embed.setDescription(msgServer.masterPet.noSymbolsClaimed);
+  } else {
+    embed.addFields(
+      {
+        name: msgServer.masterPet.symbolColumnHeader,
+        value: symbols.map(s => s.symbol).join('\n'),
+        inline: true,
+      },
+      {
+        name: msgServer.masterPet.masterColumnHeader,
+        value: symbols.map(s => `<@${s.userId}>`).join('\n'),
+        inline: true,
+      }
+    );
+  }
+
+  await message.edit({ content: null, embeds: [embed] }).catch(() => null);
 }
 
 async function executeSetReferenceMessage(interaction: ChatInputCommandInteraction) {

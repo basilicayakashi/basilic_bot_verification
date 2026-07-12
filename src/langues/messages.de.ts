@@ -945,6 +945,9 @@ const de_server: MessagesServer = {
     referenceMessageNotFound: 'Nachricht in diesem Kanal nicht gefunden.',
     referenceMessageSet: 'Die Referenznachricht wurde erfolgreich festgelegt.',
     noSymbolsClaimed: 'Noch keine Symbole beansprucht.',
+    masterSymbolsTableTitle: '📋 Master-Symbole',
+    symbolColumnHeader: 'Symbol',
+    masterColumnHeader: 'Master',
 
   }
 };

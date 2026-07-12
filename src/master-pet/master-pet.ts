@@ -271,22 +271,18 @@ export async function refreshMasterSymbolsMessage(client: Client, guildId: strin
 
 async function executeSetReferenceMessage(interaction: ChatInputCommandInteraction) {
   const guildId = interaction.guildId!;
-  const messageId = interaction.options.getString('message_id', true).trim();
   const msgServer = isUsedOnAServer(interaction)
     ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
     : getMessagesServer("en");
 
   const channel = interaction.channel;
-  if (!channel || !channel.isTextBased()) {
+  if (!channel || !channel.isTextBased() || channel.isDMBased()) {   // ✅ ajout de isDMBased()
     return interaction.reply({ content: msgServer.masterPet.invalidChannel, ephemeral: true });
   }
 
-  const message = await channel.messages.fetch(messageId).catch(() => null);
-  if (!message) {
-    return interaction.reply({ content: msgServer.masterPet.referenceMessageNotFound, ephemeral: true });
-  }
+  const placeholderMessage = await channel.send({ content: msgServer.masterPet.noSymbolsClaimed });
 
-  await firstValueFrom(setMasterPetReferenceMessage(guildId, channel.id, messageId));
+  await firstValueFrom(setMasterPetReferenceMessage(guildId, channel.id, placeholderMessage.id));
   await refreshMasterSymbolsMessage(interaction.client, guildId);
 
   return interaction.reply({ content: msgServer.masterPet.referenceMessageSet, ephemeral: true });
@@ -302,17 +298,6 @@ const masterPetSetReference = {
       [Locale.German]: "Aktualisiere die Nachricht mit der Liste der Master und ihren Symbolen",
       [Locale.Polish]: "Aktualizuj wiadomość listą masterów i ich symbolami",
     })
-    .addStringOption(opt =>
-      opt.setName('message_id')
-        .setDescription("ID du message (dans ce salon)")
-        .setDescriptionLocalizations({
-          [Locale.French]: "ID du message (doit être dans ce salon)",
-          [Locale.SpanishES]: "ID del mensaje (debe estar en este canal)",
-          [Locale.German]: "Nachrichten-ID (muss in diesem Kanal sein)",
-          [Locale.Polish]: "ID wiadomości (musi znajdować się w tym kanale)",
-        })
-        .setRequired(true)
-    )
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   execute: executeSetReferenceMessage,
 };

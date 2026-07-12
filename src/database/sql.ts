@@ -1176,7 +1176,7 @@ export function claimMasterSymbol(guildId: string, userId: string, symbol: strin
   return execute(
     `INSERT INTO master_symbols(guild_id, user_id, symbol)
      VALUES($1, $2, $3)
-     ON CONFLICT(guild_id, user_id) DO UPDATE SET symbol = $3, claimed_at = NOW()`,
+     ON CONFLICT(guild_id, user_id) DO UPDATE SET symbol = $3`,
     [guildId, userId, symbol]
   );
 }
@@ -1190,7 +1190,7 @@ export function releaseMasterSymbol(guildId: string, userId: string): Observable
 
 export function getMasterSymbolsForGuild(guildId: string): Observable<{ userId: string; symbol: string }[]> {
   return query<{ user_id: string; symbol: string }>(
-    `SELECT user_id, symbol FROM master_symbols WHERE guild_id = $1 ORDER BY claimed_at ASC`,
+    `SELECT user_id, symbol FROM master_symbols WHERE guild_id = $1`,
     [guildId]
   ).pipe(map(rows => rows.map(r => ({ userId: r.user_id, symbol: r.symbol }))));
 }

@@ -247,9 +247,15 @@ export function initDb(): Observable<void> {
       guild_id TEXT NOT NULL,
       user_id TEXT NOT NULL,
       role_type TEXT NOT NULL CHECK (role_type IN ('master', 'pet')),
+      symbol TEXT,
       declared_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       PRIMARY KEY (guild_id, user_id, role_type)
     )`,
+
+    // Contrainte d'unicité du symbole, uniquement parmi les masters (index partiel)
+    `CREATE UNIQUE INDEX IF NOT EXISTS master_declarations_symbol_unique
+    ON master_pet_declarations (guild_id, symbol)
+    WHERE role_type = 'master' AND symbol IS NOT NULL`,
 
     // Liens confirmés master -> pet
     `CREATE TABLE IF NOT EXISTS master_pet_links (
@@ -278,17 +284,6 @@ export function initDb(): Observable<void> {
       reference_channel_id TEXT NOT NULL,
       reference_message_id TEXT NOT NULL
     )`,
-
-    // Dans le tableau `statements` de initDb(), juste après la création de master_pet_declarations
-    `ALTER TABLE master_pet_declarations ADD COLUMN IF NOT EXISTS symbol TEXT`,
-
-    // Contrainte d'unicité du symbole, uniquement parmi les masters (index partiel)
-    `CREATE UNIQUE INDEX IF NOT EXISTS master_declarations_symbol_unique
-   ON master_pet_declarations (guild_id, symbol)
-   WHERE role_type = 'master' AND symbol IS NOT NULL`,
-
-   // Suppression de la table master_symbols
-   `DROP TABLE IF EXISTS master_symbols`,
 
   ];
 

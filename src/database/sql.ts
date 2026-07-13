@@ -279,14 +279,16 @@ export function initDb(): Observable<void> {
       reference_message_id TEXT NOT NULL
     )`,
 
-    // symbole par master
-    `CREATE TABLE IF NOT EXISTS master_symbols (
-      guild_id TEXT NOT NULL,
-      user_id TEXT NOT NULL,
-      symbol TEXT NOT NULL,
-      PRIMARY KEY (guild_id, user_id),
-      UNIQUE (guild_id, symbol)
-    )`,
+    // Dans le tableau `statements` de initDb(), juste après la création de master_pet_declarations
+    `ALTER TABLE master_pet_declarations ADD COLUMN IF NOT EXISTS symbol TEXT`,
+
+    // Contrainte d'unicité du symbole, uniquement parmi les masters (index partiel)
+    `CREATE UNIQUE INDEX IF NOT EXISTS master_declarations_symbol_unique
+   ON master_pet_declarations (guild_id, symbol)
+   WHERE role_type = 'master' AND symbol IS NOT NULL`,
+
+   // Suppression de la table master_symbols
+   `DROP TABLE IF EXISTS master_symbols`,
 
   ];
 
@@ -1019,12 +1021,12 @@ export function getAutokickNewMembers(guildId: string): Observable<AutokickSetti
 // master / pet relationships
 // ---------------------------------------------------------------------------
 
-export function declareMasterPetRole(guildId: string, userId: string, role: RoleType): Observable<void> {
+export function declareMasterPetRole(guildId: string, userId: string, role: RoleType, symbol?: string): Observable<void> {
   return execute(
-    `INSERT INTO master_pet_declarations (guild_id, user_id, role_type)
-     VALUES ($1, $2, $3)
+    `INSERT INTO master_pet_declarations (guild_id, user_id, role_type, symbol)
+     VALUES ($1, $2, $3, $4)
      ON CONFLICT (guild_id, user_id, role_type) DO NOTHING`,
-    [guildId, userId, role]
+    [guildId, userId, role, symbol ?? null]
   );
 }
 
@@ -1101,8 +1103,7 @@ export function purgeMasterPetRoleUser(guildId: string, userId: string): Observa
   return execute(
     `DELETE FROM master_pet_declarations WHERE guild_id = $1 AND user_id = $2;
      DELETE FROM master_pet_links WHERE guild_id = $1 AND (master_id = $2 OR pet_id = $2);
-     DELETE FROM master_pet_requests WHERE guild_id = $1 AND (requester_id = $2 OR target_id = $2);
-     DELETE FROM master_symbols WHERE guild_id = $1 AND user_id = $2;`,
+     DELETE FROM master_pet_requests WHERE guild_id = $1 AND (requester_id = $2 OR target_id = $2);`,
     [guildId, userId]
   );
 }
@@ -1165,34 +1166,30 @@ export function getMasterPetReferenceMessage(
   );
 }
 
+
 export function isMasterSymbolTaken(guildId: string, symbol: string, excludeUserId: string): Observable<boolean> {
   return queryOne(
-    `SELECT 1 FROM master_symbols WHERE guild_id = $1 AND symbol = $2 AND user_id != $3`,
+    `SELECT 1 FROM master_pet_declarations
+     WHERE guild_id = $1 AND role_type = 'master' AND symbol = $2 AND user_id != $3`,
     [guildId, symbol, excludeUserId]
   ).pipe(map(row => !!row));
 }
 
-export function claimMasterSymbol(guildId: string, userId: string, symbol: string): Observable<void> {
-  return execute(
-    `INSERT INTO master_symbols(guild_id, user_id, symbol)
-     VALUES($1, $2, $3)
-     ON CONFLICT(guild_id, user_id) DO UPDATE SET symbol = $3`,
-    [guildId, userId, symbol]
-  );
-}
-
-export function releaseMasterSymbol(guildId: string, userId: string): Observable<void> {
-  return execute(
-    `DELETE FROM master_symbols WHERE guild_id = $1 AND user_id = $2`,
-    [guildId, userId]
-  );
-}
-
 export function getMasterSymbolsForGuild(guildId: string): Observable<{ userId: string; symbol: string }[]> {
   return query<{ user_id: string; symbol: string }>(
-    `SELECT user_id, symbol FROM master_symbols WHERE guild_id = $1`,
+    `SELECT user_id, symbol FROM master_pet_declarations
+     WHERE guild_id = $1 AND role_type = 'master' AND symbol IS NOT NULL
+     ORDER BY declared_at ASC`,
     [guildId]
   ).pipe(map(rows => rows.map(r => ({ userId: r.user_id, symbol: r.symbol }))));
+}
+
+export function updateMasterSymbol(guildId: string, userId: string, symbol: string): Observable<void> {
+  return execute(
+    `UPDATE master_pet_declarations SET symbol = $3
+     WHERE guild_id = $1 AND user_id = $2 AND role_type = 'master'`,
+    [guildId, userId, symbol]
+  );
 }
 
 // ---------------------------------------------------------------------------

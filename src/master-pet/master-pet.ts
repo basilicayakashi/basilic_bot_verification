@@ -169,12 +169,6 @@ async function executeUnlink(interaction: ChatInputCommandInteraction) {
 
 // master-pet.ts
 
-// import à ajouter
-import {
-  // ... existant
-  getMasterSymbolForUser,
-} from '../database/sql.js';
-
 async function executeProfile(interaction: ChatInputCommandInteraction) {
   const guildId = interaction.guildId!;
   const targetId = interaction.options.getString('membre', true);

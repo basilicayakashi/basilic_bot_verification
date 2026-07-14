@@ -1020,7 +1020,7 @@ export function declareMasterPetRole(guildId: string, userId: string, role: Role
   return execute(
     `INSERT INTO master_pet_declarations (guild_id, user_id, role_type, symbol)
      VALUES ($1, $2, $3, $4)
-     ON CONFLICT (guild_id, user_id, role_type) DO NOTHING`,
+     ON CONFLICT (guild_id, user_id, role_type) DO UPDATE SET symbol = $4`,
     [guildId, userId, role, symbol ?? null]
   );
 }
@@ -1177,14 +1177,6 @@ export function getMasterSymbolsForGuild(guildId: string): Observable<{ userId: 
      ORDER BY declared_at ASC`,
     [guildId]
   ).pipe(map(rows => rows.map(r => ({ userId: r.user_id, symbol: r.symbol }))));
-}
-
-export function updateMasterSymbol(guildId: string, userId: string, symbol: string): Observable<void> {
-  return execute(
-    `UPDATE master_pet_declarations SET symbol = $3
-     WHERE guild_id = $1 AND user_id = $2 AND role_type = 'master'`,
-    [guildId, userId, symbol]
-  );
 }
 
 // ---------------------------------------------------------------------------

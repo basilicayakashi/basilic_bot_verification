@@ -38,6 +38,7 @@ import {
   getMasterPetReferenceMessage,
   isMasterSymbolTaken,
   getMasterSymbolsForGuild,
+  getMasterSymbolForUser,
 } from '../database/sql.js';
 
 import { getMessagesServer } from "../langues/index.js";
@@ -166,6 +167,14 @@ async function executeUnlink(interaction: ChatInputCommandInteraction) {
   return interaction.reply({ content: msgServer.masterPet.unlinkSuccess(target.id), ephemeral: true });
 }
 
+// master-pet.ts
+
+// import à ajouter
+import {
+  // ... existant
+  getMasterSymbolForUser,
+} from '../database/sql.js';
+
 async function executeProfile(interaction: ChatInputCommandInteraction) {
   const guildId = interaction.guildId!;
   const targetId = interaction.options.getString('membre', true);
@@ -178,14 +187,22 @@ async function executeProfile(interaction: ChatInputCommandInteraction) {
     return interaction.reply({ content: msgServer.masterPet.memberNotFound, ephemeral: true });
   }
 
-  const [roles, masterIds, petIds] = await Promise.all([
+  const [roles, masterIds, petIds, masterSymbol] = await Promise.all([
     firstValueFrom(getDeclaredMasterPetRolesForUser(guildId, targetId)),
     firstValueFrom(getMastersOfUser(guildId, targetId)),
     firstValueFrom(getPetsOfUser(guildId, targetId)),
+    firstValueFrom(getMasterSymbolForUser(guildId, targetId)),   // ✅ ajouté
   ]);
 
   const rolesText = roles.length > 0
-    ? roles.map(r => r === 'master' ? msgServer.masterPet.roleMaster : msgServer.masterPet.rolePet).join(', ')
+    ? roles.map(r => {
+        if (r === 'master') {
+          return masterSymbol
+            ? `${msgServer.masterPet.roleMaster} (${masterSymbol})`
+            : msgServer.masterPet.roleMaster;
+        }
+        return msgServer.masterPet.rolePet;
+      }).join(', ')
     : msgServer.masterPet.noRoleDeclared;
 
   const mastersText = masterIds.length > 0

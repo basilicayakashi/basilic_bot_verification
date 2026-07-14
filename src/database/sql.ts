@@ -1179,6 +1179,14 @@ export function getMasterSymbolsForGuild(guildId: string): Observable<{ userId: 
   ).pipe(map(rows => rows.map(r => ({ userId: r.user_id, symbol: r.symbol }))));
 }
 
+export function getMasterSymbolForUser(guildId: string, userId: string): Observable<string | null> {
+  return queryOne<{ symbol: string | null }>(
+    `SELECT symbol FROM master_pet_declarations
+     WHERE guild_id = $1 AND user_id = $2 AND role_type = 'master'`,
+    [guildId, userId]
+  ).pipe(map(row => row?.symbol ?? null));
+}
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 import { Pool, QueryResult, QueryResultRow } from "pg";
-import { Observable, from, throwError } from "rxjs";
-import { map, catchError } from "rxjs/operators";
+import { Observable, from, throwError, concat } from "rxjs";
+import { map, catchError, last  } from "rxjs/operators";
 
 // ---------------------------------------------------------------------------
 // Connexion
@@ -1095,11 +1095,13 @@ export function hasDeclaredMasterPetRole(guildId: string, userId: string, role: 
 }
 
 export function purgeMasterPetRoleUser(guildId: string, userId: string): Observable<void> {
-  return execute(
-    `DELETE FROM master_pet_declarations WHERE guild_id = $1 AND user_id = $2;
-     DELETE FROM master_pet_links WHERE guild_id = $1 AND (master_id = $2 OR pet_id = $2);
-     DELETE FROM master_pet_requests WHERE guild_id = $1 AND (requester_id = $2 OR target_id = $2);`,
-    [guildId, userId]
+  return concat(
+    execute(`DELETE FROM master_pet_declarations WHERE guild_id = $1 AND user_id = $2`, [guildId, userId]),
+    execute(`DELETE FROM master_pet_links WHERE guild_id = $1 AND (master_id = $2 OR pet_id = $2)`, [guildId, userId]),
+    execute(`DELETE FROM master_pet_requests WHERE guild_id = $1 AND (requester_id = $2 OR target_id = $2)`, [guildId, userId]),
+  ).pipe(
+    map(() => undefined),
+    last()
   );
 }
 

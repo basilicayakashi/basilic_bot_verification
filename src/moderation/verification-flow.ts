@@ -321,6 +321,10 @@ export async function handleVerificationButtons({
     }
 
     if (isValidate) {
+      // ✅ On acquitte l'interaction TOUT DE SUITE (< 3s), avant les opérations
+      // lentes (DB, rôle, DM). Sinon le token expire et update() lève "Unknown interaction".
+      await interaction.deferUpdate();
+
       const nowIso = new Date().toISOString();
 
       await firstValueFrom(
@@ -344,7 +348,8 @@ export async function handleVerificationButtons({
         await targetMember.send(msgOut.YourVerifiedStatusAccepted(interaction.guild.name));
       } catch { }
 
-      await interaction.update({
+      // On édite le message directement (pas besoin du token d'interaction pour ça)
+      await interaction.message.edit({
         content:
           `${interaction.message.content}\n\n` +
           msgServer.verificationAcceptedBy(staffMember.id, targetMember.id),
@@ -440,11 +445,14 @@ export async function handleVerificationButtons({
       return true;
     }
 
+    // ✅ Acquittement immédiat, avant le DM et le kick qui peuvent être lents.
+    await interaction.deferUpdate();
+
     try {
       await targetMember.send(msgOut.YourVerifiedStatusDenied(interaction.guild.name));
     } catch { }
 
-    await interaction.update({
+    await interaction.message.edit({
       content:
         `${interaction.message.content}\n\n` +
         msgServer.verificationDeniedBy(staffMember.id, targetMember.id),
@@ -772,11 +780,9 @@ export async function handleVerificationModals({
         getBlacklistedUsersEverywhere(member.id)
       );
 
-      let statusContent: string;
+      let statusContent: string | null = null;
 
-      if (blacklistedEverywhere.length === 0) {
-        statusContent = "";
-      } else {
+      if (blacklistedEverywhere.length > 0) {
         const lines = await Promise.all(
           blacklistedEverywhere.map(async (entry: any) => {
             const guild = await deps.client.guilds.fetch(entry.guild_id).catch(() => null);
@@ -807,9 +813,11 @@ export async function handleVerificationModals({
         // ex: "⛔ Cet utilisateur est blacklisté sur :\n\n{lines}"
       }
 
-      await (verificationChannel as TextChannel).send({
-        content: statusContent,
-      });
+      if (statusContent) {
+        await (verificationChannel as TextChannel).send({
+          content: statusContent,
+        });
+      }
 
       await interaction.reply({
         content: msgIn.verificationRequestSent,

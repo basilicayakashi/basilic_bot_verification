@@ -739,7 +739,10 @@ ${roleMsgDeleteText}
   freeGamesManualPublishSettingsDeleted: "Configuración de publicación eliminada",
   freeGamesManualPublishSettingsSaved: "Configuración de publicación guardada",
   none: "Ninguno",
-  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string) => `✅ Eliminación activada para los mensajes que mencionan: ${rolesDisplay}`,
+  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string, channelDisplay: string | null) =>
+    channelDisplay === null ? `✅ Eliminación activada para los mensajes que mencionan: ${rolesDisplay}`
+      : `✅ Eliminación activada para los mensajes que mencionan: ${rolesDisplay}
+                            Registro en: ${channelDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Eliminación desactivada`,
   FournirAuMoinsUnRole: "Debe proporcionar al menos un rol para mencionar y habilitar la eliminación automática",
   AucunRole: "No rol",
@@ -903,6 +906,10 @@ const es_server: MessagesServer = {
 
   ${msgLines}
   `,
+
+  roleMsgDeleteLogOriginChannelLabel: "Canal de origen",
+  roleMsgDeleteLogNoTextContent: "*Mensaje sin contenido de texto*",
+  roleMsgDeleteLogFooter: (messageId) => `ID del mensaje: ${messageId}`,
 
   masterPet: {
     alreadyDeclared: (role) => `Ya estás registrado como ${role}`,

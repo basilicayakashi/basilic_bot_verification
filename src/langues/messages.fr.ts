@@ -743,7 +743,10 @@ ${roleMsgDeleteText}
   freeGamesManualPublishSettingsDeleted: "Paramètres de publication supprimés",
   freeGamesManualPublishSettingsSaved: "Paramètres de publication sauvegardés",
   none: "Aucun",
-  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string) => `✅ Suppression activée pour les messages mentionnant : ${rolesDisplay}`,
+  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string, channelDisplay: string | null) =>
+    channelDisplay === null ? `✅ Suppression activée pour les messages mentionnant : ${rolesDisplay}`
+      : `✅ Suppression activée pour les messages mentionnant : ${rolesDisplay}
+                              Journalisation dans : ${channelDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Suppression désactivée`,
   FournirAuMoinsUnRole: "Vous devez fournir au moins un rôle à mentionner pour activer la suppression automatique",
   AucunRole: "Aucun rôle",
@@ -907,6 +910,10 @@ const fr_server: MessagesServer = {
 
   ${msgLines}
   `,
+
+  roleMsgDeleteLogOriginChannelLabel: "Salon d'origine",
+  roleMsgDeleteLogNoTextContent: "*Message sans contenu texte*",
+  roleMsgDeleteLogFooter: (messageId) => `ID du message : ${messageId}`,
 
   masterPet: {
     alreadyDeclared: (role) =>

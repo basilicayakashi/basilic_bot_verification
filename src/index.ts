@@ -809,6 +809,19 @@ export const commands = [
           [Locale.Polish]: "Piąta rola, która uruchomi usunięcie wiadomości",
         })
         .setRequired(false)
+    )
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("Channel where deleted messages will be logged (optional)")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Salon où les messages supprimés seront journalisés (optionnel)",
+          [Locale.SpanishES]: "Canal donde se registrarán los mensajes eliminados (opcional)",
+          [Locale.German]: "Kanal, in dem gelöschte Nachrichten protokolliert werden (optional)",
+          [Locale.Polish]: "Kanał, w którym będą rejestrowane usunięte wiadomości (opcjonalnie)",
+        })
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(false)
     ),
   new SlashCommandBuilder()
     .setName("role-category")
@@ -2759,6 +2772,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
 
         const roleIds = roles.map((role) => role.id);
+        const channel = interaction.options.getChannel("channel");
 
         await dbValue(upsertGuildRoleMessageDeleteSettings(
           interaction.guild!.id,
@@ -2769,7 +2783,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
           roleIds[3] ?? null,
           roleIds[4] ?? null,
           interaction.user.id,
-          new Date().toISOString()
+          new Date().toISOString(),
+          channel?.id ?? null
         ));
 
         const rolesDisplay =
@@ -2777,10 +2792,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
             ? roleIds.map((roleId) => `<@&${roleId}>`).join(", ")
             : msgIn.AucunRole;
 
+        const channelDisplay = channel ? `<#${channel.id}>` : null;
+
         await replyEphemeral(
           interaction,
           enabled
-            ? msgIn.SuppressionAutomatiqueMessageMentionRoleActivee(rolesDisplay)
+            ? msgIn.SuppressionAutomatiqueMessageMentionRoleActivee(rolesDisplay, channelDisplay)
             : msgIn.SuppressionAutomatiqueMessageMentionRoleDesctivee
         );
 
@@ -3404,10 +3421,10 @@ client.on(Events.MessageCreate, async (message) => {
 
 client.on(Events.MessageCreate, async (message) => {
   if (!message.guild || message.author.bot) return;
-
+ 
   // Le propriétaire du serveur est exempté
   if (message.author.id === message.guild.ownerId) return;
-
+ 
   const settings = await dbValue(getGuildRoleMessageDeleteSettings(
     message.guild.id
   )) as {
@@ -3417,10 +3434,11 @@ client.on(Events.MessageCreate, async (message) => {
     role_id3: string | null;
     role_id4: string | null;
     role_id5: string | null;
+    channel_id: string | null;
   } | undefined;
-
+ 
   if (!settings || settings.enabled !== true && settings.enabled !== 1) return;
-
+ 
   const roleIds = [
     settings.role_id1,
     settings.role_id2,
@@ -3428,33 +3446,68 @@ client.on(Events.MessageCreate, async (message) => {
     settings.role_id4,
     settings.role_id5,
   ].filter(Boolean) as string[];
-
+ 
   if (roleIds.length === 0) return;
-
+ 
   const mentionsTarget = roleIds.some((roleId) => {
     const isEveryoneOrHere =
       roleId === message.guild!.id ||
       roleId === "everyone";
-
+ 
     return isEveryoneOrHere
       ? message.mentions.everyone
       : message.mentions.roles.has(roleId);
   });
-
+ 
   console.log("[role-block] mentions.everyone:", message.mentions.everyone);
   console.log("[role-block] mentions.roles:", [...message.mentions.roles.keys()]);
   console.log("[role-block] roles surveillés:", roleIds);
   console.log("[role-block] mentionsTarget:", mentionsTarget);
-
+ 
   if (!mentionsTarget) return;
-
+ 
+  if (settings.channel_id) {
+    try {
+      const logChannel = await message.guild.channels.fetch(settings.channel_id).catch(() => null);
+ 
+      if (logChannel && logChannel.isTextBased()) {
+        const logLocale = normalizeSupportedLocale(message.guild.preferredLocale);
+        const msgServer = getMessagesServer(logLocale);
+        const logEmbed = new EmbedBuilder()
+          .setColor(0xED4245)
+          .setAuthor({
+            name: `${message.author.tag} (${message.author.id})`,
+            iconURL: message.author.displayAvatarURL(),
+          })
+          .setDescription(message.content || msgServer.roleMsgDeleteLogNoTextContent)
+          .addFields({ name: msgServer.roleMsgDeleteLogOriginChannelLabel, value: `<#${message.channelId}>` })
+          .setTimestamp(message.createdAt)
+          .setFooter({ text: msgServer.roleMsgDeleteLogFooter(message.id) });
+ 
+        const attachmentUrls = [...message.attachments.values()].map((a) => a.url);
+ 
+        await (logChannel as TextChannel).send({
+          embeds: [logEmbed],
+          files: attachmentUrls,
+        });
+      } else {
+        console.log(
+          "[role-block] Salon de log introuvable ou non textuel :",
+          settings.channel_id
+        );
+      }
+    } catch (error) {
+      console.error("[role-block] Erreur lors de la journalisation du message :", error);
+    }
+  }
+ 
   if (!message.deletable) {
     console.log(
       "[role-block] Message non supprimable — vérifie la permission Gérer les messages."
     );
     return;
   }
-
+ 
   try {
     await message.delete();
     console.log("[role-block] Message supprimé :", message.id);

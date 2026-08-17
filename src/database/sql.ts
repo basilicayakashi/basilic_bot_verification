@@ -192,6 +192,7 @@ export function initDb(): Observable<void> {
       role_id3   TEXT,
       role_id4   TEXT,
       role_id5   TEXT,
+      channel_id TEXT,
       updated_by TEXT NOT NULL,
       updated_at TIMESTAMPTZ NOT NULL
     )`,
@@ -720,12 +721,13 @@ export function upsertGuildRoleMessageDeleteSettings(
   roleId4: string | null,
   roleId5: string | null,
   updatedBy: string,
-  updatedAt: string
+  updatedAt: string,
+  channel_id: string | null
 ): Observable<void> {
   return execute(
     `INSERT INTO guild_role_message_delete_settings
-       (guild_id, enabled, role_id1, role_id2, role_id3, role_id4, role_id5, updated_by, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       (guild_id, enabled, role_id1, role_id2, role_id3, role_id4, role_id5, updated_by, updated_at, channel_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      ON CONFLICT (guild_id) DO UPDATE SET
        enabled    = EXCLUDED.enabled,
        role_id1   = EXCLUDED.role_id1,
@@ -733,9 +735,10 @@ export function upsertGuildRoleMessageDeleteSettings(
        role_id3   = EXCLUDED.role_id3,
        role_id4   = EXCLUDED.role_id4,
        role_id5   = EXCLUDED.role_id5,
+       channel_id = EXCLUDED.channel_id,
        updated_by = EXCLUDED.updated_by,
        updated_at = EXCLUDED.updated_at`,
-    [guildId, enabled, roleId1, roleId2, roleId3, roleId4, roleId5, updatedBy, updatedAt]
+    [guildId, enabled, roleId1, roleId2, roleId3, roleId4, roleId5, updatedBy, updatedAt, channel_id]
   );
 }
 
@@ -1303,6 +1306,7 @@ export type GuildRoleMessageDeleteSettingsRow = {
   role_id5: string | null;
   updated_by: string;
   updated_at: string;
+  channel_id: string | null;
 };
 
 export type RolePanelRow = {

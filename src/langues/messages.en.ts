@@ -739,7 +739,10 @@ ${roleMsgDeleteText}
   freeGamesManualPublishSettingsDeleted: "Manual publish settings deleted",
   freeGamesManualPublishSettingsSaved: "Manual publish settings saved",
   none: "None",
-  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string) => `✅ Deletion enabled for messages mentioning: ${rolesDisplay}`,
+  SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string, channelDisplay: string | null) =>
+    channelDisplay === null ? `✅ Deletion enabled for messages mentioning: ${rolesDisplay}`
+      : `✅ Deletion enabled for messages mentioning: ${rolesDisplay}
+                            Logging to: ${channelDisplay}`,
   SuppressionAutomatiqueMessageMentionRoleDesctivee: `✅ Deletion disabled`,
   FournirAuMoinsUnRole: "You must provide at least one role to mention to enable automatic deletion",
   AucunRole: "No role",
@@ -903,6 +906,10 @@ const en_server: MessagesServer = {
 
   ${msgLines}
   `,
+
+  roleMsgDeleteLogOriginChannelLabel: "Original channel",
+  roleMsgDeleteLogNoTextContent: "*Message with no text content*",
+  roleMsgDeleteLogFooter: (messageId) => `Message ID: ${messageId}`,
 
   masterPet: {
     alreadyDeclared: (role) =>

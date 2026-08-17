@@ -150,7 +150,7 @@ export type MessagesIn = {
     freeGamesManualPublishSettingsDeleted: string;
     freeGamesManualPublishSettingsSaved: string;
     none: string;
-    SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string) => string;
+    SuppressionAutomatiqueMessageMentionRoleActivee: (rolesDisplay: string, channelDisplay: string | null) => string;
     SuppressionAutomatiqueMessageMentionRoleDesctivee: string;
     FournirAuMoinsUnRole: string;
     AucunRole: string;
@@ -274,7 +274,10 @@ export type MessagesServer = {
     reactionRolePanelEmpty: string;
     blacklistServerMessage: (guildName: string, timestamp: string, blacklisted_by: string, reason: string) => string;
     blackListedMemberFound: (memberTag: string, memberId: string, msgLines: string) => string;
-
+    roleMsgDeleteLogOriginChannelLabel: string;
+    roleMsgDeleteLogNoTextContent: string;
+    roleMsgDeleteLogFooter: (messageId: string) => string;
+    
     masterPet: {
         alreadyDeclared: (role: string) => string;
         declaredSuccess: (role: string) => string;

@@ -751,10 +751,11 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "Vous devez fournir au moins un rôle à mentionner pour activer la suppression automatique",
   AucunRole: "Aucun rôle",
   RoleIntrouvable: (roleDisplay: string) => `Rôle introuvable (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string) => `## 🚫 Suppression de messages par rôle
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Suppression de messages par rôle
       
       **Activé :** ${enabled ? "oui" : "non"}
       **Rôles surveillés :** ${rolesDisplay}
+      **Chaîne de journalisation :** ${channel_display ?? "aucun"}
       `,
   unknownServer: "Serveur inconnu",
   Serveur: "Serveur",

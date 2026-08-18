@@ -155,7 +155,7 @@ export type MessagesIn = {
     FournirAuMoinsUnRole: string;
     AucunRole: string;
     RoleIntrouvable: (roleDisplay: string) => string;
-    AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string) => string;
+    AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => string;
     unknownServer: string;
     Serveur: string;
     by: string;

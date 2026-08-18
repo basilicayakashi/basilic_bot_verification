@@ -747,10 +747,11 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "You must provide at least one role to mention to enable automatic deletion",
   AucunRole: "No role",
   RoleIntrouvable: (roleDisplay: string) => `Role not found (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string) => `## 🚫 Deleting Messages by Role
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Deleting Messages by Role
       
       **Activated  :** ${enabled ? "yes" : "no"}
       **Monitored roles :** ${rolesDisplay}
+      **Log channel :** ${channel_display ?? "None"}
       `,
   unknownServer: "Unknown server",
   Serveur: "Server",

@@ -2527,7 +2527,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
               ? roleDisplays.join(", ")
               : msgIn.AucunRole;
 
-          roleMsgDeleteText = msgIn.AffichageParametrageSuppressionMessageRolesUtilises(enabled, rolesLine);
+          const channel_display = SettingsMsgDeletedFromRoles.channel_id
+            ? `<#${SettingsMsgDeletedFromRoles.channel_id}>`
+            : null ;
+
+          roleMsgDeleteText = msgIn.AffichageParametrageSuppressionMessageRolesUtilises(enabled, rolesLine, channel_display);
         }
 
         await interaction.reply({

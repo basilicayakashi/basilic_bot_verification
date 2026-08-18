@@ -747,10 +747,11 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "Debe proporcionar al menos un rol para mencionar y habilitar la eliminación automática",
   AucunRole: "No rol",
   RoleIntrouvable: (roleDisplay: string) => `Rol no encontrado (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string) => `## 🚫 Eliminación de mensajes por rol
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Eliminación de mensajes por rol
       
       **Activado   :** ${enabled ? "sí" : "no"}
       **Roles supervisados :** ${rolesDisplay}
+      **Canal de registro:** ${channel_display ?? "ninguno"}
       `,
   unknownServer: "Servidor desconocido",
   Serveur: "Servidor",

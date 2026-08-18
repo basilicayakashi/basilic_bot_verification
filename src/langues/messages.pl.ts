@@ -755,7 +755,7 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "Musisz podać co najmniej jedną rolę, jeśli usunięcie jest włączone",
   AucunRole: "Brak roli",
   RoleIntrouvable: (roleDisplay: string) => `Rola nie została znaleziona (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string) => `## 🚫 Usuwanie wiadomości według roli
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Usuwanie wiadomości według roli
       
       **Aktywowany :** ${enabled ? "tak" : "nie"}
       **Monitorowane role :** ${rolesDisplay}

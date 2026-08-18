@@ -748,10 +748,12 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "Sie müssen mindestens eine Rolle angeben, um sie zu erwähnen und die automatische Löschung zu aktivieren",
   AucunRole: "Keine Rolle",
   RoleIntrouvable: (roleDisplay: string) => `Rolle nicht gefunden (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string) => `## 🚫 Löschen von Nachrichten nach Rolle
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Löschen von Nachrichten nach Rolle
       
       **Aktiviert   :** ${enabled ? "ja" : "nein"}
       **Überwachte Rollen :** ${rolesDisplay}
+      **Protokollkanal:** ${channel_display ?? "keiner"}
+      **Kanał dziennika:** ${channel_display ?? "brak"}
       `,
   unknownServer: "Unbekannter Server",
   Serveur: "Server",

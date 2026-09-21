@@ -1768,7 +1768,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
     };
 
     const msgIn = getMessagesUser(interaction);
-    const msgOut = getMessagesOut(interaction.locale);
+    //const msgOut = getMessagesOut(interaction.locale);
+    const msgOut = getMessagesOut("en");
     const msgServer = isUsedOnAServer(interaction)
       ? getMessagesServer(interaction.guildLocale ?? interaction.guild.preferredLocale ?? "en")
       : getMessagesServer("en");

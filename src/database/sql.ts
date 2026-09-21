@@ -286,6 +286,24 @@ export function initDb(): Observable<void> {
       reference_message_id TEXT NOT NULL
     )`,
 
+    // Paramétrage de la suppression automatique des messages par rôle
+
+    `CREATE TABLE tracked_role_messages (
+      message_id   BIGINT PRIMARY KEY,
+      guild_id     BIGINT NOT NULL,
+      channel_id   BIGINT NOT NULL,
+      author_id    BIGINT NOT NULL,
+
+      content      TEXT NOT NULL,
+
+      deleted_at   TIMESTAMPTZ NULL,
+      created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`,
+
+    //index dans la table 
+    `CREATE INDEX idx_tracked_role_messages_guild_deleted
+    ON tracked_role_messages (guild_id, deleted_at)`,
   ];
 
   return from(

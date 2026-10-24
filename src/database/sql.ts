@@ -701,6 +701,7 @@ export function getFreeGamePublicationByMessageId(guildId: string, messageId: st
   ).pipe(map((row) => ({ exists: row !== null })));
 }
 
+/*
 export function getExpiredFreeGamePublications(): Observable<ExpiredFreeGamePublicationRow[]> {
   return query<ExpiredFreeGamePublicationRow>(
     `SELECT fgp.guild_id, fgp.free_game_id, fgp.channel_id, fgp.message_id
@@ -711,6 +712,19 @@ export function getExpiredFreeGamePublications(): Observable<ExpiredFreeGamePubl
        AND fgp.message_id IS NOT NULL`
   );
 }
+  */
+
+export function getExpiredFreeGamePublications(): Observable<ExpiredFreeGamePublicationRow[]> {
+  return query<ExpiredFreeGamePublicationRow>(
+    `select guild_id, free_game_id, channel_id, message_id 
+    from free_games_publications 
+    where not exists (select 'a' 
+          from public.free_games 
+          where public.free_games_publications.free_game_id=public.free_games.id
+      )`
+  );
+}
+
 
 export function deleteFreeGamePublication(guildId: string, freeGameId: number): Observable<void> {
   return execute(

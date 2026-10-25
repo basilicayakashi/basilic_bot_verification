@@ -192,7 +192,7 @@ donation
 
 \* Discord.js
 
-\* SQLite
+\* PostgreSQL
 
 
 

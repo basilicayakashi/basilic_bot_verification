@@ -266,7 +266,7 @@ export async function handleVerificationButtons({
         .setCustomId("reject_reason")
         .setLabel(msgServer.rejectReasonLabel)
         .setStyle(TextInputStyle.Paragraph)
-        .setRequired(false)
+        .setRequired(true)
         .setMaxLength(500)
         .setPlaceholder(msgServer.rejectReasonPlaceholder);
 

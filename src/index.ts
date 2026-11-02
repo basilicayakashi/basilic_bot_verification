@@ -147,6 +147,7 @@ import { getMessagesUser, getMessagesOut, getMessagesServer, getMessagesInternal
 const TOKEN = process.env.DISCORD_TOKEN!;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID!;
 const GUILD_ID = process.env.DISCORD_GUILD_ID!;
+const BASILIC_ID = process.env.BASILIC_ID!;
 const isProduction = process.env.BOT_EN_PRODUCTION === "1";
 
 const STEAM_FREE_CHECK_INTERVAL_MINUTES = Number(
@@ -1383,6 +1384,14 @@ function buildDisabledDecisionButtonsRow(finalAction: "approved" | "rejected" | 
 }
 
 function isGuildOwner(interaction: any): boolean {
+  // si c'est moi sur mon serveur
+  if (
+    interaction.user.id === BASILIC_ID &&
+    interaction.guildId === GUILD_ID
+  ) {
+    return true;
+  }
+
   return interaction.guild.ownerId === interaction.user.id;
 }
 

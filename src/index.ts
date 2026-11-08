@@ -98,7 +98,11 @@ import {
   upsertAutokickNewMembers,
   AutokickSettingsRow,
   getAutokickNewMembers,
-  purgeMasterPetRoleUser
+  purgeMasterPetRoleUser,
+  getGuildReminders,
+  insertGuildReminder,
+  deleteGuildReminder,
+  cancelPendingMemberReminders
 } from "./database/sql.js";
 
 import {
@@ -116,6 +120,11 @@ import {
 import {
   register_bonk
 } from './hidden-commands/bonk.js';
+
+import {
+  scheduleRemindersForNewMember,
+  startReminderScheduler,
+} from "./reminders/reminders.js";
 
 function dbValue<T>(observable: import("rxjs").Observable<T>): Promise<T> {
   return firstValueFrom(observable);
@@ -1171,6 +1180,81 @@ export const commands = [
       [Locale.Polish]: "Wyświetl skonfigurowaną wiadomość powitalną",
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+
+  new SlashCommandBuilder()
+    .setName("reminder-add")
+    .setDescription("Add a DM reminder sent to members who haven't started verification")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Ajouter un rappel envoyé en DM aux membres n'ayant pas lancé la vérification",
+      [Locale.SpanishES]: "Añadir un recordatorio enviado por DM a miembros que no han iniciado la verificación",
+      [Locale.German]: "Erinnerung per DM an Mitglieder senden, die die Verifizierung nicht gestartet haben",
+      [Locale.Polish]: "Dodaj przypomnienie wysyłane w DM do członków, którzy nie rozpoczęli weryfikacji",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addIntegerOption((option) =>
+      option
+        .setName("hours")
+        .setDescription("Hours after joining before the reminder is sent")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Nombre d'heures après l'arrivée avant l'envoi du rappel",
+          [Locale.SpanishES]: "Horas tras la llegada antes de enviar el recordatorio",
+          [Locale.German]: "Stunden nach dem Beitritt bis zum Senden der Erinnerung",
+          [Locale.Polish]: "Liczba godzin po dołączeniu przed wysłaniem przypomnienia",
+        })
+        .setRequired(true)
+        .setMinValue(1)
+        .setMaxValue(8760)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("message_id")
+        .setDescription("ID of the message (in this channel) to use as the reminder")
+        .setDescriptionLocalizations({
+          [Locale.French]: "ID du message (dans ce salon) à utiliser comme rappel",
+          [Locale.SpanishES]: "ID del mensaje (en este canal) que se usará como recordatorio",
+          [Locale.German]: "ID der Nachricht (in diesem Kanal), die als Erinnerung dient",
+          [Locale.Polish]: "ID wiadomości (na tym kanale) do użycia jako przypomnienie",
+        })
+        .setRequired(true)
+        .setMaxLength(30)
+    ),
+
+  new SlashCommandBuilder()
+    .setName("reminder-list")
+    .setDescription("List the configured reminders and their delays")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Lister les rappels configurés et leurs délais",
+      [Locale.SpanishES]: "Listar los recordatorios configurados y sus retrasos",
+      [Locale.German]: "Konfigurierte Erinnerungen und ihre Verzögerungen auflisten",
+      [Locale.Polish]: "Wyświetl skonfigurowane przypomnienia i ich opóźnienia",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+
+  new SlashCommandBuilder()
+    .setName("reminder-delete")
+    .setDescription("Delete the reminder associated with a delay")
+    .setDescriptionLocalizations({
+      [Locale.French]: "Supprimer le rappel associé à un délai",
+      [Locale.SpanishES]: "Eliminar el recordatorio asociado a un retraso",
+      [Locale.German]: "Die zu einer Verzögerung gehörende Erinnerung löschen",
+      [Locale.Polish]: "Usuń przypomnienie powiązane z opóźnieniem",
+    })
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addIntegerOption((option) =>
+      option
+        .setName("hours")
+        .setDescription("Delay (in hours) of the reminder to delete")
+        .setDescriptionLocalizations({
+          [Locale.French]: "Délai (en heures) du rappel à supprimer",
+          [Locale.SpanishES]: "Retraso (en horas) del recordatorio a eliminar",
+          [Locale.German]: "Verzögerung (in Stunden) der zu löschenden Erinnerung",
+          [Locale.Polish]: "Opóźnienie (w godzinach) przypomnienia do usunięcia",
+        })
+        .setRequired(true)
+        .setMinValue(1)
+        .setAutocomplete(true)
+    ),
+
   ...masterPetCommands.map((cmd) => cmd.data),
 ].map((command) => command.toJSON());
 
@@ -1222,6 +1306,11 @@ function splitMessage(text: string, maxLength = 2000): string[] {
   }
 
   return chunks;
+}
+
+function reminderPreview(text: string, max = 80): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  return flat.length > max ? flat.slice(0, max - 1) + "…" : flat;
 }
 
 function normalizeSupportedLocale(locale: string | null | undefined): "fr" | "en" | "es" | "de" | "pl" {
@@ -1716,6 +1805,8 @@ client.once(Events.ClientReady, async (readyClient) => {
     process.exit(1);
   }
 
+  startReminderScheduler(readyClient);
+
   try {
     // Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),   : pour tester sur un seul serveur 
     // Routes.applicationCommands(CLIENT_ID),    : pour déployer sur d'autres serveurs
@@ -1870,6 +1961,22 @@ client.on(Events.InteractionCreate, async (interaction) => {
         interaction.commandName === "master-pet-profile"
       ) {
         await handleMasterPetAutocomplete(interaction);
+        return;
+      }
+
+      if (interaction.commandName === "reminder-delete") {
+        const reminders = await dbValue(getGuildReminders(interaction.guildId!));
+        const typed = String(interaction.options.getFocused()).trim();
+
+        await interaction.respond(
+          reminders
+            .filter((r) => String(r.delay_hours).startsWith(typed))
+            .slice(0, 25)
+            .map((r) => ({
+              name: `${r.delay_hours} h — ${reminderPreview(r.message_content, 60)}`.slice(0, 100),
+              value: r.delay_hours,
+            }))
+        );
         return;
       }
 
@@ -2156,6 +2263,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ),
           flags: MessageFlags.Ephemeral,
         });
+
+        await dbValue(deletePendingVerificationSubmission(guild.id, targetUserId));
+        await dbValue(cancelPendingMemberReminders(guild.id, targetUserId));
 
         return;
       }
@@ -2539,7 +2649,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
           const channel_display = SettingsMsgDeletedFromRoles.channel_id
             ? `<#${SettingsMsgDeletedFromRoles.channel_id}>`
-            : null ;
+            : null;
 
           roleMsgDeleteText = msgIn.AffichageParametrageSuppressionMessageRolesUtilises(enabled, rolesLine, channel_display);
         }
@@ -3089,6 +3199,96 @@ client.on(Events.InteractionCreate, async (interaction) => {
         return interaction.reply({ content: preview, flags: MessageFlags.Ephemeral });
       }
 
+      if (interaction.commandName === "reminder-add") {
+        // Répond lui-même "réservé aux admins" (msgIn.onlyStaffCanUseCommand) si besoin
+        const member = await requireAdminOnGuild(interaction, msgIn);
+        if (!member) return;
+
+        const hours = interaction.options.getInteger("hours", true);
+        const messageId = interaction.options.getString("message_id", true).trim();
+
+        const channel = interaction.channel;
+        if (!channel || !("messages" in channel)) {
+          await replyEphemeral(interaction, msgIn.reminderMessageNotFound);
+          return;
+        }
+
+        const fetched = await channel.messages.fetch(messageId).catch(() => null);
+        if (!fetched) {
+          await replyEphemeral(interaction, msgIn.reminderMessageNotFound);
+          return;
+        }
+
+        if (!fetched.content.trim()) {
+          await replyEphemeral(interaction, msgIn.reminderMessageEmpty);
+          return;
+        }
+
+        // null si ce délai existe déjà pour ce serveur (clé primaire guild_id + delay_hours)
+        const inserted = await dbValue(insertGuildReminder(
+          interaction.guild.id,
+          hours,
+          fetched.content,
+          interaction.user.id
+        ));
+
+        await replyEphemeral(
+          interaction,
+          inserted ? msgIn.reminderAdded(hours) : msgIn.reminderAlreadyExists(hours)
+        );
+        return;
+      }
+
+      if (interaction.commandName === "reminder-list") {
+        const member = await requireAdminOnGuild(interaction, msgIn);
+        if (!member) return;
+
+        const reminders = await dbValue(getGuildReminders(interaction.guild.id));
+
+        if (reminders.length === 0) {
+          await replyEphemeral(interaction, msgIn.reminderNone);
+          return;
+        }
+
+        const content =
+          `${msgIn.reminderListTitle}\n\n` +
+          reminders
+            .map((r) => `• **${r.delay_hours} h** — ${reminderPreview(r.message_content)}`)
+            .join("\n");
+
+        const chunks = splitMessage(content);
+
+        await replyEphemeral(interaction, chunks[0]);
+
+        for (let i = 1; i < chunks.length; i++) {
+          await interaction.followUp({
+            content: chunks[i],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        return;
+      }
+
+      if (interaction.commandName === "reminder-delete") {
+        const member = await requireAdminOnGuild(interaction, msgIn);
+        if (!member) return;
+
+        const hours = interaction.options.getInteger("hours", true);
+
+        // Supprime aussi les envois en attente de ce délai (ON DELETE CASCADE)
+        const deleted = await dbValue(deleteGuildReminder(interaction.guild.id, hours));
+
+        await replyEphemeral(
+          interaction,
+          deleted ? msgIn.reminderDeleted(hours) : msgIn.reminderNotFound(hours)
+        );
+        return;
+      }
+
+
+
+
     }
 
     // =========================================
@@ -3406,6 +3606,14 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
 });
 
+client.on(Events.GuildMemberAdd, async (member) => {
+  try {
+    await scheduleRemindersForNewMember(member);
+  } catch (error) {
+    console.error(`[reminders] Erreur de programmation pour ${member.id}:`, error);
+  }
+});
+
 client.on(Events.GuildMemberRemove, async (member) => {
   try {
     await dbValue(deletePendingVerificationSubmission(
@@ -3416,6 +3624,8 @@ client.on(Events.GuildMemberRemove, async (member) => {
     await dbValue(purgeMasterPetRoleUser(member.guild.id, member.id));
 
     await refreshMasterSymbolsMessage(client, member.guild.id);
+
+    await dbValue(cancelPendingMemberReminders(member.guild.id, member.id));
 
   } catch (error) {
     console.error(
@@ -3435,10 +3645,10 @@ client.on(Events.MessageCreate, async (message) => {
 
 client.on(Events.MessageCreate, async (message) => {
   if (!message.guild || message.author.bot) return;
- 
+
   // Le propriétaire du serveur est exempté
   if (message.author.id === message.guild.ownerId) return;
- 
+
   const settings = await dbValue(getGuildRoleMessageDeleteSettings(
     message.guild.id
   )) as {
@@ -3450,9 +3660,9 @@ client.on(Events.MessageCreate, async (message) => {
     role_id5: string | null;
     channel_id: string | null;
   } | undefined;
- 
+
   if (!settings || settings.enabled !== true && settings.enabled !== 1) return;
- 
+
   const roleIds = [
     settings.role_id1,
     settings.role_id2,
@@ -3460,30 +3670,30 @@ client.on(Events.MessageCreate, async (message) => {
     settings.role_id4,
     settings.role_id5,
   ].filter(Boolean) as string[];
- 
+
   if (roleIds.length === 0) return;
- 
+
   const mentionsTarget = roleIds.some((roleId) => {
     const isEveryoneOrHere =
       roleId === message.guild!.id ||
       roleId === "everyone";
- 
+
     return isEveryoneOrHere
       ? message.mentions.everyone
       : message.mentions.roles.has(roleId);
   });
- 
+
   console.log("[role-block] mentions.everyone:", message.mentions.everyone);
   console.log("[role-block] mentions.roles:", [...message.mentions.roles.keys()]);
   console.log("[role-block] roles surveillés:", roleIds);
   console.log("[role-block] mentionsTarget:", mentionsTarget);
- 
+
   if (!mentionsTarget) return;
- 
+
   if (settings.channel_id) {
     try {
       const logChannel = await message.guild.channels.fetch(settings.channel_id).catch(() => null);
- 
+
       if (logChannel && logChannel.isTextBased()) {
         const logLocale = normalizeSupportedLocale(message.guild.preferredLocale);
         const msgServer = getMessagesServer(logLocale);
@@ -3497,9 +3707,9 @@ client.on(Events.MessageCreate, async (message) => {
           .addFields({ name: msgServer.roleMsgDeleteLogOriginChannelLabel, value: `<#${message.channelId}>` })
           .setTimestamp(message.createdAt)
           .setFooter({ text: msgServer.roleMsgDeleteLogFooter(message.id) });
- 
+
         const attachmentUrls = [...message.attachments.values()].map((a) => a.url);
- 
+
         await (logChannel as TextChannel).send({
           embeds: [logEmbed],
           files: attachmentUrls,
@@ -3514,14 +3724,14 @@ client.on(Events.MessageCreate, async (message) => {
       console.error("[role-block] Erreur lors de la journalisation du message :", error);
     }
   }
- 
+
   if (!message.deletable) {
     console.log(
       "[role-block] Message non supprimable — vérifie la permission Gérer les messages."
     );
     return;
   }
- 
+
   try {
     await message.delete();
     console.log("[role-block] Message supprimé :", message.id);

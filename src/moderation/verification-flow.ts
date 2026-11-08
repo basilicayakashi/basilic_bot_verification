@@ -21,6 +21,7 @@ import {
   getGuildVerificationSettings,
   getVerifiedUser,
   insertVerifiedUser,
+  cancelPendingMemberReminders ,
 } from "../database/sql.js";
 import { firstValueFrom } from "rxjs";
 
@@ -118,6 +119,7 @@ export async function handleVerificationButtons({
       }
 
       await firstValueFrom(deletePendingVerificationSubmission(interaction.guild.id, member.id));
+      await firstValueFrom(cancelPendingMemberReminders(interaction.guild.id, member.id));
 
       try {
         await member.send(msgOut.YourVerifiedStatusRestored(interaction.guild.name));
@@ -657,9 +659,8 @@ export async function handleVerificationModals({
     pendingVerifications.add(member.id);
 
     try {
-      await firstValueFrom(
-        deletePendingVerificationSubmission(interaction.guild.id, member.id)
-      );
+      await firstValueFrom(deletePendingVerificationSubmission(interaction.guild.id, member.id));
+      await firstValueFrom(cancelPendingMemberReminders(interaction.guild.id, member.id));
 
       const questions = await firstValueFrom(
         getGuildVerificationQuestions(interaction.guild.id)

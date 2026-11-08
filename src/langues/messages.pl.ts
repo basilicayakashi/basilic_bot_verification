@@ -755,10 +755,11 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "Musisz podać co najmniej jedną rolę, jeśli usunięcie jest włączone",
   AucunRole: "Brak roli",
   RoleIntrouvable: (roleDisplay: string) => `Rola nie została znaleziona (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Usuwanie wiadomości według roli
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display: string | null) => `## 🚫 Usuwanie wiadomości według roli
       
-      **Aktywowany :** ${enabled ? "tak" : "nie"}
-      **Monitorowane role :** ${rolesDisplay}
+      **Aktiviert:** ${enabled ? "Ja" : "Nein"}
+      **Überwachte Rollen:** ${rolesDisplay}
+      **Protokollkanal:** ${channel_display ?? "Keiner"}
       `,
   unknownServer: "Nieznany serwer",
   Serveur: "Serwer",
@@ -811,6 +812,14 @@ ${roleMsgDeleteText}
   helpAutokick: `Funkcja automatycznego wykluczania (auto kick) monitoruje dołączanie nowych członków do serwera.
 Komenda \`/autokick-newmembers\` pozwala ustawić wartość całkowitą: liczbę dni. Za każdym razem, gdy ktoś dołączy, bot sprawdza wiek konta (datę utworzenia konta). Jeśli wiek konta jest mniejszy niż ustawiona liczba dni, członek zostanie automatycznie wyrzucony.
 Ustawienie 0 dni oznacza, że funkcja auto kick jest wyłączona`,
+  reminderMessageNotFound: "❌ Nie znaleziono wiadomości. Użyj komendy na kanale, na którym wiadomość została opublikowana, podając prawidłowe ID",
+  reminderMessageEmpty: "❌ Ta wiadomość nie zawiera tekstu, więc nie może służyć jako przypomnienie",
+  reminderAlreadyExists: (hours: number) => `❌ Na tym serwerze istnieje już przypomnienie z opóźnieniem **${hours} h**. Najpierw usuń je za pomocą /reminder-delete`,
+  reminderAdded: (hours: number) => `✅ Przypomnienie zapisane: zostanie wysłane w DM **${hours} h** po dołączeniu członka, jeśli nie rozpoczął weryfikacji. Dotyczy tylko przyszłych członków`,
+  reminderNone: "Brak skonfigurowanych przypomnień na tym serwerze",
+  reminderListTitle: "**Skonfigurowane przypomnienia**",
+  reminderDeleted: (hours: number) => `🗑️ Przypomnienie **${hours} h** usunięte (oczekujące wysyłki zostały anulowane)`,
+  reminderNotFound: (hours: number) => `❌ Brak przypomnienia z opóźnieniem **${hours} h**`,
 };
 
 const pl_out: MessagesOut = {

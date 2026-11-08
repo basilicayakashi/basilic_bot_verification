@@ -1,6 +1,6 @@
 import { Pool, QueryResult, QueryResultRow } from "pg";
 import { Observable, from, throwError, concat } from "rxjs";
-import { map, catchError, last  } from "rxjs/operators";
+import { map, catchError, last } from "rxjs/operators";
 
 // ---------------------------------------------------------------------------
 // Connexion
@@ -304,6 +304,30 @@ export function initDb(): Observable<void> {
     //index dans la table 
     `CREATE INDEX IF NOT EXISTS idx_tracked_role_messages_guild_deleted
     ON tracked_role_messages (guild_id, deleted_at)`,
+
+    // Messages de rappel par serveur (le délai en heures est unique par serveur)
+    `CREATE TABLE IF NOT EXISTS guild_reminders (
+      guild_id        TEXT NOT NULL,
+      delay_hours     INTEGER NOT NULL CHECK (delay_hours > 0),
+      message_content TEXT NOT NULL,
+      created_by      TEXT NOT NULL,
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (guild_id, delay_hours)
+    )`,
+
+    // Rappels en attente pour chaque membre arrivé
+    `CREATE TABLE IF NOT EXISTS pending_member_reminders (
+      guild_id    TEXT NOT NULL,
+      user_id     TEXT NOT NULL,
+      delay_hours INTEGER NOT NULL,
+      send_at     TIMESTAMPTZ NOT NULL,
+      PRIMARY KEY (guild_id, user_id, delay_hours),
+      FOREIGN KEY (guild_id, delay_hours)
+        REFERENCES guild_reminders (guild_id, delay_hours) ON DELETE CASCADE
+    )`,
+
+    `CREATE INDEX IF NOT EXISTS idx_pending_member_reminders_send_at
+    ON pending_member_reminders (send_at)`,
   ];
 
   return from(
@@ -1224,6 +1248,69 @@ export function getMasterSymbolForUser(guildId: string, userId: string): Observa
   ).pipe(map(row => row?.symbol ?? null));
 }
 
+export function getGuildReminders(guildId: string): Observable<GuildReminderRow[]> {
+  return query<GuildReminderRow>(
+    "SELECT * FROM guild_reminders WHERE guild_id = $1 ORDER BY delay_hours ASC",
+    [guildId]
+  );
+}
+
+/** Retourne la ligne créée, ou null si ce délai existe déjà sur ce serveur */
+export function insertGuildReminder(
+  guildId: string,
+  delayHours: number,
+  messageContent: string,
+  createdBy: string
+): Observable<GuildReminderRow | null> {
+  return queryOne<GuildReminderRow>(
+    `INSERT INTO guild_reminders (guild_id, delay_hours, message_content, created_by)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (guild_id, delay_hours) DO NOTHING
+     RETURNING *`,
+    [guildId, delayHours, messageContent, createdBy]
+  );
+}
+
+/** true si une ligne a été supprimée (les rappels en attente partent en cascade) */
+export function deleteGuildReminder(guildId: string, delayHours: number): Observable<boolean> {
+  return query<{ delay_hours: number }>(
+    "DELETE FROM guild_reminders WHERE guild_id = $1 AND delay_hours = $2 RETURNING delay_hours",
+    [guildId, delayHours]
+  ).pipe(map((rows) => rows.length > 0));
+}
+
+/** Programme tous les rappels configurés du serveur pour un nouveau membre */
+export function schedulePendingMemberReminders(guildId: string, userId: string): Observable<void> {
+  return execute(
+    `INSERT INTO pending_member_reminders (guild_id, user_id, delay_hours, send_at)
+     SELECT guild_id, $2, delay_hours, NOW() + (delay_hours * INTERVAL '1 hour')
+     FROM guild_reminders
+     WHERE guild_id = $1
+     ON CONFLICT DO NOTHING`,
+    [guildId, userId]
+  );
+}
+
+/** Annule tous les rappels en attente d'un membre (vérification lancée, départ, ban, kick...) */
+export function cancelPendingMemberReminders(guildId: string, userId: string): Observable<void> {
+  return execute(
+    "DELETE FROM pending_member_reminders WHERE guild_id = $1 AND user_id = $2",
+    [guildId, userId]
+  );
+}
+
+/** Récupère ET supprime atomiquement les rappels arrivés à échéance */
+export function claimDueMemberReminders(): Observable<DueMemberReminderRow[]> {
+  return query<DueMemberReminderRow>(
+    `DELETE FROM pending_member_reminders p
+     USING guild_reminders r
+     WHERE p.guild_id = r.guild_id
+       AND p.delay_hours = r.delay_hours
+       AND p.send_at <= NOW()
+     RETURNING p.guild_id, p.user_id, p.delay_hours, r.message_content`
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -1405,3 +1492,18 @@ export interface MasterPetRequest {
   targetId: string;
   requestType: RequestType;
 }
+
+export type GuildReminderRow = {
+  guild_id: string;
+  delay_hours: number;
+  message_content: string;
+  created_by: string;
+  created_at: string;
+};
+
+export type DueMemberReminderRow = {
+  guild_id: string;
+  user_id: string;
+  delay_hours: number;
+  message_content: string;
+};

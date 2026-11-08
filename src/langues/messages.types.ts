@@ -155,7 +155,7 @@ export type MessagesIn = {
     FournirAuMoinsUnRole: string;
     AucunRole: string;
     RoleIntrouvable: (roleDisplay: string) => string;
-    AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => string;
+    AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display: string | null) => string;
     unknownServer: string;
     Serveur: string;
     by: string;
@@ -188,6 +188,14 @@ export type MessagesIn = {
     viewSettingsBlacklistNotificationChannel: (channel: string) => string;
     AutokickSettingsUpdated: string;
     helpAutokick: string;
+    reminderMessageNotFound: string;
+    reminderMessageEmpty: string;
+    reminderAlreadyExists: (hours: number) => string;
+    reminderAdded: (hours: number) => string;
+    reminderNone: string;
+    reminderListTitle: string;
+    reminderDeleted: (hours: number) => string;
+    reminderNotFound: (hours: number) => string;
 };
 
 export type MessagesOut = {
@@ -277,7 +285,7 @@ export type MessagesServer = {
     roleMsgDeleteLogOriginChannelLabel: string;
     roleMsgDeleteLogNoTextContent: string;
     roleMsgDeleteLogFooter: (messageId: string) => string;
-    
+
     masterPet: {
         alreadyDeclared: (role: string) => string;
         declaredSuccess: (role: string) => string;

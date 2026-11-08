@@ -747,7 +747,7 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "You must provide at least one role to mention to enable automatic deletion",
   AucunRole: "No role",
   RoleIntrouvable: (roleDisplay: string) => `Role not found (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Deleting Messages by Role
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display: string | null) => `## 🚫 Deleting Messages by Role
       
       **Activated  :** ${enabled ? "yes" : "no"}
       **Monitored roles :** ${rolesDisplay}
@@ -804,6 +804,14 @@ ${roleMsgDeleteText}
   helpAutokick: `The auto kick feature monitors new members joining the server.
 The \`/autokick-newmembers\` command lets you set an integer value: the number of days. Every time someone joins, the bot checks the age of their account (the account creation date). If the account age is less than the configured number of days, the member will be automatically kicked.
 If you set 0 days, the auto kick feature is disabled`,
+  reminderMessageNotFound: "❌ Message not found. Run the command in the channel where the message was posted, with a valid ID",
+  reminderMessageEmpty: "❌ This message has no text content, so it can't be used as a reminder",
+  reminderAlreadyExists: (hours: number) => `❌ A reminder already exists for a **${hours} h** delay on this server. Delete it first with /reminder-delete`,
+  reminderAdded: (hours: number) => `✅ Reminder saved: it will be sent by DM **${hours} h** after a member joins, if they haven't started verification. It only applies to future members`,
+  reminderNone: "No reminders configured on this server",
+  reminderListTitle: "**Configured reminders**",
+  reminderDeleted: (hours: number) => `🗑️ **${hours} h** reminder deleted (pending sends are cancelled)`,
+  reminderNotFound: (hours: number) => `❌ No reminder configured with a **${hours} h** delay`,
 };
 
 const en_out: MessagesOut = {

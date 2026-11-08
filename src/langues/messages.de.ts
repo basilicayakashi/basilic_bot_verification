@@ -748,12 +748,11 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "Sie müssen mindestens eine Rolle angeben, um sie zu erwähnen und die automatische Löschung zu aktivieren",
   AucunRole: "Keine Rolle",
   RoleIntrouvable: (roleDisplay: string) => `Rolle nicht gefunden (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Löschen von Nachrichten nach Rolle
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display: string | null) => `## 🚫 Löschen von Nachrichten nach Rolle
       
-      **Aktiviert   :** ${enabled ? "ja" : "nein"}
-      **Überwachte Rollen :** ${rolesDisplay}
-      **Protokollkanal:** ${channel_display ?? "keiner"}
-      **Kanał dziennika:** ${channel_display ?? "brak"}
+      **Aktiviert:** ${enabled ? "Ja" : "Nein"}
+      **Überwachte Rollen:** ${rolesDisplay}
+      **Protokollkanal:** ${channel_display ?? "Keiner"}
       `,
   unknownServer: "Unbekannter Server",
   Serveur: "Server",
@@ -806,6 +805,14 @@ ${roleMsgDeleteText}
   helpAutokick: `Die Auto-Kick-Funktion überwacht, wenn neue Mitglieder dem Server beitreten.
 Mit dem Befehl \`/autokick-newmembers\` kannst du einen ganzzahligen Wert festlegen: die Anzahl der Tage. Jedes Mal, wenn jemand beitritt, prüft der Bot das Alter seines Kontos (das Konto-Erstellungsdatum). Wenn das Kontenalter weniger als die konfigurierte Anzahl an Tagen beträgt, wird das Mitglied automatisch gekickt.
 Wenn du 0 Tage einstellst, ist die Auto-Kick-Funktion deaktiviert`,
+  reminderMessageNotFound: "❌ Nachricht nicht gefunden. Führe den Befehl in dem Kanal aus, in dem die Nachricht gepostet wurde, und gib eine gültige ID an",
+  reminderMessageEmpty: "❌ Diese Nachricht enthält keinen Text und kann daher nicht als Erinnerung verwendet werden",
+  reminderAlreadyExists: (hours: number) => `❌ Auf diesem Server existiert bereits eine Erinnerung mit einer Verzögerung von **${hours} h**. Lösche sie zuerst mit /reminder-delete`,
+  reminderAdded: (hours: number) => `✅ Erinnerung gespeichert: Sie wird **${hours} h** nach dem Beitritt eines Mitglieds per DM gesendet, falls es die Verifizierung nicht gestartet hat. Gilt nur für zukünftige Mitglieder`,
+  reminderNone: "Auf diesem Server sind keine Erinnerungen konfiguriert",
+  reminderListTitle: "**Konfigurierte Erinnerungen**",
+  reminderDeleted: (hours: number) => `🗑️ Erinnerung mit **${hours} h** Verzögerung gelöscht (ausstehende Sendungen werden abgebrochen)`,
+  reminderNotFound: (hours: number) => `❌ Es ist keine Erinnerung mit einer Verzögerung von **${hours} h** konfiguriert`,
 };
 
 const de_out: MessagesOut = {

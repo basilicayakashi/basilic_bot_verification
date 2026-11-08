@@ -751,7 +751,7 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "Vous devez fournir au moins un rôle à mentionner pour activer la suppression automatique",
   AucunRole: "Aucun rôle",
   RoleIntrouvable: (roleDisplay: string) => `Rôle introuvable (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Suppression de messages par rôle
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display: string | null) => `## 🚫 Suppression de messages par rôle
       
       **Activé :** ${enabled ? "oui" : "non"}
       **Rôles surveillés :** ${rolesDisplay}
@@ -808,6 +808,14 @@ ${roleMsgDeleteText}
   helpAutokick: `La fonctionnalité d’auto kick surveille l’arrivée des nouveaux membres sur le serveur.
 La commande \`/autokick-newmembers\` te permet de définir un paramètre entier : le nombre de jours. À chaque nouveau membre qui rejoint, le bot vérifie l’ancienneté de son compte (sa date de création). Si cette ancienneté est inférieure au nombre de jours configuré, le membre est alors automatiquement expulsé.
 Si tu mets 0 jour, la fonctionnalité d’auto kick est désactivée`,
+  reminderMessageNotFound: "❌ Message introuvable. Lance la commande dans le salon où le message a été publié, avec un ID valide",
+  reminderMessageEmpty: "❌ Ce message n'a pas de contenu texte, il ne peut pas servir de rappel",
+  reminderAlreadyExists: (hours: number) => `❌ Un rappel existe déjà pour un délai de **${hours} h** sur ce serveur. Supprime-le d'abord avec /reminder-delete`,
+  reminderAdded: (hours: number) => `✅ Rappel enregistré : il sera envoyé en DM **${hours} h** après l'arrivée d'un membre, s'il n'a pas lancé la vérification. Il ne concerne que les futurs membres`,
+  reminderNone: "Aucun rappel configuré sur ce serveur",
+  reminderListTitle: "**Rappels configurés**",
+  reminderDeleted: (hours: number) => `🗑️ Rappel de **${hours} h** supprimé (les envois en attente sont annulés)`,
+  reminderNotFound: (hours: number) => `❌ Aucun rappel configuré avec un délai de **${hours} h**`,
 };
 
 const fr_out: MessagesOut = {

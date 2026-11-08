@@ -747,7 +747,7 @@ ${roleMsgDeleteText}
   FournirAuMoinsUnRole: "Debe proporcionar al menos un rol para mencionar y habilitar la eliminación automática",
   AucunRole: "No rol",
   RoleIntrouvable: (roleDisplay: string) => `Rol no encontrado (\`${roleDisplay}\`)`,
-  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display : string | null) => `## 🚫 Eliminación de mensajes por rol
+  AffichageParametrageSuppressionMessageRolesUtilises: (enabled: boolean, rolesDisplay: string, channel_display: string | null) => `## 🚫 Eliminación de mensajes por rol
       
       **Activado   :** ${enabled ? "sí" : "no"}
       **Roles supervisados :** ${rolesDisplay}
@@ -804,6 +804,14 @@ ${roleMsgDeleteText}
   helpAutokick: `La función de auto kick supervisa la llegada de nuevos miembros al servidor.
 El comando \`/autokick-newmembers\` te permite configurar un valor entero: el número de días. Cada vez que alguien se une, el bot comprueba la antigüedad de su cuenta (la fecha de creación de la cuenta). Si la antigüedad es menor que el número de días configurado, el miembro será expulsado automáticamente.
 Si estableces 0 días, la función de auto kick está desactivada`,
+  reminderMessageNotFound: "❌ Mensaje no encontrado. Ejecuta el comando en el canal donde se publicó el mensaje, con un ID válido",
+  reminderMessageEmpty: "❌ Este mensaje no tiene contenido de texto, por lo que no puede usarse como recordatorio",
+  reminderAlreadyExists: (hours: number) => `❌ Ya existe un recordatorio con un retraso de **${hours} h** en este servidor. Elimínalo primero con /reminder-delete`,
+  reminderAdded: (hours: number) => `✅ Recordatorio guardado: se enviará por DM **${hours} h** después de que un miembro se una, si no ha iniciado la verificación. Solo afecta a los futuros miembros`,
+  reminderNone: "No hay recordatorios configurados en este servidor",
+  reminderListTitle: "**Recordatorios configurados**",
+  reminderDeleted: (hours: number) => `🗑️ Recordatorio de **${hours} h** eliminado (los envíos pendientes se cancelan)`,
+  reminderNotFound: (hours: number) => `❌ No hay ningún recordatorio configurado con un retraso de **${hours} h**`,
 };
 
 const es_out: MessagesOut = {
